@@ -1,0 +1,6 @@
+#
+# GLSL example
+#
+
+Program(Split("ogl.cpp textfile.cpp"), CPPPATH = '.', LIBS = Split("GL GLEW glut"))
+
