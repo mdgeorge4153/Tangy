@@ -135,7 +135,6 @@ class FollowPath(ApproachPath):
 	   advanced n_self steps and other has advanced to other_step steps.
 	   This path is valid for steps [0...nself)"""
 
-	def __init__(self, start, target, n
 
 class CirclePath(Path):
 	"""A Path that walks a circlish shape"""
@@ -148,15 +147,15 @@ class CirclePath(Path):
 
 def bezier_interpolate(points, t):
 	s = 1 - t
-	return s*s*s*points[0]
-	   + 3*s*s*t*points[1]
-	   + 3*s*t*t*points[2]
+	return s*s*s*points[0] \
+	   + 3*s*s*t*points[1] \
+	   + 3*s*t*t*points[2] \
 	   +   t*t*t*points[3]
 
 def bezier_derivative(points, t):
 	s = 1 - t
 
-	return s*s*(points[1] - points[0])
-	   + 2*s*t*(points[2] - points[1])
+	return s*s*(points[1] - points[0]) \
+	   + 2*s*t*(points[2] - points[1]) \
 	   +   t*t*(points[3] - points[2])
 
