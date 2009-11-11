@@ -1,8 +1,8 @@
 class Node(object):
 	def __init__(self, back, frwd):
-		self._back = back
-		self._frwd = frwd
-		self._pos  = (back + frwd)/2
+		self.back = back
+		self.frwd = frwd
+		self.pos  = (back + frwd)/2
 
 class Path(object):
 	# logical node i is self._nodes[i - self._step]
@@ -21,14 +21,14 @@ class Path(object):
 		t = step - floor(step)
 		s = 1-t
 
-		return bezier_interpolate(prev._pos, prev._frwd, next._back, next._pos)
+		return bezier_interpolate(prev.pos, prev.frwd, next.back, next.pos)
 
 	# return an interpolated bezier node representing the position and derivative at the given step
 	def node(self, step):
 		prev,next = self.get_nodes(step)
 		t = step - floor(step)
 
-		points = (prev._pos, prev._frwd, next._back, next._pos)
+		points = (prev.pos, prev.frwd, next.back, next.pos)
 		pos = bezier_interpolate(points, t)
 		der = bezier_derivative(points, t)
 		return Node(pos - der, pos + der)
@@ -51,7 +51,7 @@ class Path(object):
 			self._nodes.append(current)
 
 	def _create_node(prev):
-		back = self.next(prev._frwd)
+		back = self.next(prev.frwd)
 		frwd = self.next(back)
 		return Node(back,frwd)
 
@@ -79,8 +79,8 @@ class ApproachPath(Path):
 		# we generate unit vectors ahead of time so we can shuffle them.
 		#
 		units   = []
-		current = start._frwd
-		final   = start._back
+		current = start.frwd
+		final   = start.back
 		for i in range(2*n - 2):
 			#
 			# sample a point within 2n - i of the final target and distance 1 from current
@@ -119,7 +119,7 @@ class ApproachPath(Path):
 		# is decreasing with each step.  In the last step r is 1, so d
 		# is likely to be close to 1 also, so we call it good enough
 		units.append(final - current) # may be shorter than unit, but likely to be close enough
-		units.append(steps._frwd - steps._back)
+		units.append(steps.frwd - steps.back)
 
 		# we shuffle the unit vectors to get rid of the tendency to
 		# wander as long as possible and then race to the target
