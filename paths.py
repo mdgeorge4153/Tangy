@@ -1,3 +1,5 @@
+import cmath
+
 class Node(object):
 	def __init__(self, back, frwd):
 		self.back = back
@@ -90,14 +92,14 @@ class ApproachPath(Path):
 			# final and one with radius 1 around current
 
 			# theta is the angle of the line connecting the centers
-			theta = atan2(final.x - current.x, final.y - current.y)
+			d, theta = cmath.polar(final - current)
 
 			# delta is the angle between that connecting line and
 			# one of the intersections between the circles.  By the
 			# law of cosines:
-			d2 = (final - current)^2
+			d2 = d^2
 			r2 = (2*n - i)^2
-			cos_delta = (1 + d2 - r2) / 2 / sqrt(d2)
+			cos_delta = (1 + d2 - r2) / 2 / d
 
 			if cos_delta > 1:
 				# only happens if we started too far away
@@ -110,7 +112,7 @@ class ApproachPath(Path):
 
 			# sample a random angle and convert it to a unit vector
 			gamma = random.uniform(theta - delta, theta + delta)
-			unit  = (cos(gamma), sin(gamma))
+			unit  = cmath.rect(1, gamma)
 			units.append(unit)
 			current = current + unit
 
@@ -119,7 +121,7 @@ class ApproachPath(Path):
 		# is decreasing with each step.  In the last step r is 1, so d
 		# is likely to be close to 1 also, so we call it good enough
 		units.append(final - current) # may be shorter than unit, but likely to be close enough
-		units.append(steps.frwd - steps.back)
+		units.append(target.frwd - target.back)
 
 		# we shuffle the unit vectors to get rid of the tendency to
 		# wander as long as possible and then race to the target
@@ -130,11 +132,13 @@ class ApproachPath(Path):
 	def next(self, point):
 		return point + self._units.pop()
 
-class FollowPath(ApproachPath):
-	"""A Path that approaches another Path, joining with it after self has
-	   advanced n_self steps and other has advanced to other_step steps.
-	   This path is valid for steps [0...nself)"""
+class FollowPath(Path):
+	"""A Path that approaches points defined by a function f from steps to
+	   Nodes, joining with it after self has advanced n steps.  Assumes that |f(n) - f(n-1)| < 2. This path is valid
+	   for steps [0...n)"""
 
+	def __init__(self, start, f, n):
+		pass
 
 class CirclePath(Path):
 	"""A Path that walks a circlish shape"""
@@ -159,3 +163,6 @@ def bezier_derivative(points, t):
 	   + 2*s*t*(points[2] - points[1]) \
 	   +   t*t*(points[3] - points[2])
 
+
+if __name__ == '__main__':
+	
