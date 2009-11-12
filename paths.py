@@ -1,10 +1,22 @@
 import cmath
+import random
+from math import *
 
 class Node(object):
 	def __init__(self, back, frwd):
 		self.back = back
 		self.frwd = frwd
 		self.pos  = (back + frwd)/2
+
+def random_node(boundary):
+	xmin, xmax, ymin, ymax = boundary
+
+	back  = complex(random.uniform(xmin, xmax), random.uniform(ymin, ymax))
+	while True:
+		diff  = cmath.rect(1, random.uniform(0, 2*pi))
+		frwd  = back + diff
+		if xmin < frwd.real < xmax and ymin < frwd.imag < ymax:
+			return Node(back, frwd)
 
 class Path(object):
 	# logical node i is self._nodes[i - self._step]
@@ -14,20 +26,18 @@ class Path(object):
 
 	def advance_to(self, step):
 		self._extend_past(step)
-		i = floor(step)
+		i = int(step)
 		self._nodes = self._nodes[i - self._step:]
 		self._step  = i
 
 	def pos(self, step):
 		prev, next = self.get_nodes(step)
-		t = step - floor(step)
-		s = 1-t
 
-		return bezier_interpolate(prev.pos, prev.frwd, next.back, next.pos)
+		return bezier_interpolate((prev.pos, prev.frwd, next.back, next.pos), step - floor(step))
 
 	# return an interpolated bezier node representing the position and derivative at the given step
 	def node(self, step):
-		prev,next = self.get_nodes(step)
+		prev, next = self.get_nodes(step)
 		t = step - floor(step)
 
 		points = (prev.pos, prev.frwd, next.back, next.pos)
@@ -41,18 +51,20 @@ class Path(object):
 		if step < self._step:
 			raise Exception
 
-		step = floor(step)
+		step = int(step)
 		self._extend_past(step+1)
 
-		return self._nodes[step - self._step : step+1 - self._step]
+		return self._nodes[step - self._step : step+2 - self._step]
 
 	def _extend_past(self, step):
 		current = self._nodes[-1]
-		for i in range(self._step + len(self._nodes), ceil(step)):
-			current = self.next(current)
+		for i in range(self._step + len(self._nodes), int(step)+2):
+			current = self._create_node(current)
 			self._nodes.append(current)
 
-	def _create_node(prev):
+		assert (int(step) + 1) < self._step + len(self._nodes)
+
+	def _create_node(self,prev):
 		back = self.next(prev.frwd)
 		frwd = self.next(back)
 		return Node(back,frwd)
@@ -66,10 +78,10 @@ class WanderPath(Path):
 	def next(self, point):
 		"generate a random point distance 1 from point that is within the boundary"
 		while True:
-			theta = math.uniform(0, 2*math.PI)
-			x,y = cos(theta), sin(theta)
-			if self._xmin < x < self._xmax and self._ymin < y < self._ymax:
-				return point + complex(x,y)
+			theta  = random.uniform(0, 2*pi)
+			result = point + cmath.rect(1, theta)
+			if self._xmin < result.real < self._xmax and self._ymin < result.imag < self._ymax:
+				return result
 
 class ApproachPath(Path):
 	"""A Path that approaches a node, reaching it in n steps.  This path is
@@ -143,10 +155,12 @@ class FollowPath(Path):
 class CirclePath(Path):
 	"""A Path that walks a circlish shape"""
 	def __init__(self, start, center):
+		Path.__init__(self, start)
 		self._center = center
 
 	def next(self, point):
-		return (point - self._center) * 1j
+		r, theta = cmath.polar(point - self._center)
+		return point + cmath.rect(1, theta + pi/2)
 
 
 def bezier_interpolate(points, t):
@@ -163,6 +177,85 @@ def bezier_derivative(points, t):
 	   + 2*s*t*(points[2] - points[1]) \
 	   +   t*t*(points[3] - points[2])
 
-
 if __name__ == '__main__':
-	
+	#
+	# testing
+	#
+
+	from gtk.gtkgl.apputils import *
+	from OpenGL.GL          import *
+	from OpenGL.GLU         import *
+	from time               import clock
+
+	def glVertex1c(z):
+		glVertex2f(z.real, z.imag)
+
+	class Example(GLScene,
+	              GLSceneKey,
+	              GLSceneIdle):
+
+		def __init__(self):
+			GLScene.__init__(self)
+
+			self._start    = clock()
+			self._boundary = (-5.0, 5.0, -5.0, 5.0)
+
+			self._circle = CirclePath(Node(complex(0, 1), complex(1,1)), complex(0,0))
+			self._wander = WanderPath(random_node(self._boundary), self._boundary)
+			self._sprout = None
+
+		# GLScene mathods
+
+		def init(self):
+			glMatrixMode(GL_PROJECTION)
+			gluOrtho2D(-5.0, 5.0, -5.0, 5.0)
+
+		def reshape(self, width, height):
+			glViewport(0, 0, width, height)
+
+		def display(self, width, height):
+			time = clock() - self._start
+			time = time
+			self._circle.advance_to(time)
+			self._wander.advance_to(time)
+
+			glClearColor(1.0, 1.0, 1.0, 1.0)
+			glClear(GL_COLOR_BUFFER_BIT)
+			glPointSize(2.0)
+
+			glBegin(GL_LINES)
+
+			glColor(1.0, 0.0, 0.0, 1.0)
+			node = self._circle.node(time)
+			glVertex1c(node.back)
+			glVertex1c(node.pos)
+
+			glColor(0.0, 0.0, 1.0, 1.0)
+			node = self._wander.node(time)
+			glVertex1c(node.back)
+			glVertex1c(node.pos)
+
+			glVertex2f(0.0, 0.0)
+			glVertex2f(3,3)
+			glEnd()
+
+
+		# GLSceneKey methods
+		
+		def key_press(self, width, height, event):
+			pass
+
+		def key_release(self, width, height, event):
+			pass
+
+		# GLSceneIdle methods
+
+		def idle(self, width, height):
+			self.invalidate()
+			self.update()
+
+	scene = Example()
+	app   = GLApplication(scene)
+	app.set_title("Paths demo")
+	app.run()
+
