@@ -1,6 +1,99 @@
 import cmath
 import random
 from math import *
+from sys  import maxint
+
+def random_point(boundary):
+	"""
+	Generate a random point within boundary
+	"""
+	pass
+
+def _random_near(point, boundary):
+	"""
+	Generate a random point distance 1 from point and with boundary
+	"""
+	pass
+
+def _random_towards(current, target, radius):
+	"""
+	Generate a random point distance 1 from current, and distance < radius from target
+	"""
+
+class PointSequence(object):
+	"""
+	A pointlist is a (potentially infinite) sequence of points.  Each point is
+	guaranteed to be within distance 1 from the previous point.
+	"""
+
+	def __init__(self):
+		self.__iter      = self.__points()
+		self.__min_index = 0
+		self.__points    = []
+
+	def __getitem__(self, n):
+		"""
+		ps.__getitem__(int) -> complex
+
+		return the nth element of the sequence.  Raises an IndexException unless
+		ps.min_index <= n < max_index.
+		"""
+
+		if isinstance(n, slice):
+			indices = n.indices(len(self))
+			return [self[i] for i in range(*indices)]
+
+		if not self.min_index() <= n < self.max_index():
+			raise IndexException
+
+		self.__extend_past(n)
+		return self.__points[n - self.__min_index]
+
+	def forget(self, n):
+		"""
+		Drop the prefix [0...n) from the sequence.
+		"""
+		if n > self.__min_index:
+			self.__extend_past(n)
+			self.__points    = self.__points[n - self.__min_index:]
+			self.__min_index = n
+
+	def min_index(self):
+		"""
+		ps.min_index() -> int
+		"""
+		return self.__min_index
+
+	def __len__(self):
+		return self.max_index()
+
+	def __extend_past(self, n):
+		self.__points.extend([self.__iter.next() for i in range(self.__min_index + len(self.__points), n)])
+
+	def max_index(self):
+		"""
+		ps.max_index() -> int
+		"""
+		pass
+
+	def __points(self, n):
+		pass
+
+class Wander(PointSequence):
+	def __init__(self, start):
+		pass
+
+	def __points(self):
+		pass
+
+class Circle(PointSequence):
+	pass
+
+class Approach(PointSequence):
+	pass
+
+class Transform(PointSequence):
+	pass
 
 class Node(object):
 	def __init__(self, back, frwd):
