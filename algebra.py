@@ -53,8 +53,14 @@ class Number(object):
 		return not self.__eq__(other)
 
 	def __cmp__(self, other):
-		# TODO
-		return NotImplemented
+		if self == other:
+			return 0
+
+		result = float(self) - float(other)
+		if abs(result) < 1e-5:
+			raise OverflowError
+
+		return result
 
 	def __nonzero__(self):
 		return self.a1 != 0 \
@@ -127,7 +133,7 @@ class Number(object):
 		return complex(self.__float__())
 
 	def __float__(self):
-		return self.a1 + self.a2*FLOAT_SQRT2 + self.a3*FLOAT_SQRT3 + self.a6*FLOAT_SQRT6
+		return (self.a1 + self.a2*FLOAT_SQRT2 + self.a3*FLOAT_SQRT3 + self.a6*FLOAT_SQRT6) / self.d
 
 	#
 	# helper functions
@@ -164,4 +170,13 @@ NMBR1 = Number(1,0,0,0,1)
 SQRT2 = Number(0,1,0,0,1)
 SQRT3 = Number(0,0,1,0,1)
 SQRT6 = Number(0,0,0,1,1)
+
+COS45 = Number(0,1,0,0,2)
+SIN45 = Number(0,1,0,0,2)
+
+COS30 = Number(0,0,1,0,2)
+SIN30 = Number(1,0,0,0,2)
+
+COS15 = Number(0,1,0,1,4)
+SIN15 = Number(0,-1,0,1,4)
 
