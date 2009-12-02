@@ -11,7 +11,6 @@ class Tan(object):
 		self._waves = [(200, 200), (250, 150), (325, 325), (300, 120)]
 		self._rot   = 0
 		self._sel   = False
-		self.
 
 class GTansApp(object):
 

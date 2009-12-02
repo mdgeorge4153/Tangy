@@ -31,6 +31,9 @@ class PointSequence(object):
 		self.__min_index = 0
 		self.__points    = []
 
+	def __len__(self):
+		return self.max_index()
+
 	def __getitem__(self, n):
 		"""
 		ps.__getitem__(int) -> complex
@@ -53,10 +56,9 @@ class PointSequence(object):
 		"""
 		Drop the prefix [0...n) from the sequence.
 		"""
-		if n > self.__min_index:
-			self.__extend_past(n)
-			self.__points    = self.__points[n - self.__min_index:]
-			self.__min_index = n
+		self.__extend_past(n)
+		self.__points    = self.__points[n - self.__min_index:]
+		self.__min_index = n
 
 	def min_index(self):
 		"""
@@ -64,36 +66,65 @@ class PointSequence(object):
 		"""
 		return self.__min_index
 
-	def __len__(self):
-		return self.max_index()
-
 	def __extend_past(self, n):
-		self.__points.extend([self.__iter.next() for i in range(self.__min_index + len(self.__points), n)])
+		"""
+		generate points so that __min_index + len(__points) > n
+		"""
+		if n > self.__min_index:
+			self.__points.extend([self.__iter.next() for i in range(self.__min_index + len(self.__points), n)])
 
 	def max_index(self):
 		"""
 		ps.max_index() -> int
 		"""
-		pass
+		raise NotImplementedError
 
-	def __points(self, n):
-		pass
+	def __points(self):
+		"""
+		ps.__points() -> iter<complex>
+		"""
+		raise NotImplementedError
 
 class Wander(PointSequence):
-	def __init__(self, start):
+	def __init__(self, start, boundary):
+		self.__current  = start
+		self.__boundary = boundary
+
+	def __points(self):
+		while True:
+			yield self.__current
+			self.__current = random_near(self.__current, boundary)
+
+	def max_index(self):
+		return maxint
+
+class Circle(PointSequence):
+	def __init__(self, start, center):
+		self.__current = start - center
+		self.__center  = center
+
+		r2     = dot(self.__current, self.__current)
+		dtheta = acos(1 - 1 / 2 / r2)
+
+		self.__delta = polar(1, dtheta)
+
+	def __points(self):
+		while True:
+			yield self.__center + self.__current
+			self.__current *= self.__delta
+
+	def max_index(self):
+		return maxint
+
+class Approach(PointSequence):
+	def __init__(self, start, target, steps):
 		pass
 
 	def __points(self):
 		pass
 
-class Circle(PointSequence):
-	pass
-
-class Approach(PointSequence):
-	pass
-
-class Transform(PointSequence):
-	pass
+	def max_index(self):
+		pass
 
 class Node(object):
 	def __init__(self, back, frwd):
