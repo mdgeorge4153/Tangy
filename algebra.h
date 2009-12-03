@@ -56,16 +56,17 @@ public:
 	friend bool operator== (const Number & a, const Number & b);
 	friend bool operator<= (const Number & a, const Number & b);
 
-	Number inv()   const;
-	Number conj2() const;
-	Number conj3() const;
-
 	template<typename Ch, typename Tr>
 	friend basic_ostream<Ch, Tr>& operator<< (basic_ostream<Ch,Tr> &, const Number &);
+
 private:
 
 	valarray<int> _n;
 	int  _d;
+
+	Number inv()   const;
+	Number conj2() const;
+	Number conj3() const;
 
 	void reduce ();
 };
