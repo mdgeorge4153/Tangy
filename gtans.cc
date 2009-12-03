@@ -14,6 +14,7 @@ int main(int argc, char ** argv)
 	std::cout << "ROT45 = " << ROT45 << std::endl;
 	std::cout << "ROT30 = " << ROT30 << std::endl;
 	std::cout << "ROT15 = " << ROT15 << std::endl;
+	std::cout << pow(ROT15, 24) << std::endl;
 	return 0;
 }
 
