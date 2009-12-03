@@ -4,41 +4,10 @@
 
 inline
 Number &
+Number::
 operator/= (const Number & other)
 {
 	return (* this) *= other.inv();
-}
-
-inline
-int *
-Number::
-begin ()
-{
-	return _n;
-}
-
-inline
-const int *
-Number::
-begin () const
-{
-	return _n;
-}
-
-inline
-int *
-Number::
-end ()
-{
-	return _n + 4;
-}
-
-inline
-const int *
-Number::
-end () const
-{
-	return _n + 4;
 }
 
 inline
@@ -123,19 +92,28 @@ operator> (const Number & a, const Number & b)
 	return b < a;
 }
 
+
+template<typename Ch, typename Tr>
+void
+with_sign(basic_ostream<Ch,Tr>& out, int n)
+{
+	if (n < 0)
+		out << " - " << -n;
+	else
+		out << " + " <<  n;
+}
+
 template<typename Ch, typename Tr>
 basic_ostream<Ch, Tr> &
-operator<< (std::basic_ostream<Ch, Tr> & out, const Number & n)
+operator<< (basic_ostream<Ch, Tr> & out, const Number & a)
 {
-	out << "[" << n._n[0];
-	for (int i = 0; i < 3; i++)
-	{
-		if (_n[i] < 0)
-			out << " - " << -_n[i];
-		else
-			out << " + " << _n[i];
-	}
-	out << "]/" << _d;
+	out << "[" << a._n[0];
+
+	with_sign(out, a._n[1]); out << "*sqrt(2)";
+	with_sign(out, a._n[2]); out << "*sqrt(3)";
+	with_sign(out, a._n[3]); out << "*sqrt(6)";
+
+	out << "]/" << a._d;
 }
 
 /*

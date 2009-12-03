@@ -8,6 +8,10 @@
 
 #include <iostream>
 #include <complex>
+#include <valarray>
+
+using std::valarray;
+using std::basic_ostream;
 
 /*
 ** Numbers *********************************************************************
@@ -37,8 +41,8 @@ public:
 	// conversion operators                                                   //
 	////////////////////////////////////////////////////////////////////////////
 
-	operator float  () const;
-	operator double () const;
+	float  make_float  () const;
+	double make_double () const;
 
 	////////////////////////////////////////////////////////////////////////////
 	// operator overloading                                                   //
@@ -52,18 +56,16 @@ public:
 	friend bool operator== (const Number & a, const Number & b);
 	friend bool operator<= (const Number & a, const Number & b);
 
+	Number inv()   const;
+	Number conj2() const;
+	Number conj3() const;
+
+	template<typename Ch, typename Tr>
+	friend basic_ostream<Ch, Tr>& operator<< (basic_ostream<Ch,Tr> &, const Number &);
 private:
 
-	int           _n[4];
-	unsigned int  _d;
-
-	const int * begin () const;
-	      int * begin ();
-	const int * end   () const;
-
-	Number inv();
-	Number conj2();
-	Number conj3();
+	valarray<int> _n;
+	int  _d;
 
 	void reduce ();
 };
@@ -85,7 +87,7 @@ bool operator>= (const Number & a, const Number & b);
 bool operator>  (const Number & a, const Number & b);
 
 template<typename Ch, typename Tr>
-std::basic_ostream<Ch, Tr>& operator<< (std::basic_ostream<Ch,Tr> &, const Number &);
+basic_ostream<Ch, Tr>& operator<< (basic_ostream<Ch,Tr> &, const Number &);
 
 
 /*
@@ -99,14 +101,15 @@ typedef std::complex<Number> Vector;
 ** Constants *******************************************************************
 */
 
+static const Number SQRT1 = 1;
 static const Number SQRT2 (0,1,0,0,1);
 static const Number SQRT3 (0,0,1,0,1);
-static const Number SQRT6 (0,0,0,1,0);
+static const Number SQRT6 (0,0,0,1,1);
 
-static const Number COS45 = (1 + SQRT2)/2;
-static const Number SIN45 = (1 + SQRT2)/2;
-static const Number COS30 = Number(1)/2;
-static const Number SIN30 = SQRT3/2;
+static const Number COS45 = SQRT2/2;
+static const Number SIN45 = SQRT2/2;
+static const Number COS30 = SQRT3/2;
+static const Number SIN30 = Number(1)/2;
 
 static const Vector ROT45 (COS45, SIN45);
 static const Vector ROT30 (COS30, SIN30);

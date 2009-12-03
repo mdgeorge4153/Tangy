@@ -2,10 +2,15 @@
  * algebra.cc - implementation of algebra.h
  */
 
-#include <algorithm>
+#include "algebra.h"
+#include <cmath>
+#include <cassert>
+#include <numeric>
+#include <stdexcept>
 
 Number::
 Number (int a1, int a2, int a3, int a6, unsigned int d)
+	: _n(4)
 {
 	_n[0] = a1;
 	_n[1] = a2;
@@ -14,44 +19,50 @@ Number (int a1, int a2, int a3, int a6, unsigned int d)
 
 	_d    = d;
 
+	if (_d == 0)
+	{
+		std::cerr << "div by zero" << std::endl;
+		throw std::logic_error("denominator must be non-zero");
+	}
+
 	reduce();
 }
 
 Number::
 Number (const Number & other)
+	: _n (other._n), _d (other._d)
 {
-	_d = other._d;
-	std::copy(other.begin(), other.end(), begin());
 }
 
 Number &
 Number::
 operator= (const Number & other)
 {
+	_n = other._n;
 	_d = other._d;
-	std::copy(other.begin(), other.end(), begin());
 
 	return (* this);
 }
 
+float
 Number::
-operator float () const
+make_float () const
 {
-	// TODO
+	return _n[0] + _n[1]*sqrt(2.0f) + _n[2]*sqrt(3.0f) + _n[6]*sqrt(6.0f);
 }
 
+double
 Number::
-operator double () const
+make_double () const
 {
-	// TODO
+	return _n[0] + _n[1]*sqrt(2.0)  + _n[2]*sqrt(3.0)  + _n[3]*sqrt(6.0);
 }
 
 Number &
 Number::
 operator+= (const Number & other)
 {
-	for (int i = 0; i < 4; i++)
-		_n[i] = _n[i] * other._d + other._n[i];
+	_n = _n * other._d + _d * other._n;
 
 	_d *= other._d;
 
@@ -61,10 +72,10 @@ operator+= (const Number & other)
 }
 
 Number &
+Number::
 operator-= (const Number & other)
 {
-	for (int i = 0; i < 4; i++)
-		_n[i] = _n[i] * other._d - other._n[i];
+	_n = _n * other._d - _d * other._n;
 
 	_d *= other._d;
 
@@ -74,6 +85,7 @@ operator-= (const Number & other)
 }
 
 Number &
+Number::
 operator*= (const Number & other)
 {
 	int a1 = _n[0];
@@ -116,6 +128,9 @@ inv () const
 {
 	Number result  = (*this);
 
+	if (_n[0] == 0 && _n[1] == 0 && _n[2] == 0 && _n[3] == 0)
+		throw std::logic_error("divide by zero");
+
 	//
 	// result = (*this) * factor1
 	//
@@ -128,7 +143,7 @@ inv () const
 	//
 	Number factor2 = conj3();
 	result *= factor2;
-	assert(!result._n[1] && !result._n[2] && !result._n[3]);
+	assert(result._n[0] && !result._n[1] && !result._n[2] && !result._n[3]);
 
 	//                       1
 	// result = ---------------------------
@@ -174,18 +189,18 @@ static
 int 
 gcd(int a, int b)
 {
-	return b == 0 ? a : gcd(a, a%b);
+	return b == 0 ? a : gcd(b, a%b);
 }
 
 void
 Number::
 reduce ()
 {
-	int divisor = accumulate(begin(), end(), _d, *gcd);
+	int divisor = std::accumulate(&(_n[0]), &(_n[4]), _d, *gcd);
 
-	for (int i = 0; i < 3; i++)
-		_n[i] /= divisor;
-
+	if (divisor * _d < 0)
+		divisor = -divisor;
+	_n /= divisor;
 	_d /= divisor;
 }
 
@@ -209,7 +224,7 @@ operator<= (const Number & a, const Number & b)
 		return true;
 
 	// TODO -- imprecise
-	return float(a) <= float(b);
+	return a.make_double() <= b.make_double();
 }
 
 /*
