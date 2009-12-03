@@ -1,0 +1,143 @@
+/*
+ * algebra.hcc - inline implementations of algebra.h
+ */
+
+inline
+Number &
+operator/= (const Number & other)
+{
+	return (* this) *= other.inv();
+}
+
+inline
+int *
+Number::
+begin ()
+{
+	return _n;
+}
+
+inline
+const int *
+Number::
+begin () const
+{
+	return _n;
+}
+
+inline
+int *
+Number::
+end ()
+{
+	return _n + 4;
+}
+
+inline
+const int *
+Number::
+end () const
+{
+	return _n + 4;
+}
+
+inline
+Number
+operator+ (const Number & a, const Number & b)
+{
+	Number result = a;
+	result += b;
+	return result;
+}
+
+inline
+Number
+operator- (const Number & a, const Number & b)
+{
+	Number result = a;
+	result -= b;
+	return result;
+}
+
+inline
+Number
+operator* (const Number & a, const Number & b)
+{
+	Number result = a;
+	result *= b;
+	return result;
+}
+
+inline
+Number
+operator/ (const Number & a, const Number & b)
+{
+	Number result = a;
+	result /= b;
+	return result;
+}
+
+inline
+Number
+operator+ (const Number & a)
+{
+	return Number(a);
+}
+
+inline
+Number
+operator- (const Number & a)
+{
+	Number result;
+	result -= a;
+}
+
+inline
+bool
+operator!= (const Number & a, const Number & b)
+{
+	return !(a == b);
+}
+
+inline
+bool
+operator< (const Number & a, const Number & b)
+{
+	if (a == b)
+		return false;
+
+	return a <= b;
+}
+
+inline
+bool
+operator>= (const Number & a, const Number & b)
+{
+	return b <= a;
+}
+
+inline
+bool
+operator> (const Number & a, const Number & b)
+{
+	return b < a;
+}
+
+template<typename Ch, typename Tr>
+basic_ostream<Ch, Tr> &
+operator<< (std::basic_ostream<Ch, Tr> & out, const Number & n)
+{
+	out << "[" << n._n[0];
+	for (int i = 0; i < 3; i++)
+	{
+		if (_n[i] < 0)
+			out << " - " << -_n[i];
+		else
+			out << " + " << _n[i];
+	}
+	out << "]/" << _d;
+}
+
+/*
+** vim: syntax=cpp ts=4 sw=4 cindent
+*/

@@ -1,0 +1,121 @@
+/*
+ * algebra.h - numbers of the form [a1 + a2*sqrt(2) + a3*sqrt(3) + a4*sqrt(4)]/d
+ *
+ */
+
+#ifndef __gtans_algebra_h__
+#define __gtans_algebra_h__ 1
+
+#include <iostream>
+#include <complex>
+
+/*
+** Numbers *********************************************************************
+*/
+
+class Number
+{
+public:
+	////////////////////////////////////////////////////////////////////////////
+	// public constructors                                                    //
+	////////////////////////////////////////////////////////////////////////////
+
+	Number(int a1 = 0,
+	       int a2 = 0,
+	       int a3 = 0,
+	       int a4 = 0,
+	       unsigned int d  = 1);
+
+	////////////////////////////////////////////////////////////////////////////
+	// copying                                                                //
+	////////////////////////////////////////////////////////////////////////////
+
+	Number(const Number &);
+	Number & operator= (const Number &);
+
+	////////////////////////////////////////////////////////////////////////////
+	// conversion operators                                                   //
+	////////////////////////////////////////////////////////////////////////////
+
+	operator float  () const;
+	operator double () const;
+
+	////////////////////////////////////////////////////////////////////////////
+	// operator overloading                                                   //
+	////////////////////////////////////////////////////////////////////////////
+
+	Number & operator+= (const Number & other);
+	Number & operator*= (const Number & other);
+	Number & operator-= (const Number & other);
+	Number & operator/= (const Number & other);
+
+	friend bool operator== (const Number & a, const Number & b);
+	friend bool operator<= (const Number & a, const Number & b);
+
+private:
+
+	int           _n[4];
+	unsigned int  _d;
+
+	const int * begin () const;
+	      int * begin ();
+	const int * end   () const;
+
+	Number inv();
+	Number conj2();
+	Number conj3();
+
+	void reduce ();
+};
+
+Number operator+ (const Number & a, const Number & b);
+Number operator- (const Number & a, const Number & b);
+Number operator* (const Number & a, const Number & b);
+Number operator/ (const Number & a, const Number & b);
+
+Number operator+ (const Number & a);
+Number operator- (const Number & a);
+
+bool operator== (const Number & a, const Number & b);
+bool operator!= (const Number & a, const Number & b);
+
+bool operator<= (const Number & a, const Number & b);
+bool operator<  (const Number & a, const Number & b);
+bool operator>= (const Number & a, const Number & b);
+bool operator>  (const Number & a, const Number & b);
+
+template<typename Ch, typename Tr>
+std::basic_ostream<Ch, Tr>& operator<< (std::basic_ostream<Ch,Tr> &, const Number &);
+
+
+/*
+** Complex Numbers *************************************************************
+*/
+
+typedef std::complex<Number> Vector;
+
+
+/*
+** Constants *******************************************************************
+*/
+
+static const Number SQRT2 (0,1,0,0,1);
+static const Number SQRT3 (0,0,1,0,1);
+static const Number SQRT6 (0,0,0,1,0);
+
+static const Number COS45 = (1 + SQRT2)/2;
+static const Number SIN45 = (1 + SQRT2)/2;
+static const Number COS30 = Number(1)/2;
+static const Number SIN30 = SQRT3/2;
+
+static const Vector ROT45 (COS45, SIN45);
+static const Vector ROT30 (COS30, SIN30);
+static const Vector ROT15 = ROT45 / ROT30;
+
+#include "algebra.hcc"
+
+#endif
+
+/*
+** vim: ts=4 sw=4 cindent
+*/
