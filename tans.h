@@ -58,8 +58,6 @@ protected:
 
 	virtual void _best_fit (int, int) = 0;
 
-private:
-
 	container _tans;
 	tan       _selection;
 
