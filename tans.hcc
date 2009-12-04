@@ -1,0 +1,155 @@
+
+
+template<typename N>
+TanSet<N>::
+TanSet ()
+	: _tans(7)
+{
+	_tans[0] = tan(point(0,0), point(0,1), point(1,0));             // small triangle
+	_tans[1] = tan(point(0,0), point(0,1), point(1,0));             // small triangle
+	_tans[2] = tan(point(0,0), point(0,1), point(1,1), point(1,0)); // square
+	_tans[3] = tan(point(0,0), point(0,2), point(1,1));             // medium triangle
+	_tans[4] = tan(point(0,0), point(1,1), point(2,1), point(1,0)); // parallelogram
+	_tans[5] = tan(point(0,0), point(0,2), point(2,0));             // big triangle
+	_tans[6] = tan(point(0,0), point(0,2), point(2,0));             // big triangle
+}
+
+template<typename N, typename InputIterator>
+TanSet<N>::
+TanSet (InputIterator begin, InputIterator end)
+	: _tans()
+{
+	std::copy(begin, end, _tans.begin());
+}
+
+template<typename N>
+TanSet<N>::
+begin_motion (int x, int y)
+{
+	// TODO
+}
+
+template<typename N>
+TanSet<N>::
+end_motion ()
+{
+	// TODO
+}
+
+template<typename N>
+TanSet<N>::
+move ()
+{
+	// TODO
+}
+
+template<typename N>
+TanSet<N>::
+flip ()
+{
+	// TODO
+}
+
+template<typename N>
+TanSet<N>::
+rotate (float theta)
+{
+	// TODO
+}
+
+template<typename N>
+TanSet<N>::
+set_size (int w, int h)
+{
+	// TODO
+}
+
+template<typename N>
+TanSet<N>::
+add_obstacle (const polygon& obstacle)
+{
+	// TODO
+}
+
+template<typename N>
+TanSet<N>::
+add_listener (observer *)
+{
+	// TODO
+}
+
+template<typename N>
+TanSet<>N>::
+remove_listener (observer *)
+{
+	// TODO
+}
+
+template<typename N>
+const TanSet<N>::container &
+TansSet<N>::
+tans () const
+{
+	// TODO
+}
+
+template<typename N>
+const TanSet<N>::tan &
+TanSet<N>::
+selection () const
+{
+	// TODO
+}
+
+template<typename N>
+void
+TanSet<N>::
+operator~ ()
+{
+	// TODO
+}
+
+template<typename N>
+bool
+Tan<N>::
+is_selected () const
+{
+	// TODO
+}
+
+template<typename N>
+bool
+Tan<N>::
+is_offset () const
+{
+	// TODO
+}
+
+template<typename N>
+const Tan<N>::polygon &
+Tan<N>::
+coords () const
+{
+	// TODO
+}
+
+template<typename N>
+const Tan<N>::polygon
+Tan<N>::
+desired_coords () const
+{
+	// TODO
+}
+
+template<typename N>
+Tan<N>::
+Tan<N> (const polygon & poly)
+{
+	// TODO
+}
+
+
+
+/*
+** vim: syntax=cpp ts=4 sw=4 cindent
+*/

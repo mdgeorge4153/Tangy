@@ -26,25 +26,16 @@ struct tan_traits
 };
 
 template<typename N>
-class Tan
-	: public tan_traits<N>
-{
-public:
-	bool is_selected () const;
-	bool is_offset   () const;
-
-	const polygon& coords () const;
-
-	friend class tanset;
-};
-
-template<typename N>
 class TanSet
 	: public tan_traits<N>
 {
 public:
-
 	typedef std::vector< Tan<N> > container;
+
+	TanSet ();
+
+	template<typename InputIterator>
+	TanSet (InputIterator);
 
 	void begin_motion (int, int);
 	void move         (int, int);
@@ -61,10 +52,37 @@ public:
 	const container& tans      () const;
 	const tan&       selection () const;
 
+	virtual void operator~ ();
+
 protected:
 
 	virtual void _best_fit (int, int) = 0;
 
+private:
+
+	container _tans;
+	tan       _selection;
+
+};
+
+template<typename N>
+class Tan
+	: public tan_traits<N>
+{
+public:
+	bool is_selected () const;
+	bool is_offset   () const;
+
+	const polygon& coords         () const;
+	const polygon  desired_coords () const;
+
+	friend class tanset;
+
+private:
+
+	Tan(const polygon &);
+
+	polygon _coords;
 };
 
 template<typename N>
@@ -76,6 +94,8 @@ public:
 	virtual void unselected (const tan &) = 0;
 	virtual void moved      (const tan &) = 0;
 	virtual void rotated    (const tan &) = 0;
+
+	virtual void operator~ () = 0;
 };
 
 #include "tans.hcc"
