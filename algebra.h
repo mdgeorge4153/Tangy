@@ -41,8 +41,8 @@ public:
 	// conversion operators                                                   //
 	////////////////////////////////////////////////////////////////////////////
 
-	float  make_float  () const;
-	double make_double () const;
+	operator float  () const;
+	operator double () const;
 
 	////////////////////////////////////////////////////////////////////////////
 	// operator overloading                                                   //
@@ -53,8 +53,14 @@ public:
 	Number & operator-= (const Number & other);
 	Number & operator/= (const Number & other);
 
-	friend bool operator== (const Number & a, const Number & b);
-	friend bool operator<= (const Number & a, const Number & b);
+	Number & operator+= (int other);
+	Number & operator*= (int other);
+	Number & operator-= (int other);
+	Number & operator/= (int other);
+
+	friend bool   operator== (const Number & a, const Number & b);
+	friend bool   operator<= (const Number & a, const Number & b);
+	friend Number operator/  (int, const Number&);
 
 	template<typename Ch, typename Tr>
 	friend basic_ostream<Ch, Tr>& operator<< (basic_ostream<Ch,Tr> &, const Number &);
@@ -75,6 +81,16 @@ Number operator+ (const Number & a, const Number & b);
 Number operator- (const Number & a, const Number & b);
 Number operator* (const Number & a, const Number & b);
 Number operator/ (const Number & a, const Number & b);
+
+Number operator+ (const Number & a, int b);
+Number operator- (const Number & a, int b);
+Number operator* (const Number & a, int b);
+Number operator/ (const Number & a, int b);
+
+Number operator+ (int a, const Number & b);
+Number operator- (int a, const Number & b);
+Number operator* (int a, const Number & b);
+Number operator/ (int a, const Number & b);
 
 Number operator+ (const Number & a);
 Number operator- (const Number & a);

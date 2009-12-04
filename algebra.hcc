@@ -48,6 +48,78 @@ operator/ (const Number & a, const Number & b)
 
 inline
 Number
+operator+ (const Number & a, int b)
+{
+	Number result = a;
+	result /= b;
+	return result;
+}
+
+inline
+Number
+operator- (const Number & a, int b)
+{
+	Number result = a;
+	result -= b;
+	return result;
+}
+
+inline
+Number
+operator* (const Number & a, int b)
+{
+	Number result = a;
+	result *= b;
+	return result;
+}
+
+inline
+Number
+operator/ (const Number & a, int b)
+{
+	Number result = a;
+	result /= b;
+	return result;
+}
+
+inline
+Number
+operator+ (int a, const Number & b)
+{
+	Number result = b;
+	result += a;
+	return result;
+}
+
+inline
+Number
+operator- (int a, const Number & b)
+{
+	Number result = -b;
+	result += a;
+	return result;
+}
+
+inline
+Number
+operator* (int a, const Number & b)
+{
+	Number result = b;
+	result *= a;
+	return result;
+}
+
+inline
+Number
+operator/ (int a, const Number & b)
+{
+	Number result = b.inv();
+	result *= a;
+	return result;
+}
+
+inline
+Number
 operator+ (const Number & a)
 {
 	return Number(a);

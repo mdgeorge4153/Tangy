@@ -44,16 +44,14 @@ operator= (const Number & other)
 	return (* this);
 }
 
-float
 Number::
-make_float () const
+operator float () const
 {
 	return _n[0] + _n[1]*sqrt(2.0f) + _n[2]*sqrt(3.0f) + _n[6]*sqrt(6.0f);
 }
 
-double
 Number::
-make_double () const
+operator double () const
 {
 	return _n[0] + _n[1]*sqrt(2.0)  + _n[2]*sqrt(3.0)  + _n[3]*sqrt(6.0);
 }
@@ -120,6 +118,38 @@ operator*= (const Number & other)
 	reduce();
 
 	return (*this);
+}
+
+Number &
+Number::
+operator+= (int other)
+{
+	_n[0] += other * _d;
+	reduce ();
+}
+
+Number &
+Number::
+operator-= (int other)
+{
+	_n[0] -= other * _d;
+	reduce ();
+}
+
+Number &
+Number::
+operator*= (int other)
+{
+	_n *= other;
+	reduce ();
+}
+
+Number &
+Number::
+operator/= (int other)
+{
+	_d *= other;
+	reduce ();
 }
 
 Number
@@ -224,7 +254,7 @@ operator<= (const Number & a, const Number & b)
 		return true;
 
 	// TODO -- imprecise
-	return a.make_double() <= b.make_double();
+	return double(a) <= double(b);
 }
 
 /*
