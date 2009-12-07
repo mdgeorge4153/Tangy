@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <valarray>
+#include <complex>
 
 template<typename N> class Tan;
 template<typename N> class TanSet;
@@ -15,10 +16,10 @@ template<typename N> class TanSetObserver;
 template<typename N>
 struct tan_traits
 {
-	typedef N                    value;
-	typedef std::complex<N>      point;
-	typedef std::complex<N>      vector;
-	typedef std::valarray<point> polygon;
+	typedef N                             value;
+	typedef typename std::complex<N>      point;
+	typedef typename std::complex<N>      vector;
+	typedef typename std::valarray<point> polygon;
 
 	typedef Tan<N>            tan;
 	typedef TanSet<N>         tanset;
