@@ -11,5 +11,9 @@ PKG_CHECK_MODULES(gtkmm, [gtkmm-2.4])
 AC_SUBST(gtkmm_CFLAGS)
 AC_SUBST(gtkmm_LIBS)
 
+PKG_CHECK_MODULES(gtkglextmm, [gtkglextmm-1.2])
+AC_SUBST(gtkglextmm_CFLAGS)
+AC_SUBST(gtkglextmm_LIBS)
+
 AC_OUTPUT(Makefile src/Makefile data/Makefile)
 

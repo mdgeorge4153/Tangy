@@ -1,6 +1,6 @@
 
-INCLUDES = $(gtkmm_CFLAGS)
-LIBS     = $(gtkmm_LIBS)
+INCLUDES = $(gtkmm_CFLAGS) $(gtkglextmm_CFLAGS)
+LIBS     = $(gtkmm_LIBS)   $(gtkglextmm_LIBS)
 
 bin_PROGRAMS = gtans2
 
