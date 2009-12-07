@@ -74,7 +74,15 @@ on_configure_event (GdkEventConfigure * event)
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
-	gluOrtho2D(0.0, 100.0, 0.0, 100.0);
+	double waspect = float (get_width  ()) / float (get_height ());
+	double haspect = float (get_height ()) / float (get_width  ());
+
+	if (waspect < 1.0)
+		waspect = 1.0;
+	else
+		haspect = 1.0;
+
+	gluOrtho2D(0.0, 100.0 * waspect, 0.0, 100.0 * haspect);
 	glViewport(0, 0, get_width(), get_height());
 
 	gl_end();
