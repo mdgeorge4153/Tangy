@@ -4,8 +4,6 @@
   <!-- interface-naming-policy project-wide -->
   <object class="GtkWindow" id="window">
     <property name="title" translatable="yes">Tangrams</property>
-    <property name="default_width">800</property>
-    <property name="default_height">600</property>
     <signal name="destroy" handler="on_window_destroy"/>
     <child>
       <object class="GtkVBox" id="vbox1">
@@ -163,6 +161,8 @@
         </child>
         <child>
           <object class="GtkDrawingArea" id="scene">
+            <property name="width_request">800</property>
+            <property name="height_request">550</property>
             <property name="visible">True</property>
             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
             <signal name="expose_event" handler="on_scene_expose"/>

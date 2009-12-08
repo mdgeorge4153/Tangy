@@ -66,7 +66,7 @@ bool
 TanView::
 on_configure_event (GdkEventConfigure * event)
 {
-	std::cout << "configure" << std::endl;
+	std::cout << "configure (" << event->width << " x " << event->height << ")" << std::endl;
 	Gtk::DrawingArea::on_configure_event (event);
 
 	gl_begin();
@@ -82,7 +82,7 @@ on_configure_event (GdkEventConfigure * event)
 	else
 		haspect = 1.0;
 
-	gluOrtho2D(0.0, 100.0 * waspect, 0.0, 100.0 * haspect);
+	gluOrtho2D(0.0, 8.0 * waspect, 0.0, 8.0 * haspect);
 	glViewport(0, 0, get_width(), get_height());
 
 	gl_end();
@@ -102,10 +102,10 @@ on_expose_event (GdkEventExpose * event)
 	glColor4f(0.3, 0.0, 1.0, 1.0);
 	glBegin(GL_POLYGON);
 
-	glVertex2f(10.0, 10.0);
-	glVertex2f(25.0, 10.0);
-	glVertex2f(25.0, 25.0);
-	glVertex2f(10.0, 25.0);
+	glVertex2f(1.0, 1.0);
+	glVertex2f(2.0, 1.0);
+	glVertex2f(2.0, 2.0);
+	glVertex2f(1.0, 2.0);
 
 	glEnd();
 
