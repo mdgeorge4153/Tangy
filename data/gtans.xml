@@ -61,11 +61,50 @@
             <child>
               <object class="GtkMenuItem" id="menuitem3">
                 <property name="visible">True</property>
-                <property name="label" translatable="yes">_View</property>
+                <property name="label" translatable="yes">_Preferences</property>
                 <property name="use_underline">True</property>
                 <child type="submenu">
                   <object class="GtkMenu" id="menu2">
                     <property name="visible">True</property>
+                    <child>
+                      <object class="GtkMenuItem" id="snap_menu_item">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Snap</property>
+                        <property name="use_underline">True</property>
+                        <child type="submenu">
+                          <object class="GtkMenu" id="menu1">
+                            <property name="visible">True</property>
+                            <child>
+                              <object class="GtkRadioMenuItem" id="snap_placement_menu_item">
+                                <property name="visible">True</property>
+                                <property name="label" translatable="yes">Rotation and Placement</property>
+                                <property name="use_underline">True</property>
+                                <property name="active">True</property>
+                                <property name="draw_as_radio">True</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkRadioMenuItem" id="snap_rotate_menu_item">
+                                <property name="visible">True</property>
+                                <property name="label" translatable="yes">Rotation</property>
+                                <property name="use_underline">True</property>
+                                <property name="draw_as_radio">True</property>
+                                <property name="group">snap_placement_menu_item</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkRadioMenuItem" id="free_rotate_menu_item">
+                                <property name="visible">True</property>
+                                <property name="label" translatable="yes">None</property>
+                                <property name="use_underline">True</property>
+                                <property name="draw_as_radio">True</property>
+                                <property name="group">snap_rotate_menu_item</property>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
                     <child>
                       <object class="GtkCheckMenuItem" id="animate_menu_item">
                         <property name="visible">True</property>
@@ -154,7 +193,7 @@
     <property name="visible">True</property>
     <property name="stock">gtk-open</property>
   </object>
-  <object class="GtkRecentAction" id="recentaction1">
-    <property name="limit">10</property>
+  <object class="GtkRadioAction" id="radioaction1">
+    <property name="draw_as_radio">True</property>
   </object>
 </interface>
