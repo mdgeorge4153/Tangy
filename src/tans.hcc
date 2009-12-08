@@ -5,6 +5,7 @@ TanSet<N>::
 TanSet ()
 	: _tans(7)
 {
+	/*
 	_tans[0] = tan(point(0,0), point(0,1), point(1,0));             // small triangle
 	_tans[1] = tan(point(0,0), point(0,1), point(1,0));             // small triangle
 	_tans[2] = tan(point(0,0), point(0,1), point(1,1), point(1,0)); // square
@@ -12,9 +13,11 @@ TanSet ()
 	_tans[4] = tan(point(0,0), point(1,1), point(2,1), point(1,0)); // parallelogram
 	_tans[5] = tan(point(0,0), point(0,2), point(2,0));             // big triangle
 	_tans[6] = tan(point(0,0), point(0,2), point(2,0));             // big triangle
+	*/
 }
 
-template<typename N, typename InputIterator>
+template<typename N>
+template<typename InputIterator>
 TanSet<N>::
 TanSet (InputIterator begin, InputIterator end)
 	: _tans()
@@ -23,6 +26,7 @@ TanSet (InputIterator begin, InputIterator end)
 }
 
 template<typename N>
+void
 TanSet<N>::
 begin_motion (int x, int y)
 {
@@ -30,6 +34,7 @@ begin_motion (int x, int y)
 }
 
 template<typename N>
+void
 TanSet<N>::
 end_motion ()
 {
@@ -37,13 +42,15 @@ end_motion ()
 }
 
 template<typename N>
+void
 TanSet<N>::
-move ()
+move (int x, int y)
 {
 	// TODO
 }
 
 template<typename N>
+void
 TanSet<N>::
 flip ()
 {
@@ -51,6 +58,7 @@ flip ()
 }
 
 template<typename N>
+void
 TanSet<N>::
 rotate (float theta)
 {
@@ -58,6 +66,7 @@ rotate (float theta)
 }
 
 template<typename N>
+void
 TanSet<N>::
 set_size (int w, int h)
 {
@@ -65,6 +74,7 @@ set_size (int w, int h)
 }
 
 template<typename N>
+void
 TanSet<N>::
 add_obstacle (const polygon& obstacle)
 {
@@ -72,29 +82,15 @@ add_obstacle (const polygon& obstacle)
 }
 
 template<typename N>
+const typename TanSet<N>::container &
 TanSet<N>::
-add_listener (observer *)
-{
-	// TODO
-}
-
-template<typename N>
-TanSet<>N>::
-remove_listener (observer *)
-{
-	// TODO
-}
-
-template<typename N>
-const TanSet<N>::container &
-TansSet<N>::
 tans () const
 {
 	// TODO
 }
 
 template<typename N>
-const TanSet<N>::tan &
+const typename TanSet<N>::tan &
 TanSet<N>::
 selection () const
 {
@@ -126,7 +122,7 @@ is_offset () const
 }
 
 template<typename N>
-const Tan<N>::polygon &
+const typename Tan<N>::polygon &
 Tan<N>::
 coords () const
 {
@@ -134,7 +130,7 @@ coords () const
 }
 
 template<typename N>
-const Tan<N>::polygon
+const typename Tan<N>::polygon
 Tan<N>::
 desired_coords () const
 {
@@ -143,7 +139,7 @@ desired_coords () const
 
 template<typename N>
 Tan<N>::
-Tan<N> (const polygon & poly)
+Tan (const polygon & poly)
 {
 	// TODO
 }
