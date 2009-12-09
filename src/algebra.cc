@@ -21,7 +21,6 @@ Number (int a1, int a2, int a3, int a6, unsigned int d)
 
 	if (_d == 0)
 	{
-		std::cerr << "div by zero" << std::endl;
 		throw std::logic_error("denominator must be non-zero");
 	}
 

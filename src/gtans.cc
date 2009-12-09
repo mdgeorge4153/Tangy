@@ -1,4 +1,3 @@
-#include <iostream>
 #include <gtkmm.h>
 #include <gtkglmm.h>
 #include <GL/gl.h>
@@ -39,8 +38,6 @@ TanView(BaseObjectType * base, const Glib::RefPtr<Gtk::Builder> &)
 	: Gtk::DrawingArea(base),
 	  Gtk::GL::Widget<TanView>(* this)
 {
-	std::cout << "creating TanView" << std::endl;
-
 	Glib::RefPtr<Gdk::GL::Config> glconfig;
    
 	glconfig = Gdk::GL::Config::create (Gdk::GL::MODE_RGB   |
@@ -58,7 +55,6 @@ void
 TanView::
 on_realize ()
 {
-	std::cout << "realize" << std::endl;
 	Gtk::DrawingArea::on_realize ();
 
 	gl_begin();
@@ -72,7 +68,6 @@ bool
 TanView::
 on_configure_event (GdkEventConfigure * event)
 {
-	std::cout << "configure (" << event->width << " x " << event->height << ")" << std::endl;
 	bool result = Gtk::DrawingArea::on_configure_event (event);
 
 	gl_begin();
@@ -100,7 +95,6 @@ bool
 TanView::
 on_expose_event (GdkEventExpose * event)
 {
-	std::cout << "expose" << std::endl;
 	bool result = Gtk::DrawingArea::on_expose_event (event);
 
 	gl_begin();
@@ -131,7 +125,6 @@ bool
 TanView::
 on_button_press_event (GdkEventButton * event)
 {
-	std::cout << "button press" << std::endl;
 	return Gtk::DrawingArea::on_button_press_event (event);
 }
 
@@ -139,7 +132,6 @@ bool
 TanView::
 on_button_release_event (GdkEventButton * event)
 {
-	std::cout << "button release" << std::endl;
 	return Gtk::DrawingArea::on_button_release_event (event);
 }
 

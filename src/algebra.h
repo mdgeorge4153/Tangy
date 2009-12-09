@@ -6,7 +6,6 @@
 #ifndef __gtans_algebra_h__
 #define __gtans_algebra_h__ 1
 
-#include <iostream>
 #include <complex>
 #include <valarray>
 

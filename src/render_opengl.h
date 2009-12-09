@@ -19,7 +19,6 @@ render_opengl (const TanSet & tans)
 
 		for (unsigned j = 0; j < points.size(); j++)
 		{
-			std::cout << "  " << points[j] << " --> (" << (float) points[j].real() << "," << (float) points[j].imag() << ")" << std::endl;
 			glVertex2f(points[j].real(), points[j].imag());
 		}
 
