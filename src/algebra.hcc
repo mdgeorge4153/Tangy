@@ -131,6 +131,7 @@ operator- (const Number & a)
 {
 	Number result;
 	result -= a;
+	return result;
 }
 
 inline
@@ -186,6 +187,8 @@ operator<< (basic_ostream<Ch, Tr> & out, const Number & a)
 	with_sign(out, a._n[3]); out << "*sqrt(6)";
 
 	out << "]/" << a._d;
+
+	return out;
 }
 
 /*

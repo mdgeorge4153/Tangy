@@ -9,36 +9,70 @@
 #include <valarray>
 #include <complex>
 
-template<typename N> class Tan;
-template<typename N> class TanSet;
-template<typename N> class TanSetObserver;
+/*
+********************************************************************************
+*/
 
-template<typename N>
-struct tan_traits
-{
-	typedef N                             value;
-	typedef typename std::complex<N>      point;
-	typedef typename std::complex<N>      vector;
-	typedef typename std::valarray<point> polygon;
+template<typename>                  class Tan;
+template<typename,
+         template <typename> class> class TanSet;
+template<typename>                  class FreePlacement;
 
-	typedef Tan<N>            tan;
-	typedef TanSet<N>         tanset;
-	typedef TanSetObserver<N> observer;
-};
+/*
+********************************************************************************
+*/
 
-template<typename N>
-class TanSet
+template<typename Number>
+class Tan
 {
 public:
-	typedef typename tan_traits<N>::polygon  polygon;
-	typedef typename tan_traits<N>::tan      tan;
+	typedef typename std::complex<Number>  point;
+	typedef typename std::complex<Number>  vector;
+	typedef typename std::valarray<vector> vector_container;
+	typedef typename std::valarray<point>  point_container;
 
-	typedef std::vector< Tan<N> > container;
+	bool is_selected () const;
+	bool is_offset   () const;
+
+	const vector_container & shape   () const;
+	const point            & pos     () const;
+	const point            & desired () const;
+
+	template<typename, template<typename> class>
+	friend class TanSet;
+
+private:
+	bool             _selected;
+	point            _pos;
+	point            _desired_pos;
+	vector_container _shape;
+
+	Tan ();
+	Tan (point, point, point);
+	Tan (point, point, point, point);
+
+	template<typename N>
+	Tan (const Tan<N> &);
+};
+
+/*
+********************************************************************************
+*/
+
+template<typename Number = float,
+         template <typename> class PlacementPolicy = FreePlacement
+		 >
+class TanSet
+	: public PlacementPolicy<Number>
+{
+public:
+	typedef Tan<Number>      tan;
+	typedef std::vector<tan> container;
 
 	TanSet ();
 
-	template<typename InputIterator>
-	TanSet (InputIterator, InputIterator);
+	template<typename TS>
+	TanSet (const TS &);
 
 	void begin_motion (int, int);
 	void move         (int, int);
@@ -47,7 +81,9 @@ public:
 	void end_motion   ();
 
 	void set_size     (int, int);
-	void add_obstacle (const polygon &);
+
+	template<typename PointIter>
+	void add_obstacle (PointIter, PointIter);
 
 	const container& tans      () const;
 	const tan&       selection () const;
@@ -57,30 +93,22 @@ public:
 protected:
 
 	container _tans;
-	tan       _selection;
-
+	int       _selection;
 };
+
+/*
+********************************************************************************
+*/
 
 template<typename N>
-class Tan
+class FreePlacement
 {
-public:
-	typedef typename tan_traits<N>::polygon polygon;
 
-	bool is_selected () const;
-	bool is_offset   () const;
-
-	const polygon& coords         () const;
-	const polygon  desired_coords () const;
-
-	friend class tanset;
-
-private:
-
-	Tan(const polygon &);
-
-	polygon _coords;
 };
+
+/*
+********************************************************************************
+*/
 
 #include "tans.hcc"
 

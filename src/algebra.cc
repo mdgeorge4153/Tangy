@@ -47,13 +47,13 @@ operator= (const Number & other)
 Number::
 operator float () const
 {
-	return _n[0] + _n[1]*sqrt(2.0f) + _n[2]*sqrt(3.0f) + _n[6]*sqrt(6.0f);
+	return (_n[0] + _n[1]*sqrt(2.0f) + _n[2]*sqrt(3.0f) + _n[3]*sqrt(6.0f)) / _d;
 }
 
 Number::
 operator double () const
 {
-	return _n[0] + _n[1]*sqrt(2.0)  + _n[2]*sqrt(3.0)  + _n[3]*sqrt(6.0);
+	return (_n[0] + _n[1]*sqrt(2.0)  + _n[2]*sqrt(3.0)  + _n[3]*sqrt(6.0)) / _d;
 }
 
 Number &
@@ -126,6 +126,8 @@ operator+= (int other)
 {
 	_n[0] += other * _d;
 	reduce ();
+
+	return (* this);
 }
 
 Number &
@@ -134,6 +136,8 @@ operator-= (int other)
 {
 	_n[0] -= other * _d;
 	reduce ();
+
+	return (* this);
 }
 
 Number &
@@ -142,6 +146,8 @@ operator*= (int other)
 {
 	_n *= other;
 	reduce ();
+
+	return (* this);
 }
 
 Number &
@@ -150,6 +156,8 @@ operator/= (int other)
 {
 	_d *= other;
 	reduce ();
+
+	return (* this);
 }
 
 Number

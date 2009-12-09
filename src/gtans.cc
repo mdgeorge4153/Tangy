@@ -4,6 +4,10 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 
+#include "tans.h"
+#include "render_opengl.h"
+#include "algebra.h"
+
 class TanView
 	: public Gtk::DrawingArea,
 	  public Gtk::GL::Widget<TanView>
@@ -26,10 +30,12 @@ protected:
 	void gl_begin ();
 	void gl_end   ();
 	void gl_flush ();
+
+	TanSet<Number> tans;
 };
 
 TanView::
-TanView(BaseObjectType * base, const Glib::RefPtr<Gtk::Builder> & builder)
+TanView(BaseObjectType * base, const Glib::RefPtr<Gtk::Builder> &)
 	: Gtk::DrawingArea(base),
 	  Gtk::GL::Widget<TanView>(* this)
 {
@@ -67,7 +73,7 @@ TanView::
 on_configure_event (GdkEventConfigure * event)
 {
 	std::cout << "configure (" << event->width << " x " << event->height << ")" << std::endl;
-	Gtk::DrawingArea::on_configure_event (event);
+	bool result = Gtk::DrawingArea::on_configure_event (event);
 
 	gl_begin();
 
@@ -86,6 +92,8 @@ on_configure_event (GdkEventConfigure * event)
 	glViewport(0, 0, get_width(), get_height());
 
 	gl_end();
+
+	return result;
 }
 
 bool
@@ -93,10 +101,11 @@ TanView::
 on_expose_event (GdkEventExpose * event)
 {
 	std::cout << "expose" << std::endl;
-	Gtk::DrawingArea::on_expose_event (event);
+	bool result = Gtk::DrawingArea::on_expose_event (event);
 
 	gl_begin();
 
+	/*
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glColor4f(0.3, 0.0, 1.0, 1.0);
@@ -108,9 +117,14 @@ on_expose_event (GdkEventExpose * event)
 	glVertex2f(1.0, 2.0);
 
 	glEnd();
+	*/
+
+	render_opengl(tans);
 
 	gl_flush();
 	gl_end();
+
+	return result;
 }
 
 bool
