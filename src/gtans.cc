@@ -88,7 +88,7 @@ on_configure_event (GdkEventConfigure * event)
 	else
 		haspect = 1.0;
 
-	gluOrtho2D(0.0, 8.0 * waspect, 0.0, 8.0 * haspect);
+	gluOrtho2D(0.0, 8.0 * waspect, 8.0 * haspect, 0.0);
 	glViewport(0, 0, get_width(), get_height());
 
 	gl_end();
