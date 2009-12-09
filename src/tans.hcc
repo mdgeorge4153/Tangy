@@ -115,8 +115,8 @@ TanSet ()
 	_tans[1]._pos += point(1,2)  / N(2);
 	_tans[2]._pos += point(11,3) / N(4);
 	_tans[3]._pos += point(3,2)  / N(1);
-	_tans[4]._pos += point(12,3) / N(4);
-	_tans[5]._pos += point(17,2) / N(4);
+	_tans[4]._pos += point(13,3) / N(4);
+	_tans[5]._pos += point(9,1)  / N(2);
 	_tans[6]._pos += point(17,8) / N(4);
 }
 
