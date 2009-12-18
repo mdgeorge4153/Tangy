@@ -1,7 +1,8 @@
 
-INCLUDES = $(gtkmm_CFLAGS) $(gtkglextmm_CFLAGS)
-LIBS     = -g $(gtkmm_LIBS)   $(gtkglextmm_LIBS)
-CXXFLAGS = -g -Werror -Wall -pedantic
+INCLUDES    = $(gtkmm_CFLAGS) $(gtkglextmm_CFLAGS) $(CGAL_CPPFLAGS)
+LIBS        = $(gtkmm_LIBS)   $(gtkglextmm_LIBS) $(CGAL_LIBS)
+LDFLAGS     = $(CGAL_LDFLAGS)
+AM_CXXFLAGS = -g -Werror -Wall -pedantic $(CGAL_CXXFLAGS)
 
 bin_PROGRAMS = gtans2 test
 
