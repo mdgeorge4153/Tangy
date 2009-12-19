@@ -5,8 +5,10 @@ public:
 	Dragger (int, int, bool = false, bool = false);
 
 	void move_to    (int, int);
+
 	void left_down  ();
 	void left_up    ();
+
 	void right_down ();
 	void right_up   ();
 
