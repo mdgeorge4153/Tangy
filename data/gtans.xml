@@ -135,6 +135,13 @@
                   <object class="GtkMenu" id="menu3">
                     <property name="visible">True</property>
                     <child>
+                      <object class="GtkMenuItem" id="outline_menu_item">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">_Show outline</property>
+                        <property name="use_underline">True</property>
+                      </object>
+                    </child>
+                    <child>
                       <object class="GtkMenuItem" id="help_menu_item">
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">_How To Play</property>
