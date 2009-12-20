@@ -3,147 +3,147 @@
  */
 
 inline
-Number &
-Number::
-operator/= (const Number & other)
+ExtendedRational &
+ExtendedRational::
+operator/= (const ExtendedRational & other)
 {
 	return (* this) *= other.inv();
 }
 
 inline
-Number
-operator+ (const Number & a, const Number & b)
+ExtendedRational
+operator+ (const ExtendedRational & a, const ExtendedRational & b)
 {
-	Number result = a;
+	ExtendedRational result = a;
 	result += b;
 	return result;
 }
 
 inline
-Number
-operator- (const Number & a, const Number & b)
+ExtendedRational
+operator- (const ExtendedRational & a, const ExtendedRational & b)
 {
-	Number result = a;
+	ExtendedRational result = a;
 	result -= b;
 	return result;
 }
 
 inline
-Number
-operator* (const Number & a, const Number & b)
+ExtendedRational
+operator* (const ExtendedRational & a, const ExtendedRational & b)
 {
-	Number result = a;
+	ExtendedRational result = a;
 	result *= b;
 	return result;
 }
 
 inline
-Number
-operator/ (const Number & a, const Number & b)
+ExtendedRational
+operator/ (const ExtendedRational & a, const ExtendedRational & b)
 {
-	Number result = a;
+	ExtendedRational result = a;
 	result /= b;
 	return result;
 }
 
 inline
-Number
-operator+ (const Number & a, int b)
+ExtendedRational
+operator+ (const ExtendedRational & a, int b)
 {
-	Number result = a;
+	ExtendedRational result = a;
 	result /= b;
 	return result;
 }
 
 inline
-Number
-operator- (const Number & a, int b)
+ExtendedRational
+operator- (const ExtendedRational & a, int b)
 {
-	Number result = a;
+	ExtendedRational result = a;
 	result -= b;
 	return result;
 }
 
 inline
-Number
-operator* (const Number & a, int b)
+ExtendedRational
+operator* (const ExtendedRational & a, int b)
 {
-	Number result = a;
+	ExtendedRational result = a;
 	result *= b;
 	return result;
 }
 
 inline
-Number
-operator/ (const Number & a, int b)
+ExtendedRational
+operator/ (const ExtendedRational & a, int b)
 {
-	Number result = a;
+	ExtendedRational result = a;
 	result /= b;
 	return result;
 }
 
 inline
-Number
-operator+ (int a, const Number & b)
+ExtendedRational
+operator+ (int a, const ExtendedRational & b)
 {
-	Number result = b;
+	ExtendedRational result = b;
 	result += a;
 	return result;
 }
 
 inline
-Number
-operator- (int a, const Number & b)
+ExtendedRational
+operator- (int a, const ExtendedRational & b)
 {
-	Number result = -b;
+	ExtendedRational result = -b;
 	result += a;
 	return result;
 }
 
 inline
-Number
-operator* (int a, const Number & b)
+ExtendedRational
+operator* (int a, const ExtendedRational & b)
 {
-	Number result = b;
+	ExtendedRational result = b;
 	result *= a;
 	return result;
 }
 
 inline
-Number
-operator/ (int a, const Number & b)
+ExtendedRational
+operator/ (int a, const ExtendedRational & b)
 {
-	Number result = b.inv();
+	ExtendedRational result = b.inv();
 	result *= a;
 	return result;
 }
 
 inline
-Number
-operator+ (const Number & a)
+ExtendedRational
+operator+ (const ExtendedRational & a)
 {
-	return Number(a);
+	return ExtendedRational(a);
 }
 
 inline
-Number
-operator- (const Number & a)
+ExtendedRational
+operator- (const ExtendedRational & a)
 {
-	Number result;
+	ExtendedRational result;
 	result -= a;
 	return result;
 }
 
 inline
 bool
-operator!= (const Number & a, const Number & b)
+operator!= (const ExtendedRational & a, const ExtendedRational & b)
 {
 	return !(a == b);
 }
 
 inline
 bool
-operator< (const Number & a, const Number & b)
+operator< (const ExtendedRational & a, const ExtendedRational & b)
 {
 	if (a == b)
 		return false;
@@ -153,14 +153,14 @@ operator< (const Number & a, const Number & b)
 
 inline
 bool
-operator>= (const Number & a, const Number & b)
+operator>= (const ExtendedRational & a, const ExtendedRational & b)
 {
 	return b <= a;
 }
 
 inline
 bool
-operator> (const Number & a, const Number & b)
+operator> (const ExtendedRational & a, const ExtendedRational & b)
 {
 	return b < a;
 }
@@ -178,7 +178,7 @@ with_sign(basic_ostream<Ch,Tr>& out, int n)
 
 template<typename Ch, typename Tr>
 basic_ostream<Ch, Tr> &
-operator<< (basic_ostream<Ch, Tr> & out, const Number & a)
+operator<< (basic_ostream<Ch, Tr> & out, const ExtendedRational & a)
 {
 	out << "[" << a._n[0];
 

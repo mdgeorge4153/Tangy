@@ -13,28 +13,28 @@ using std::valarray;
 using std::basic_ostream;
 
 /*
-** Numbers *********************************************************************
+** ExtendedRational ************************************************************
 */
 
-class Number
+class ExtendedRational
 {
 public:
 	////////////////////////////////////////////////////////////////////////////
 	// public constructors                                                    //
 	////////////////////////////////////////////////////////////////////////////
 
-	Number(int a1 = 0,
-	       int a2 = 0,
-	       int a3 = 0,
-	       int a4 = 0,
-	       unsigned int d  = 1);
+	ExtendedRational(int a1 = 0,
+	                 int a2 = 0,
+	                 int a3 = 0,
+	                 int a4 = 0,
+	                 unsigned int d  = 1);
 
 	////////////////////////////////////////////////////////////////////////////
 	// copying                                                                //
 	////////////////////////////////////////////////////////////////////////////
 
-	Number(const Number &);
-	Number & operator= (const Number &);
+	ExtendedRational(const ExtendedRational &);
+	ExtendedRational & operator= (const ExtendedRational &);
 
 	////////////////////////////////////////////////////////////////////////////
 	// conversion operators                                                   //
@@ -47,85 +47,85 @@ public:
 	// operator overloading                                                   //
 	////////////////////////////////////////////////////////////////////////////
 
-	Number & operator+= (const Number & other);
-	Number & operator*= (const Number & other);
-	Number & operator-= (const Number & other);
-	Number & operator/= (const Number & other);
+	ExtendedRational & operator+= (const ExtendedRational & other);
+	ExtendedRational & operator*= (const ExtendedRational & other);
+	ExtendedRational & operator-= (const ExtendedRational & other);
+	ExtendedRational & operator/= (const ExtendedRational & other);
 
-	Number & operator+= (int other);
-	Number & operator*= (int other);
-	Number & operator-= (int other);
-	Number & operator/= (int other);
+	ExtendedRational & operator+= (int other);
+	ExtendedRational & operator*= (int other);
+	ExtendedRational & operator-= (int other);
+	ExtendedRational & operator/= (int other);
 
-	friend bool   operator== (const Number & a, const Number & b);
-	friend bool   operator<= (const Number & a, const Number & b);
-	friend Number operator/  (int, const Number&);
-
+	friend bool             operator== (const ExtendedRational & a, const ExtendedRational & b);
+	friend bool             operator<= (const ExtendedRational & a, const ExtendedRational & b);
+	friend ExtendedRational operator/  (int, const ExtendedRational &);
+                                                     
 	template<typename Ch, typename Tr>
-	friend basic_ostream<Ch, Tr>& operator<< (basic_ostream<Ch,Tr> &, const Number &);
+	friend basic_ostream<Ch, Tr>& operator<< (basic_ostream<Ch,Tr> &, const ExtendedRational &);
 
 private:
 
 	valarray<int> _n;
 	int  _d;
 
-	Number inv()   const;
-	Number conj2() const;
-	Number conj3() const;
+	ExtendedRational inv()   const;
+	ExtendedRational conj2() const;
+	ExtendedRational conj3() const;
 
 	void reduce ();
 };
 
-Number operator+ (const Number & a, const Number & b);
-Number operator- (const Number & a, const Number & b);
-Number operator* (const Number & a, const Number & b);
-Number operator/ (const Number & a, const Number & b);
+ExtendedRational operator+ (const ExtendedRational & a, const ExtendedRational & b);
+ExtendedRational operator- (const ExtendedRational & a, const ExtendedRational & b);
+ExtendedRational operator* (const ExtendedRational & a, const ExtendedRational & b);
+ExtendedRational operator/ (const ExtendedRational & a, const ExtendedRational & b);
 
-Number operator+ (const Number & a, int b);
-Number operator- (const Number & a, int b);
-Number operator* (const Number & a, int b);
-Number operator/ (const Number & a, int b);
+ExtendedRational operator+ (const ExtendedRational & a, int b);
+ExtendedRational operator- (const ExtendedRational & a, int b);
+ExtendedRational operator* (const ExtendedRational & a, int b);
+ExtendedRational operator/ (const ExtendedRational & a, int b);
 
-Number operator+ (int a, const Number & b);
-Number operator- (int a, const Number & b);
-Number operator* (int a, const Number & b);
-Number operator/ (int a, const Number & b);
+ExtendedRational operator+ (int a, const ExtendedRational & b);
+ExtendedRational operator- (int a, const ExtendedRational & b);
+ExtendedRational operator* (int a, const ExtendedRational & b);
+ExtendedRational operator/ (int a, const ExtendedRational & b);
 
-Number operator+ (const Number & a);
-Number operator- (const Number & a);
+ExtendedRational operator+ (const ExtendedRational & a);
+ExtendedRational operator- (const ExtendedRational & a);
 
-bool operator== (const Number & a, const Number & b);
-bool operator!= (const Number & a, const Number & b);
+bool operator== (const ExtendedRational & a, const ExtendedRational & b);
+bool operator!= (const ExtendedRational & a, const ExtendedRational & b);
 
-bool operator<= (const Number & a, const Number & b);
-bool operator<  (const Number & a, const Number & b);
-bool operator>= (const Number & a, const Number & b);
-bool operator>  (const Number & a, const Number & b);
+bool operator<= (const ExtendedRational & a, const ExtendedRational & b);
+bool operator<  (const ExtendedRational & a, const ExtendedRational & b);
+bool operator>= (const ExtendedRational & a, const ExtendedRational & b);
+bool operator>  (const ExtendedRational & a, const ExtendedRational & b);
 
 template<typename Ch, typename Tr>
-basic_ostream<Ch, Tr>& operator<< (basic_ostream<Ch,Tr> &, const Number &);
+basic_ostream<Ch, Tr>& operator<< (basic_ostream<Ch,Tr> &, const ExtendedRational &);
 
 
 /*
-** Complex Numbers *************************************************************
+** Vector type *****************************************************************
 */
 
-typedef std::complex<Number> Vector;
-
+typedef std::complex<ExtendedRational> Vector;
 
 /*
 ** Constants *******************************************************************
 */
 
-static const Number SQRT1 = 1;
-static const Number SQRT2 (0,1,0,0,1);
-static const Number SQRT3 (0,0,1,0,1);
-static const Number SQRT6 (0,0,0,1,1);
+static const ExtendedRational SQRT1 = 1;
+static const ExtendedRational SQRT2 (0,1,0,0,1);
+static const ExtendedRational SQRT3 (0,0,1,0,1);
+static const ExtendedRational SQRT6 (0,0,0,1,1);
 
-static const Number COS45 = SQRT2/2;
-static const Number SIN45 = SQRT2/2;
-static const Number COS30 = SQRT3/2;
-static const Number SIN30 = Number(1)/2;
+static const ExtendedRational COS45 = SQRT2/2;
+static const ExtendedRational SIN45 = SQRT2/2;
+static const ExtendedRational COS30 = SQRT3/2;
+static const ExtendedRational SIN30 = ExtendedRational(1)/2;
+
 
 static const Vector ROT45 (COS45, SIN45);
 static const Vector ROT30 (COS30, SIN30);

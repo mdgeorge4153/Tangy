@@ -18,8 +18,8 @@ protected:
 };
 
 
-typedef TanSetNoCollide<int>    TanSetNoCollide90;
-typedef TanSetNoCollide<Number> TanSetNoCollide15;
+typedef TanSetNoCollide<int>              TanSetNoCollide90;
+typedef TanSetNoCollide<ExtendedRational> TanSetNoCollide15;
 
 #include "tans_nocollide.hcc"
 

@@ -30,7 +30,7 @@ protected:
 	void gl_end   ();
 	void gl_flush ();
 
-	TanSet<Number> tans;
+	TanSet<ExtendedRational> tans;
 };
 
 TanView::

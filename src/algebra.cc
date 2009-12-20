@@ -8,8 +8,8 @@
 #include <numeric>
 #include <stdexcept>
 
-Number::
-Number (int a1, int a2, int a3, int a6, unsigned int d)
+ExtendedRational::
+ExtendedRational (int a1, int a2, int a3, int a6, unsigned int d)
 	: _n(4)
 {
 	_n[0] = a1;
@@ -27,15 +27,15 @@ Number (int a1, int a2, int a3, int a6, unsigned int d)
 	reduce();
 }
 
-Number::
-Number (const Number & other)
+ExtendedRational::
+ExtendedRational (const ExtendedRational & other)
 	: _n (other._n), _d (other._d)
 {
 }
 
-Number &
-Number::
-operator= (const Number & other)
+ExtendedRational &
+ExtendedRational::
+operator= (const ExtendedRational & other)
 {
 	_n = other._n;
 	_d = other._d;
@@ -43,21 +43,21 @@ operator= (const Number & other)
 	return (* this);
 }
 
-Number::
+ExtendedRational::
 operator float () const
 {
 	return (_n[0] + _n[1]*sqrt(2.0f) + _n[2]*sqrt(3.0f) + _n[3]*sqrt(6.0f)) / _d;
 }
 
-Number::
+ExtendedRational::
 operator double () const
 {
 	return (_n[0] + _n[1]*sqrt(2.0)  + _n[2]*sqrt(3.0)  + _n[3]*sqrt(6.0)) / _d;
 }
 
-Number &
-Number::
-operator+= (const Number & other)
+ExtendedRational &
+ExtendedRational::
+operator+= (const ExtendedRational & other)
 {
 	_n = _n * other._d + _d * other._n;
 
@@ -68,9 +68,9 @@ operator+= (const Number & other)
 	return (* this);
 }
 
-Number &
-Number::
-operator-= (const Number & other)
+ExtendedRational &
+ExtendedRational::
+operator-= (const ExtendedRational & other)
 {
 	_n = _n * other._d - _d * other._n;
 
@@ -81,9 +81,9 @@ operator-= (const Number & other)
 	return (* this);
 }
 
-Number &
-Number::
-operator*= (const Number & other)
+ExtendedRational &
+ExtendedRational::
+operator*= (const ExtendedRational & other)
 {
 	int a1 = _n[0];
 	int a2 = _n[1];
@@ -119,8 +119,8 @@ operator*= (const Number & other)
 	return (*this);
 }
 
-Number &
-Number::
+ExtendedRational &
+ExtendedRational::
 operator+= (int other)
 {
 	_n[0] += other * _d;
@@ -129,8 +129,8 @@ operator+= (int other)
 	return (* this);
 }
 
-Number &
-Number::
+ExtendedRational &
+ExtendedRational::
 operator-= (int other)
 {
 	_n[0] -= other * _d;
@@ -139,8 +139,8 @@ operator-= (int other)
 	return (* this);
 }
 
-Number &
-Number::
+ExtendedRational &
+ExtendedRational::
 operator*= (int other)
 {
 	_n *= other;
@@ -149,8 +149,8 @@ operator*= (int other)
 	return (* this);
 }
 
-Number &
-Number::
+ExtendedRational &
+ExtendedRational::
 operator/= (int other)
 {
 	_d *= other;
@@ -159,11 +159,11 @@ operator/= (int other)
 	return (* this);
 }
 
-Number
-Number::
+ExtendedRational
+ExtendedRational::
 inv () const
 {
-	Number result  = (*this);
+	ExtendedRational result  = (*this);
 
 	if (_n[0] == 0 && _n[1] == 0 && _n[2] == 0 && _n[3] == 0)
 		throw std::logic_error("divide by zero");
@@ -171,14 +171,14 @@ inv () const
 	//
 	// result = (*this) * factor1
 	//
-	Number factor1 = conj2();
+	ExtendedRational factor1 = conj2();
 	result *= factor1;
 	assert(!result._n[1] && !result._n[3]);
 
 	//
 	// result = (*this) * factor1 * factor2
 	//
-	Number factor2 = conj3();
+	ExtendedRational factor2 = conj3();
 	result *= factor2;
 	assert(result._n[0] && !result._n[1] && !result._n[2] && !result._n[3]);
 
@@ -202,21 +202,21 @@ inv () const
 	return result;
 }
 
-Number
-Number::
+ExtendedRational
+ExtendedRational::
 conj2 () const
 {
-	Number result = (* this);
+	ExtendedRational result = (* this);
 	result._n[1] = - result._n[1];
 	result._n[3] = - result._n[3];
 	return result;
 }
 
-Number
-Number::
+ExtendedRational
+ExtendedRational::
 conj3 () const
 {
-	Number result = (* this);
+	ExtendedRational result = (* this);
 	result._n[2] = - result._n[2];
 	result._n[3] = - result._n[3];
 	return result;
@@ -230,7 +230,7 @@ gcd(int a, int b)
 }
 
 void
-Number::
+ExtendedRational::
 reduce ()
 {
 	int divisor = std::accumulate(&(_n[0]), &(_n[4]), _d, *gcd);
@@ -242,7 +242,7 @@ reduce ()
 }
 
 bool
-operator== (const Number & a, const Number & b)
+operator== (const ExtendedRational & a, const ExtendedRational & b)
 {
 	for (int i = 0; i < 3; i++)
 		if (a._n[i] != b._n[i])
@@ -255,7 +255,7 @@ operator== (const Number & a, const Number & b)
 }
 
 bool
-operator<= (const Number & a, const Number & b)
+operator<= (const ExtendedRational & a, const ExtendedRational & b)
 {
 	if (a == b)
 		return true;
