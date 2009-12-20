@@ -1,8 +1,15 @@
+/*
+ * mouse_controller.h - maps mouse motion and clicks to tan motion and rotations
+ */
 
-class Dragger
+#ifndef __gtans_mouse_controller_h__
+#define __gtans_mouse_controller_h__ 1
+
+class MouseController
 {
 public:
-	Dragger (int, int, bool = false, bool = false);
+	MouseController (int, int, bool = false, bool = false);
+	~MouseController ();
 
 	void move_to    (int, int);
 
@@ -13,12 +20,9 @@ public:
 	void right_up   ();
 
 private:
-	State * _state;
-	int     _last_x, _last_y;
-
 	struct State
 	{
-		State(Dragger &);
+		State(MouseController &);
 		virtual ~State();
 
 		virtual void move_to    (int, int) {};
@@ -29,13 +33,13 @@ private:
 
 		void transition (State *);
 
-		Dragger & _dragger;
+		MouseController & _dragger;
 	};
 
 	struct Unselected : public State
 	{
-		Unselected(Dragger &);
-		virtual ~Unselected();
+		Unselected (MouseController &);
+		virtual ~Unselected ();
 
 		virtual void move_to    (int, int); // -> Unselected, Hover
 		virtual void left_down  ();         // -> Panning
@@ -43,6 +47,9 @@ private:
 
 	struct Hovering : public State
 	{
+		Hovering (MouseController &);
+		virtual ~Hovering ();
+
 		virtual void move_to    (int, int); // -> Unselected, Hover
 		virtual void left_down  ();         // -> Dragging
 		virtual void right_down ();         // -> Dragging
@@ -50,6 +57,9 @@ private:
 
 	struct Panning : public State
 	{
+		Panning (MouseController &);
+		virtual ~Panning ();
+
 		virtual void move_to (int, int);    // -> Panning
 		virtual void left_up ();            // -> Unselected
 	};
@@ -92,4 +102,14 @@ private:
 		virtual void right_up ();           // -> Selected, SelectHovering
 	};
 
+	State * _state;
+	int     _last_x, _last_y;
+
 };
+
+
+#endif
+
+/*
+** vim: ts=4 sw=4 cindent
+*/
