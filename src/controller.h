@@ -1,17 +1,31 @@
 /*
- * mouse_controller.h - maps mouse motion and clicks to tan motion and rotations
+ * controller.h - classes for mapping inputs (e.g. mouse motion and clicks) to
+ *                tan manipulations (e.g. move, flip, rotate)
  */
 
 #ifndef __gtans_mouse_controller_h__
 #define __gtans_mouse_controller_h__ 1
 
-class MouseController
+/*
+** Simple Mouse Controller *****************************************************
+**
+** This takes mouse input and converts it to move, flip, rotate, and pan.  It is
+** simple because it only allows one action at a time.  For example, while
+** dragging, you cannot flip or rotate.
+*/
+
+template<typename GameTraits>
+class SimpleMouseController
 {
 public:
-	MouseController (int, int, bool = false, bool = false);
-	~MouseController ();
+	typedef typename GameTraits::tanset tanset;
+	typedef typename GameTraits::tan    tan;
+	typedef typename GameTraits::point  position;
 
-	void move_to    (int, int);
+	SimpleMouseController (tanset &);
+	~SimpleMouseController ();
+
+	void move_to    (const position &);
 
 	void left_down  ();
 	void left_up    ();
@@ -20,93 +34,86 @@ public:
 	void right_up   ();
 
 private:
+
+	// this class uses the state design pattern internally to manage the mouse state
+
+	class State;
+
+	State  * _state;
+	position _pos;
+	tanset & _tans;
+	tan    * _selection;
+
 	struct State
 	{
-		State(MouseController &);
+		State (SimpleMouseController &);
 		virtual ~State();
 
-		virtual void move_to    (int, int) {};
-		virtual void left_down  ()         {};
-		virtual void left_up    ()         {};
-		virtual void right_down ()         {};
-		virtual void right_up   ()         {};
+		virtual void move       () {};
+		virtual void left_down  () {};
+		virtual void left_up    () {};
+		virtual void right_down () {};
+		virtual void right_up   () {};
 
 		void transition (State *);
 
-		MouseController & _dragger;
+		SimpleMouseController & _context;
 	};
 
-	struct Unselected : public State
+	struct Inactive : public State
 	{
-		Unselected (MouseController &);
-		virtual ~Unselected ();
+		Inactive (SimpleMouseController &);
 
-		virtual void move_to    (int, int); // -> Unselected, Hover
-		virtual void left_down  ();         // -> Panning
-	};
-
-	struct Hovering : public State
-	{
-		Hovering (MouseController &);
-		virtual ~Hovering ();
-
-		virtual void move_to    (int, int); // -> Unselected, Hover
-		virtual void left_down  ();         // -> Dragging
-		virtual void right_down ();         // -> Dragging
+		virtual void left_down  ();
+		virtual void right_down ();
 	};
 
 	struct Panning : public State
 	{
-		Panning (MouseController &);
-		virtual ~Panning ();
+		Panning (SimpleMouseController &);
 
-		virtual void move_to (int, int);    // -> Panning
-		virtual void left_up ();            // -> Unselected
+		virtual void move    ();
+		virtual void left_up ();
 	};
 
 	struct Dragging : public State
 	{
-		virtual void move_to    (int, int); // -> Dragging
+		Dragging (SimpleMouseController &);
 
-		virtual void left_down  ();         // -> DoubleDragging
-		virtual void right_down ();         // -> DoubleDragging
-
-		virtual void left_up    ();         // -> Selected, SelectedHover
-		virtual void right_up   ();         // -> Selected, SelectedHover
+		virtual void move     ();
+		virtual void left_up  ();
 	};
 
-	struct DoubleDragging : public State
+	struct Flipping : public State
 	{
-		virtual void move_to  (int, int);   // -> DoubleDragging
-		virtual void left_up  ();           // -> Dragging
-		virtual void right_up ();           // -> Dragging
-	};
+		Flipping (SimpleMouseController &);
 
-	struct Selected : public State
-	{
-		virtual void move_to    (int, int); // -> Selected, SelectHovering
-		virtual void left_down  ();         // -> Panning
-		virtual void right_down ();         // -> Rotating
-	};
-
-	struct SelectHovering : public State
-	{
-		virtual void move_to    (int, int); // -> Selected, SelectHovering
-		virtual void left_down  ();         // -> Dragging
-		virtual void right_down ();         // -> Dragging
+		virtual void move     ();
+		virtual void right_up ();
 	};
 
 	struct Rotating : public State
 	{
-		virtual void move_to  (int, int);   // -> Rotating
-		virtual void right_up ();           // -> Selected, SelectHovering
+		Rotating (SimpleMouseController &);
+
+		virtual void move     ();
+		virtual void right_up ();
 	};
-
-	State * _state;
-	int     _last_x, _last_y;
-
 };
 
+/*
+** ComplexMouseController ******************************************************
+*/
+
+// TODO
+
+/*
+** MultitouchController ********************************************************
+*/
+
+// TODO
+
+#include "controller.hcc"
 
 #endif
 

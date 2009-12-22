@@ -8,10 +8,8 @@ render_opengl (const TanSet & tans)
 
 	for (typename TanSet::container::const_iterator i = tans.tans().begin(); i != tans.tans().end(); i++)
 	{
-		if (i->is_selected())
-			glColor4f(0.0, 0.0, 1.0, 1.0);
-		else
-			glColor4f(0.3, 0.0, 1.0, 1.0);
+		glColor4f(0.0, 0.0, 1.0, 1.0);
+		glColor4f(0.3, 0.0, 1.0, 1.0);
 
 		glBegin(GL_POLYGON);
 

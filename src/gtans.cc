@@ -6,6 +6,7 @@
 #include "tans.h"
 #include "render_opengl.h"
 #include "algebra.h"
+#include "traits.h"
 
 class TanView
 	: public Gtk::DrawingArea,
@@ -30,7 +31,7 @@ protected:
 	void gl_end   ();
 	void gl_flush ();
 
-	TanSet<ExtendedRational> tans;
+	TanSet<GameTraits> tans;
 };
 
 TanView::

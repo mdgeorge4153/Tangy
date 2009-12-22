@@ -7,6 +7,6 @@ AM_CXXFLAGS = -g -Werror -Wall -pedantic $(CGAL_CXXFLAGS) -frounding-math
 bin_PROGRAMS = gtans2 test
 
 gtans2_SOURCES = gtans.cc algebra.cc
-test_SOURCES = test.cc algebra.cc
+test_SOURCES = test.cc controller.hcc controller.h algebra.cc
 
 

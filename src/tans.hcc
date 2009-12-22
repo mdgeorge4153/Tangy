@@ -1,55 +1,82 @@
 
 
+/*
+** Tans ************************************************************************
+*/
 
-template<typename N>
+template<typename GT>
 bool
-Tan<N>::
-is_selected () const
-{
-	return _selected;
-}
-
-template<typename N>
-bool
-Tan<N>::
+Tan<GT>::
 is_offset () const
 {
 	return _selected && _pos != _desired_pos;
 }
 
-template<typename N>
-const typename Tan<N>::vector_container &
-Tan<N>::
+template<typename GT>
+const typename Tan<GT>::vector_container &
+Tan<GT>::
 shape () const
 {
 	return _shape;
 }
 
-template<typename N>
-const typename Tan<N>::point &
-Tan<N>::
+template<typename GT>
+const typename Tan<GT>::point &
+Tan<GT>::
 pos () const
 {
 	return _pos;
 }
 
-template<typename N>
-const typename Tan<N>::point &
-Tan<N>::
+template<typename GT>
+const typename Tan<GT>::point &
+Tan<GT>::
 desired () const
 {
 	return _desired_pos;
 }
 
-template<typename N>
-Tan<N>::
+template<typename GT>
+void
+Tan<GT>::
+flip ()
+{
+	// TODO
+}
+
+template<typename GT>
+void
+Tan<GT>::
+set_pos (const point &)
+{
+	// TODO
+}
+
+template<typename GT>
+void
+Tan<GT>::
+set_rot (const vector &)
+{
+	// TODO
+}
+
+template<typename GT>
+void
+Tan<GT>::
+pacify ()
+{
+	// TODO
+}
+
+template<typename GT>
+Tan<GT>::
 Tan ()
 	: _selected(false), _pos(0,0), _desired_pos(0,0), _shape()
 {
 }
 
-template<typename N>
-Tan<N>::
+template<typename GT>
+Tan<GT>::
 Tan (point p0, point p1, point p2)
 	: _selected(false),
 	  _shape(3)
@@ -63,8 +90,8 @@ Tan (point p0, point p1, point p2)
 	_desired_pos = _pos;
 }
 
-template<typename N>
-Tan<N>::
+template<typename GT>
+Tan<GT>::
 Tan(point p0, point p1, point p2, point p3)
 	: _selected(false),
 	  _shape(4)
@@ -79,10 +106,10 @@ Tan(point p0, point p1, point p2, point p3)
 	_desired_pos = _pos;
 }
 
-template<typename N>
-template<typename M>
-Tan<N>::
-Tan (const Tan<M> & other)
+template<typename GT>
+template<typename GT2>
+Tan<GT>::
+Tan (const Tan<GT2> & other)
 	: _selected(other._selected),
 	  _pos(other._pos),
 	  _desired_pos(other._desired_pos),
@@ -91,15 +118,16 @@ Tan (const Tan<M> & other)
 }
 
 /*
-********************************************************************************
+** Tan Set *********************************************************************
 */
 
-template<typename N, template<typename> class P>
-TanSet<N,P>::
+template<typename GT>
+TanSet<GT>::
 TanSet ()
 	: _tans()
 {
-	typedef typename tan::point point;
+	typedef typename GT::point  point;
+	typedef typename GT::number number;
 
 	// shapes
 	_tans.push_back(tan(point(0,0), point(0,2), point(2,0)));             // big triangle
@@ -111,102 +139,63 @@ TanSet ()
 	_tans.push_back(tan(point(0,0), point(0,1), point(1,1), point(1,0))); // square
 
 	// positions
-	_tans[0]._pos += point(1,1)  / N(2);
-	_tans[1]._pos += point(1,2)  / N(2);
-	_tans[2]._pos += point(11,3) / N(4);
-	_tans[3]._pos += point(3,2)  / N(1);
-	_tans[4]._pos += point(13,3) / N(4);
-	_tans[5]._pos += point(9,1)  / N(2);
-	_tans[6]._pos += point(17,8) / N(4);
+	_tans[0]._pos += point(1,1)  / number(2);
+	_tans[1]._pos += point(1,2)  / number(2);
+	_tans[2]._pos += point(11,3) / number(4);
+	_tans[3]._pos += point(3,2)  / number(1);
+	_tans[4]._pos += point(13,3) / number(4);
+	_tans[5]._pos += point(9,1)  / number(2);
+	_tans[6]._pos += point(17,8) / number(4);
 }
 
-template<typename N, template<typename> class P>
+template<typename GT>
 template<typename TS>
-TanSet<N,P>::
+TanSet<GT>::
 TanSet (const TS & other)
-	: P<N>(other), _tans(other.tans()), _selection(other._selection)
+	: _tans(other.tans()), _selection(other._selection)
 {
 }
 
-template<typename N, template<typename> class P>
+template<typename GT>
 void
-TanSet<N,P>::
-begin_motion (int x, int y)
-{
-	// TODO
-}
-
-template<typename N, template<typename> class P>
-void
-TanSet<N,P>::
-end_motion ()
-{
-	// TODO
-}
-
-template<typename N, template<typename> class P>
-void
-TanSet<N,P>::
-move (int x, int y)
-{
-	// TODO
-}
-
-template<typename N, template<typename> class P>
-void
-TanSet<N,P>::
-flip ()
-{
-	// TODO
-}
-
-template<typename N, template<typename> class P>
-void
-TanSet<N,P>::
-rotate (float theta)
-{
-	// TODO
-}
-
-template<typename N, template<typename> class P>
-void
-TanSet<N,P>::
+TanSet<GT>::
 set_size (int w, int h)
 {
 	// TODO
 }
 
-template<typename N, template<typename> class P>
+template<typename GT>
 template<typename PointIter>
 void
-TanSet<N,P>::
+TanSet<GT>::
 add_obstacle (PointIter begin, PointIter end)
 {
 	// TODO
 }
 
-template<typename N, template<typename> class P>
-const typename TanSet<N,P>::container &
-TanSet<N,P>::
+template<typename GT>
+const typename TanSet<GT>::container &
+TanSet<GT>::
 tans () const
 {
 	return _tans;
 }
 
-template<typename N, template<typename> class P>
-const typename TanSet<N,P>::tan &
-TanSet<N,P>::
+template<typename GT>
+const typename TanSet<GT>::tan &
+TanSet<GT>::
 selection () const
 {
 	// TODO
 }
 
-template<typename N, template<typename> class P>
-void
-TanSet<N,P>::
-operator~ ()
+template<typename GT>
+typename TanSet<GT>::tan *
+TanSet<GT>::
+find (const point &) const
 {
 	// TODO
+	return NULL;
 }
 
 /*

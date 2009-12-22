@@ -1,0 +1,247 @@
+/*
+** Simple Mouse Controller *****************************************************
+*/
+
+template<typename GameTraits>
+SimpleMouseController<GameTraits>::
+SimpleMouseController (tanset & tans)
+	: _state     (new Inactive (* this)),
+	  _tans      (tans),
+	  _selection (NULL)
+{
+}
+
+template<typename GameTraits>
+SimpleMouseController<GameTraits>::
+~SimpleMouseController ()
+{
+	delete _state;
+}
+
+template<typename GameTraits>
+void
+SimpleMouseController<GameTraits>::
+move_to (const position & pos)
+{
+	_pos = pos;
+	_state->move ();
+}
+
+template<typename GameTraits>
+void
+SimpleMouseController<GameTraits>::
+left_down ()
+{
+	_state->left_down ();
+}
+
+template<typename GameTraits>
+void
+SimpleMouseController<GameTraits>::
+left_up ()
+{
+	_state->left_up ();
+}
+
+template<typename GameTraits>
+void
+SimpleMouseController<GameTraits>::
+right_down ()
+{
+	_state->right_down ();
+}
+
+template<typename GameTraits>
+void
+SimpleMouseController<GameTraits>::
+right_up ()
+{
+	_state->right_up ();
+}
+
+/*
+** SimpleMouseController::State ************************************************
+*/
+
+template<typename GameTraits>
+SimpleMouseController<GameTraits>::State::
+State (SimpleMouseController<GameTraits> & context)
+	: _context (context)
+{
+}
+
+template<typename GameTraits>
+SimpleMouseController<GameTraits>::State::
+~State ()
+{
+}
+
+template<typename GameTraits>
+void
+SimpleMouseController<GameTraits>::State::
+transition (State * new_state)
+{
+	this->_context._state = new_state;
+	delete this;
+}
+
+/*
+** SimpleMouseController::Inactive *********************************************
+*/
+
+template<typename GameTraits>
+SimpleMouseController<GameTraits>::Inactive::
+Inactive (SimpleMouseController & context)
+	: State (context)
+{
+}
+
+template<typename GameTraits>
+void
+SimpleMouseController<GameTraits>::Inactive::
+left_down ()
+{
+	this->_context._selection = this->_context._tans.find (this->_context._pos);
+
+	if (this->_context._selection)
+	{
+		transition (new Dragging (this->_context));
+	}
+	else
+	{
+		transition (new Panning (this->_context));
+	}
+}
+
+template<typename GameTraits>
+void
+SimpleMouseController<GameTraits>::Inactive::
+right_down ()
+{
+	tan * inside = this->_context._tans.find (this->_context._pos);
+
+	if (this->_context._selection == inside)
+	{
+		this->_context._selection->flip();
+		transition (new Flipping (this->_context));
+	}
+	else if (this->_context._selection)
+	{
+		transition (new Rotating (this->_context));
+	}
+}
+
+/*
+** SimpleMouseController::Panning **********************************************
+*/
+
+template<typename GameTraits>
+SimpleMouseController<GameTraits>::Panning::
+Panning (SimpleMouseController & context)
+	: State (context)
+{
+}
+
+template<typename GameTraits>
+void
+SimpleMouseController<GameTraits>::Panning::
+move ()
+{
+	//TODO: this->_context._tans.pan
+}
+
+template<typename GameTraits>
+void
+SimpleMouseController<GameTraits>::Panning::
+left_up ()
+{
+	this->_context._selection->pacify();
+	transition (new Inactive(this->_context));
+}
+
+/*
+** SimpleMouseController::Dragging *********************************************
+*/
+
+template<typename GameTraits>
+SimpleMouseController<GameTraits>::Dragging::
+Dragging (SimpleMouseController & context)
+	: State (context)
+{
+}
+
+template<typename GameTraits>
+void
+SimpleMouseController<GameTraits>::Dragging::
+move ()
+{
+	// TODO
+}
+
+template<typename GameTraits>
+void
+SimpleMouseController<GameTraits>::Dragging::
+left_up ()
+{
+	// TODO
+}
+
+/*
+** SimpleMouseController::Flipping *********************************************
+*/
+
+template<typename GameTraits>
+SimpleMouseController<GameTraits>::Flipping::
+Flipping (SimpleMouseController & context)
+	: State (context)
+{
+}
+
+template<typename GameTraits>
+void
+SimpleMouseController<GameTraits>::Flipping::
+move ()
+{
+	// TODO
+}
+
+template<typename GameTraits>
+void
+SimpleMouseController<GameTraits>::Flipping::
+right_up ()
+{
+	// TODO
+}
+
+/*
+** SimpleMouseController::Rotating *********************************************
+*/
+
+template<typename GameTraits>
+SimpleMouseController<GameTraits>::Rotating::
+Rotating (SimpleMouseController & context)
+	: State (context)
+{
+}
+
+template<typename GameTraits>
+void
+SimpleMouseController<GameTraits>::Rotating::
+move ()
+{
+	// TODO
+}
+
+template<typename GameTraits>
+void
+SimpleMouseController<GameTraits>::Rotating::
+right_up ()
+{
+	// TODO
+}
+
+
+
+/*
+** vim: ts=4 sw=4 cindent syntax=cpp
+*/
