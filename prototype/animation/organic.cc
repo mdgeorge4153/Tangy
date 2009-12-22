@@ -24,10 +24,8 @@ typedef struct Wave {
 	GLint loc;
 } Wave;
 
-typedef struct WaveTexture {
-	const int nwaves = 3;
-	wave waves[nwaves];
-} WaveTexture;
+const int nwaves = 3;
+Wave waves[nwaves];
 
 void printInfoLog(GLhandleARB obj)
 {
