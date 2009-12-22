@@ -46,11 +46,15 @@ public:
 	// public accessors //
 	//////////////////////
 
+	const vector_container & shape () const;
+
+	const point  & pos   () const;
+	const vector & rot   () const;
+
 	bool is_offset   () const;
 
-	const vector_container & shape   () const;
-	const point            & pos     () const;
-	const point            & desired () const;
+	const point  & desired_pos () const;
+	const vector & desired_rot () const;
 
 	bool contains (const point &) const;
 
@@ -60,9 +64,12 @@ private:
 	// private members //
 	/////////////////////
 
-	bool             _selected;
 	point            _pos;
+	vector           _rot;
+
 	point            _desired_pos;
+	vector           _desired_rot;
+
 	vector_container _shape;
 
 	Tan ();
@@ -86,8 +93,9 @@ public:
 	// public types //
 	//////////////////
 
-	typedef typename GameTraits::tan   tan;
-	typedef typename GameTraits::point point;
+	typedef typename GameTraits::tan    tan;
+	typedef typename GameTraits::point  point;
+	typedef typename GameTraits::vector vector;
 
 	typedef std::vector<tan>         container;
 
@@ -108,6 +116,8 @@ public:
 
 	template<typename PointIter>
 	void add_obstacle (PointIter, PointIter);
+
+	void pan (const vector &);
 
 	//////////////////////
 	// public accessors //

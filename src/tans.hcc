@@ -9,7 +9,7 @@ bool
 Tan<GT>::
 is_offset () const
 {
-	return _selected && _pos != _desired_pos;
+	return _pos != _desired_pos;
 }
 
 template<typename GT>
@@ -29,11 +29,27 @@ pos () const
 }
 
 template<typename GT>
+const typename Tan<GT>::vector &
+Tan<GT>::
+rot () const
+{
+	return _rot;
+}
+
+template<typename GT>
 const typename Tan<GT>::point &
 Tan<GT>::
-desired () const
+desired_pos () const
 {
 	return _desired_pos;
+}
+
+template<typename GT>
+const typename Tan<GT>::vector &
+Tan<GT>::
+desired_rot () const
+{
+	// TODO
 }
 
 template<typename GT>
@@ -71,15 +87,14 @@ pacify ()
 template<typename GT>
 Tan<GT>::
 Tan ()
-	: _selected(false), _pos(0,0), _desired_pos(0,0), _shape()
+	: _pos(0,0), _desired_pos(0,0), _shape()
 {
 }
 
 template<typename GT>
 Tan<GT>::
 Tan (point p0, point p1, point p2)
-	: _selected(false),
-	  _shape(3)
+	: _shape(3)
 {
 	_shape[0] = p0;
 	_shape[1] = p1;
@@ -93,8 +108,7 @@ Tan (point p0, point p1, point p2)
 template<typename GT>
 Tan<GT>::
 Tan(point p0, point p1, point p2, point p3)
-	: _selected(false),
-	  _shape(4)
+	: _shape(4)
 {
 	_shape[0] = p0;
 	_shape[1] = p1;
@@ -110,8 +124,7 @@ template<typename GT>
 template<typename GT2>
 Tan<GT>::
 Tan (const Tan<GT2> & other)
-	: _selected(other._selected),
-	  _pos(other._pos),
+	: _pos(other._pos),
 	  _desired_pos(other._desired_pos),
 	  _shape(other._shape)
 {
@@ -169,6 +182,14 @@ template<typename PointIter>
 void
 TanSet<GT>::
 add_obstacle (PointIter begin, PointIter end)
+{
+	// TODO
+}
+
+template<typename GT>
+void
+TanSet<GT>::
+pan (const vector &)
 {
 	// TODO
 }

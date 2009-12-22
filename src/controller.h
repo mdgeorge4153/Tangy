@@ -21,6 +21,7 @@ public:
 	typedef typename GameTraits::tanset tanset;
 	typedef typename GameTraits::tan    tan;
 	typedef typename GameTraits::point  position;
+	typedef typename GameTraits::vector vector;
 
 	SimpleMouseController (tanset &);
 	~SimpleMouseController ();
@@ -74,6 +75,8 @@ private:
 
 		virtual void move    ();
 		virtual void left_up ();
+
+		position _last_pos;
 	};
 
 	struct Dragging : public State
@@ -82,6 +85,8 @@ private:
 
 		virtual void move     ();
 		virtual void left_up  ();
+
+		vector _offset;
 	};
 
 	struct Flipping : public State
@@ -98,6 +103,10 @@ private:
 
 		virtual void move     ();
 		virtual void right_up ();
+
+		vector _rot_offset;
+
+		vector offset ();
 	};
 };
 

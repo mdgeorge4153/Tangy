@@ -1,3 +1,5 @@
+#include <iostream>
+
 /*
 ** Simple Mouse Controller *****************************************************
 */
@@ -94,6 +96,7 @@ SimpleMouseController<GameTraits>::Inactive::
 Inactive (SimpleMouseController & context)
 	: State (context)
 {
+	std::cout << "Inactive" << std::endl;
 }
 
 template<typename GameTraits>
@@ -138,8 +141,10 @@ right_down ()
 template<typename GameTraits>
 SimpleMouseController<GameTraits>::Panning::
 Panning (SimpleMouseController & context)
-	: State (context)
+	: State (context),
+	  _last_pos(this->_context._pos)
 {
+	std::cout << "Panning" << std::endl;
 }
 
 template<typename GameTraits>
@@ -147,7 +152,10 @@ void
 SimpleMouseController<GameTraits>::Panning::
 move ()
 {
-	//TODO: this->_context._tans.pan
+	vector offset   = this->_context._pos - this->_last_pos;
+	this->_last_pos = this->_context._pos;
+
+	this->_context._tans.pan(offset);
 }
 
 template<typename GameTraits>
@@ -155,7 +163,6 @@ void
 SimpleMouseController<GameTraits>::Panning::
 left_up ()
 {
-	this->_context._selection->pacify();
 	transition (new Inactive(this->_context));
 }
 
@@ -166,8 +173,10 @@ left_up ()
 template<typename GameTraits>
 SimpleMouseController<GameTraits>::Dragging::
 Dragging (SimpleMouseController & context)
-	: State (context)
+	: State   (context),
+	  _offset (this->_context._selection->pos() - this->_context._pos)
 {
+	std::cout << "Dragging" << std::endl;
 }
 
 template<typename GameTraits>
@@ -175,7 +184,7 @@ void
 SimpleMouseController<GameTraits>::Dragging::
 move ()
 {
-	// TODO
+	this->_context._selection->set_pos (this->_context._pos + this->_offset);
 }
 
 template<typename GameTraits>
@@ -183,7 +192,8 @@ void
 SimpleMouseController<GameTraits>::Dragging::
 left_up ()
 {
-	// TODO
+	this->_context._selection->pacify();
+	transition (new Inactive(this->_context));
 }
 
 /*
@@ -193,8 +203,9 @@ left_up ()
 template<typename GameTraits>
 SimpleMouseController<GameTraits>::Flipping::
 Flipping (SimpleMouseController & context)
-	: State (context)
+	: State   (context)
 {
+	std::cout << "Flipping" << std::endl;
 }
 
 template<typename GameTraits>
@@ -202,7 +213,6 @@ void
 SimpleMouseController<GameTraits>::Flipping::
 move ()
 {
-	// TODO
 }
 
 template<typename GameTraits>
@@ -210,7 +220,8 @@ void
 SimpleMouseController<GameTraits>::Flipping::
 right_up ()
 {
-	// TODO
+	this->_context._selection->pacify ();
+	transition (new Inactive(this->_context));
 }
 
 /*
@@ -220,8 +231,10 @@ right_up ()
 template<typename GameTraits>
 SimpleMouseController<GameTraits>::Rotating::
 Rotating (SimpleMouseController & context)
-	: State (context)
+	: State  (context),
+	  _rot_offset (std::conj(offset()) * this->_context._selection->rot ())
 {
+	std::cout << "Rotating" << std::endl;
 }
 
 template<typename GameTraits>
@@ -229,7 +242,7 @@ void
 SimpleMouseController<GameTraits>::Rotating::
 move ()
 {
-	// TODO
+	this->_context._selection->set_rot (offset() * this->_rot_offset);
 }
 
 template<typename GameTraits>
@@ -237,9 +250,18 @@ void
 SimpleMouseController<GameTraits>::Rotating::
 right_up ()
 {
-	// TODO
+	this->_context._selection->pacify ();
+	transition (new Inactive (this->_context));
 }
 
+template<typename GameTraits>
+inline
+typename SimpleMouseController<GameTraits>::vector
+SimpleMouseController<GameTraits>::Rotating::
+offset ()
+{
+	return this->_context._pos - this->_context._selection->pos();
+}
 
 
 /*

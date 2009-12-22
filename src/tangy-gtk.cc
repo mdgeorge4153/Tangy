@@ -6,6 +6,7 @@
 #include "tans.h"
 #include "render_opengl.h"
 #include "algebra.h"
+#include "controller.h"
 #include "traits.h"
 
 class TanView
@@ -31,13 +32,16 @@ protected:
 	void gl_end   ();
 	void gl_flush ();
 
-	TanSet<GameTraits> tans;
+	TanSet<GameTraits>                tans;
+	SimpleMouseController<GameTraits> mouse;
 };
 
 TanView::
 TanView(BaseObjectType * base, const Glib::RefPtr<Gtk::Builder> &)
 	: Gtk::DrawingArea(base),
-	  Gtk::GL::Widget<TanView>(* this)
+	  Gtk::GL::Widget<TanView>(* this),
+	  tans(),
+	  mouse(tans)
 {
 	Glib::RefPtr<Gdk::GL::Config> glconfig;
    
@@ -100,20 +104,6 @@ on_expose_event (GdkEventExpose * event)
 
 	gl_begin();
 
-	/*
-	glClear(GL_COLOR_BUFFER_BIT);
-
-	glColor4f(0.3, 0.0, 1.0, 1.0);
-	glBegin(GL_POLYGON);
-
-	glVertex2f(1.0, 1.0);
-	glVertex2f(2.0, 1.0);
-	glVertex2f(2.0, 2.0);
-	glVertex2f(1.0, 2.0);
-
-	glEnd();
-	*/
-
 	render_opengl(tans);
 
 	gl_flush();
@@ -126,21 +116,41 @@ bool
 TanView::
 on_button_press_event (GdkEventButton * event)
 {
-	return Gtk::DrawingArea::on_button_press_event (event);
+	Gtk::DrawingArea::on_button_press_event (event);
+
+	if (event->button == 1)
+		mouse.left_down();
+	else if (event->button == 3)
+		mouse.right_down();
+
+	return false;
 }
 
 bool
 TanView::
 on_button_release_event (GdkEventButton * event)
 {
-	return Gtk::DrawingArea::on_button_release_event (event);
+	Gtk::DrawingArea::on_button_release_event (event);
+
+	if (event->button == 1)
+		mouse.left_up();
+	else if (event->button == 3)
+		mouse.right_up();
+
+	return false;
 }
 
 bool
 TanView::
 on_motion_notify_event (GdkEventMotion * event)
 {
-	return Gtk::DrawingArea::on_motion_notify_event (event);
+	Gtk::DrawingArea::on_motion_notify_event (event);
+
+	GameTraits::point pos (event->x, event->y);
+	// TODO
+	mouse.move_to(pos);
+
+	return false;
 }
 
 void
