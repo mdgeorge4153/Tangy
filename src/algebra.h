@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef __gtans_algebra_h__
-#define __gtans_algebra_h__ 1
+#ifndef __tangy_algebra_h__
+#define __tangy_algebra_h__ 1
 
 #include <complex>
 #include <valarray>

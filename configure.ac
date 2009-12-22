@@ -1,10 +1,10 @@
-AC_INIT([gtans], [0.0], [mdgeorge@cs.cornell.edu])
+AC_INIT([tangy], [0.0], [mdgeorge@cs.cornell.edu])
 
-AC_CONFIG_SRCDIR([src/gtans.cc])
+AC_CONFIG_SRCDIR([src/tangy-gtk.cc])
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_MACRO_DIR([config])
 
-AM_INIT_AUTOMAKE(gtans,0.1)
+AM_INIT_AUTOMAKE(tangy,0.1)
 
 AC_PROG_CXX
 AC_LANG([C++])

@@ -2,8 +2,8 @@
  * tans.h - interface for manipulating sets of tans.
  */
 
-#ifndef __gtans_tans_h__
-#define __gtans_tans_h__ 1
+#ifndef __tangy_tans_h__
+#define __tangy_tans_h__ 1
 
 #include <vector>
 #include <valarray>

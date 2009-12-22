@@ -2,8 +2,8 @@
  * geometry.h - polygons, polygon union, and minkoski sum
  */
 
-#ifndef __gtans_geometry_h__
-#define __gtans_geometry_h__ 1
+#ifndef __tangy_geometry_h__
+#define __tangy_geometry_h__ 1
 
 namespace CGAL {
 	template<>

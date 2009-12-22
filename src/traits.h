@@ -1,5 +1,8 @@
 #include "tans.h"
 
+#ifndef __tangy_traits_h__
+#define __tangy_traits_h__
+
 struct GameTraits
 {
 	typedef ExtendedRational     number;
@@ -10,4 +13,6 @@ struct GameTraits
 	typedef TanSet<GameTraits>   tanset;
 	typedef Tan<GameTraits>      tan;
 };
+
+#endif
 

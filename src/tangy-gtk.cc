@@ -170,7 +170,7 @@ int main(int argc, char ** argv)
 
 	Gtk::GL::init(argc, argv);
 
-	Glib::RefPtr<Gtk::Builder> builder = Gtk::Builder::create_from_file("../data/gtans.xml");
+	Glib::RefPtr<Gtk::Builder> builder = Gtk::Builder::create_from_file("../data/tangy.xml");
 
 	Gtk::Window * window = 0;
 	builder->get_widget("window", window);

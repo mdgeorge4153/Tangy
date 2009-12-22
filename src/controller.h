@@ -3,8 +3,8 @@
  *                tan manipulations (e.g. move, flip, rotate)
  */
 
-#ifndef __gtans_mouse_controller_h__
-#define __gtans_mouse_controller_h__ 1
+#ifndef __tangy_mouse_controller_h__
+#define __tangy_mouse_controller_h__ 1
 
 /*
 ** Simple Mouse Controller *****************************************************

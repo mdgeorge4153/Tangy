@@ -1,1 +1,1 @@
-EXTRA_DIST = gtans.xml
+EXTRA_DIST = tangy.xml
