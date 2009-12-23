@@ -32,6 +32,8 @@ protected:
 	void gl_end   ();
 	void gl_flush ();
 
+	bool render   ();
+
 	TanSet<GameTraits>                tans;
 	SimpleMouseController<GameTraits> mouse;
 };
@@ -67,6 +69,8 @@ on_realize ()
 	glClearColor(1.0, 1.0, 1.0, 1.0);
 
 	gl_end();
+
+	Glib::signal_idle().connect( sigc::mem_fun (*this, &TanView::render) );
 }
 
 bool
@@ -102,12 +106,7 @@ on_expose_event (GdkEventExpose * event)
 {
 	bool result = Gtk::DrawingArea::on_expose_event (event);
 
-	gl_begin();
-
-	render_opengl(tans);
-
-	gl_flush();
-	gl_end();
+	render();
 
 	return result;
 }
@@ -178,6 +177,20 @@ gl_flush()
 	get_gl_window()->swap_buffers();
 }
 
+bool
+TanView::
+render()
+{
+	gl_begin();
+
+	render_opengl(tans);
+
+	gl_flush();
+	gl_end();
+
+	return true;
+}
+
 int main(int argc, char ** argv)
 {
 	Gtk::Main kit(argc, argv);
@@ -188,7 +201,6 @@ int main(int argc, char ** argv)
 
 	Gtk::Window * window = 0;
 	builder->get_widget("window", window);
-
 	TanView * view = 0;
 	builder->get_widget_derived("scene", view);
 

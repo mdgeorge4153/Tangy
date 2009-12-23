@@ -5,11 +5,36 @@
 */
 
 template<typename GT>
-bool
+void
 Tan<GT>::
-is_offset () const
+flip ()
 {
-	return _pos != _desired_pos;
+	this->_conj = !this->_conj;
+}
+
+template<typename GT>
+void
+Tan<GT>::
+set_pos (const point & pos)
+{
+	this->_pos = this->_desired_pos = pos;
+}
+
+template<typename GT>
+void
+Tan<GT>::
+set_rot (const vector & rot)
+{
+	this->_rot = this->_desired_rot = rot;
+}
+
+template<typename GT>
+void
+Tan<GT>::
+pacify ()
+{
+	this->_desired_pos = this->_pos;
+	this->_desired_rot = this->_rot;
 }
 
 template<typename GT>
@@ -37,6 +62,40 @@ rot () const
 }
 
 template<typename GT>
+const bool
+Tan<GT>::
+conj () const
+{
+	return _conj;
+}
+
+template<typename GT>
+template<typename OutputIterator>
+OutputIterator
+Tan<GT>::
+points (OutputIterator out) const
+{
+	for (unsigned i = 0; i < _shape.size(); i++)
+	{
+		vector offset = _shape[i];
+		if (_conj)
+			offset = std::conj(offset);
+		offset *= _rot;
+		(* out++) = _pos + offset;
+	}
+
+	return out;
+}
+
+template<typename GT>
+bool
+Tan<GT>::
+is_offset () const
+{
+	return _pos != _desired_pos;
+}
+
+template<typename GT>
 const typename Tan<GT>::point &
 Tan<GT>::
 desired_pos () const
@@ -49,52 +108,37 @@ const typename Tan<GT>::vector &
 Tan<GT>::
 desired_rot () const
 {
-	// TODO
+	return _desired_rot;
 }
 
 template<typename GT>
-void
+bool
 Tan<GT>::
-flip ()
+contains (const point &) const
 {
 	// TODO
-}
-
-template<typename GT>
-void
-Tan<GT>::
-set_pos (const point &)
-{
-	// TODO
-}
-
-template<typename GT>
-void
-Tan<GT>::
-set_rot (const vector &)
-{
-	// TODO
-}
-
-template<typename GT>
-void
-Tan<GT>::
-pacify ()
-{
-	// TODO
+	return true;
 }
 
 template<typename GT>
 Tan<GT>::
 Tan ()
-	: _pos(0,0), _desired_pos(0,0), _shape()
+	: _pos(0,0),
+	  _desired_pos(0,0),
+	  _rot(1),
+	  _desired_rot(1),
+	  _conj(false),
+	  _shape()
 {
 }
 
 template<typename GT>
 Tan<GT>::
 Tan (point p0, point p1, point p2)
-	: _shape(3)
+	: _rot(1),
+	  _desired_rot(1),
+	  _conj(false),
+	  _shape(3)
 {
 	_shape[0] = p0;
 	_shape[1] = p1;
@@ -108,7 +152,10 @@ Tan (point p0, point p1, point p2)
 template<typename GT>
 Tan<GT>::
 Tan(point p0, point p1, point p2, point p3)
-	: _shape(4)
+	: _rot(1),
+	  _desired_rot(1),
+	  _conj(false),
+	  _shape(4)
 {
 	_shape[0] = p0;
 	_shape[1] = p1;
@@ -126,6 +173,9 @@ Tan<GT>::
 Tan (const Tan<GT2> & other)
 	: _pos(other._pos),
 	  _desired_pos(other._desired_pos),
+	  _rot(other._rot),
+	  _desired_rot(other._desired_rot),
+	  _conj(other._conj),
 	  _shape(other._shape)
 {
 }
@@ -211,11 +261,27 @@ selection () const
 }
 
 template<typename GT>
+const typename TanSet<GT>::tan *
+TanSet<GT>::
+find (const point & p) const
+{
+	for (typename container::iterator i = _tans.begin(); i != _tans.end(); i++)
+		if (i->contains(p))
+			return &(* i);
+
+	return NULL;
+}
+
+template<typename GT>
 typename TanSet<GT>::tan *
 TanSet<GT>::
-find (const point &) const
+find (const point & p)
 {
-	// TODO
+	// TODO: duplication
+	for (typename container::iterator i = _tans.begin(); i != _tans.end (); i++)
+		if (i->contains(p))
+			return &(* i);
+
 	return NULL;
 }
 

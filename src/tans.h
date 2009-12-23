@@ -28,7 +28,6 @@ public:
 	typedef typename GameTraits::point   point;
 	typedef typename GameTraits::vector  vector;
 	typedef std::valarray<vector>        vector_container;
-	typedef std::valarray<point>         point_container;
 
 	friend class TanSet<GameTraits>;
 
@@ -36,9 +35,9 @@ public:
 	// public mutators //
 	/////////////////////
 
-	void flip();
-	void set_pos (const point  &);
-	void set_rot (const vector &);
+	void flip     ();
+	void set_pos  (const point  &);
+	void set_rot  (const vector &);
 
 	void pacify();
 
@@ -48,8 +47,12 @@ public:
 
 	const vector_container & shape () const;
 
-	const point  & pos   () const;
-	const vector & rot   () const;
+	const point  & pos  () const;
+	const vector & rot  () const;
+	const bool     conj () const;
+
+	template<typename OutputIterator>
+	OutputIterator points (OutputIterator) const;
 
 	bool is_offset   () const;
 
@@ -58,17 +61,19 @@ public:
 
 	bool contains (const point &) const;
 
-private:
+protected:
 
 	/////////////////////
 	// private members //
 	/////////////////////
 
 	point            _pos;
-	vector           _rot;
-
 	point            _desired_pos;
+
+	vector           _rot;
 	vector           _desired_rot;
+
+	bool             _conj;
 
 	vector_container _shape;
 
@@ -126,7 +131,8 @@ public:
 	const container& tans      () const;
 	const tan&       selection () const;
 
-	tan * find(const point &) const;
+	const tan * find (const point &) const;
+	      tan * find (const point &);
 
 protected:
 
