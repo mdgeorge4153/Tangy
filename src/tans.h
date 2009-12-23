@@ -77,6 +77,9 @@ protected:
 
 	vector_container _shape;
 
+	mutable std::vector<point> _points;
+	mutable bool               _points_valid;
+
 	Tan ();
 	Tan (point, point, point);
 	Tan (point, point, point, point);

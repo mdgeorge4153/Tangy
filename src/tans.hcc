@@ -1,4 +1,6 @@
 
+#include<iterator>
+#include<algorithm>
 
 /*
 ** Tans ************************************************************************
@@ -10,6 +12,7 @@ Tan<GT>::
 flip ()
 {
 	this->_conj = !this->_conj;
+	this->_points_valid = false;
 }
 
 template<typename GT>
@@ -18,6 +21,7 @@ Tan<GT>::
 set_pos (const point & pos)
 {
 	this->_pos = this->_desired_pos = pos;
+	this->_points_valid = false;
 }
 
 template<typename GT>
@@ -25,7 +29,9 @@ void
 Tan<GT>::
 set_rot (const vector & rot)
 {
-	this->_rot = this->_desired_rot = rot;
+	this->_desired_rot = rot;
+	this->_rot = normalize(rot);
+	this->_points_valid = false;
 }
 
 template<typename GT>
@@ -75,16 +81,22 @@ OutputIterator
 Tan<GT>::
 points (OutputIterator out) const
 {
-	for (unsigned i = 0; i < _shape.size(); i++)
+	if (!_points_valid)
 	{
-		vector offset = _shape[i];
-		if (_conj)
-			offset = std::conj(offset);
-		offset *= _rot;
-		(* out++) = _pos + offset;
+		_points.clear();
+		for (unsigned i = 0; i < _shape.size(); i++)
+		{
+			vector offset = _shape[i];
+			if (_conj)
+				offset = std::conj(offset);
+			offset *= _rot;
+			_points.push_back (_pos + offset);
+		}
+
+		_points_valid = true;
 	}
 
-	return out;
+	return std::copy(_points.begin(), _points.end(), out);
 }
 
 template<typename GT>
@@ -114,9 +126,31 @@ desired_rot () const
 template<typename GT>
 bool
 Tan<GT>::
-contains (const point &) const
+contains (const point & p) const
 {
-	// TODO
+	//
+	// note: we could alternately do this by conjugating and rotating point - _pos
+	//
+
+	typedef typename std::vector<point> pointset;
+
+	pointset points(_shape.size());
+	this->points(std::back_inserter(points));
+
+	point l = points.back();
+	for (typename pointset::iterator i = points.begin(); i != points.end(); i++)
+	{
+		vector ltop =  p - l;
+		vector ltoi = *i - l;
+
+		vector angle = ltop * std::conj(ltoi);
+
+		if (angle.imag() > typename GT::number(0))
+			return false;
+
+		l = *i;
+	}
+
 	return true;
 }
 

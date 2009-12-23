@@ -7,6 +7,7 @@
 #include <cassert>
 #include <numeric>
 #include <stdexcept>
+#include <iostream>
 
 ExtendedRational::
 ExtendedRational (int a1, int a2, int a3, int a6, unsigned int d)
@@ -85,15 +86,15 @@ ExtendedRational &
 ExtendedRational::
 operator*= (const ExtendedRational & other)
 {
-	int a1 = _n[0];
-	int a2 = _n[1];
-	int a3 = _n[2];
-	int a6 = _n[3];
+	long a1 = _n[0];
+	long a2 = _n[1];
+	long a3 = _n[2];
+	long a6 = _n[3];
 
-	int b1 = other._n[0];
-	int b2 = other._n[1];
-	int b3 = other._n[2];
-	int b6 = other._n[3];
+	long b1 = other._n[0];
+	long b2 = other._n[1];
+	long b3 = other._n[2];
+	long b6 = other._n[3];
 
 
 	//     *    ||    1      |  sqrt(2)  |  sqrt(3)  |  srqt(6) 
@@ -185,7 +186,7 @@ inv () const
 	//                       1
 	// result = ---------------------------
 	//          (*this) * factor1 * factor2
-	int d        = result._d;
+	long d       = result._d;
 	result._d    = result._n[0];
 	result._n[0] = d;
 
@@ -223,8 +224,8 @@ conj3 () const
 }
 
 static
-int 
-gcd(int a, int b)
+long
+gcd(long a, long b)
 {
 	return b == 0 ? a : gcd(b, a%b);
 }
@@ -233,7 +234,7 @@ void
 ExtendedRational::
 reduce ()
 {
-	int divisor = std::accumulate(&(_n[0]), &(_n[4]), _d, *gcd);
+	long divisor = std::accumulate(&(_n[0]), &(_n[4]), _d, *gcd);
 
 	if (divisor * _d < 0)
 		divisor = -divisor;
@@ -268,6 +269,33 @@ std::complex<float>
 approximate (std::complex<ExtendedRational> n)
 {
 	return std::complex<float> (n.real(), n.imag());
+}
+
+static const float PI = 3.14159265;
+
+Vector
+normalize (const Vector & v)
+{
+	//
+	// perhaps there is a better algorithm?
+	//
+
+	float theta = atan2(v.real(), v.imag());
+
+	std::cout << v << ": " << theta;
+
+	if (theta < 0)
+		theta += 2 * PI;
+
+	theta /= PI;  // theta in [0, 2)
+	theta *= 12;  // theta in [0, 24)
+	theta += 0.5; // turn floor into round
+
+	int n = int(theta) % 24;
+	
+	std::cout << " --> " << n << std::endl;
+
+	return std::pow(ROT15, n);
 }
 
 /*

@@ -66,8 +66,8 @@ public:
 
 private:
 
-	valarray<int> _n;
-	int  _d;
+	valarray<long> _n;
+	long  _d;
 
 	ExtendedRational inv()   const;
 	ExtendedRational conj2() const;
@@ -113,6 +113,8 @@ basic_ostream<Ch, Tr>& operator<< (basic_ostream<Ch,Tr> &, const ExtendedRationa
 typedef std::complex<ExtendedRational> Vector;
 
 std::complex<float> approximate (Vector);
+
+Vector normalize (const Vector &);
 
 /*
 ** Constants *******************************************************************

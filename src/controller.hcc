@@ -123,6 +123,9 @@ void
 SimpleMouseController<GameTraits>::Inactive::
 right_down ()
 {
+	if (!this->_context._selection)
+		return;
+
 	tan * inside = this->_context._tans.find (this->_context._pos);
 
 	if (this->_context._selection == inside)
@@ -130,7 +133,7 @@ right_down ()
 		this->_context._selection->flip();
 		transition (new Flipping (this->_context));
 	}
-	else if (this->_context._selection)
+	else
 	{
 		transition (new Rotating (this->_context));
 	}
