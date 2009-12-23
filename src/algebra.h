@@ -112,6 +112,8 @@ basic_ostream<Ch, Tr>& operator<< (basic_ostream<Ch,Tr> &, const ExtendedRationa
 
 typedef std::complex<ExtendedRational> Vector;
 
+std::complex<float> approximate (Vector);
+
 /*
 ** Constants *******************************************************************
 */

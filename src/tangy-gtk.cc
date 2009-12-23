@@ -147,7 +147,11 @@ on_motion_notify_event (GdkEventMotion * event)
 	Gtk::DrawingArea::on_motion_notify_event (event);
 
 	GameTraits::point pos (event->x, event->y);
-	// TODO
+
+	int size = get_width () < get_height () ? get_width () : get_height ();
+	pos /= size;
+	pos *= 8;
+
 	mouse.move_to(pos);
 
 	return false;

@@ -264,6 +264,12 @@ operator<= (const ExtendedRational & a, const ExtendedRational & b)
 	return double(a) <= double(b);
 }
 
+std::complex<float>
+approximate (std::complex<ExtendedRational> n)
+{
+	return std::complex<float> (n.real(), n.imag());
+}
+
 /*
 ** vim: syntax=cpp ts=4 sw=4 cindent
 */

@@ -7,10 +7,12 @@
 template<typename GameTraits>
 SimpleMouseController<GameTraits>::
 SimpleMouseController (tanset & tans)
-	: _state     (new Inactive (* this)),
+	: _pos       (),
 	  _tans      (tans),
-	  _selection (NULL)
+	  _selection (NULL),
+	  _state     (NULL)
 {
+	_state = new Inactive (* this);
 }
 
 template<typename GameTraits>
@@ -96,7 +98,7 @@ SimpleMouseController<GameTraits>::Inactive::
 Inactive (SimpleMouseController & context)
 	: State (context)
 {
-	std::cout << "Inactive" << std::endl;
+	std::cout << "Inactive " << approximate(this->_context._pos) << std::endl;
 }
 
 template<typename GameTraits>
@@ -144,7 +146,7 @@ Panning (SimpleMouseController & context)
 	: State (context),
 	  _last_pos(this->_context._pos)
 {
-	std::cout << "Panning" << std::endl;
+	std::cout << "Panning " << approximate (this->_context._pos) << std::endl;
 }
 
 template<typename GameTraits>
@@ -176,7 +178,7 @@ Dragging (SimpleMouseController & context)
 	: State   (context),
 	  _offset (this->_context._selection->pos() - this->_context._pos)
 {
-	std::cout << "Dragging" << std::endl;
+	std::cout << "Dragging " << approximate (this->_context._pos) << std::endl;
 }
 
 template<typename GameTraits>
@@ -205,7 +207,7 @@ SimpleMouseController<GameTraits>::Flipping::
 Flipping (SimpleMouseController & context)
 	: State   (context)
 {
-	std::cout << "Flipping" << std::endl;
+	std::cout << "Flipping " << approximate (this->_context._pos) << std::endl;
 }
 
 template<typename GameTraits>
@@ -234,7 +236,7 @@ Rotating (SimpleMouseController & context)
 	: State  (context),
 	  _rot_offset (std::conj(offset()) * this->_context._selection->rot ())
 {
-	std::cout << "Rotating" << std::endl;
+	std::cout << "Rotating" << this->_context._pos << std::endl;
 }
 
 template<typename GameTraits>

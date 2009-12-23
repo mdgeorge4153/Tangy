@@ -40,10 +40,10 @@ private:
 
 	class State;
 
-	State  * _state;
 	position _pos;
 	tanset & _tans;
 	tan    * _selection;
+	State  * _state;
 
 	struct State
 	{
