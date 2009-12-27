@@ -11,7 +11,6 @@ render_opengl (const TanSet & tans)
 	{
 		typedef typename std::vector<typename TanSet::point> pointset;
 
-		glColor4f(0.0, 0.0, 1.0, 1.0);
 		glColor4f(0.3, 0.0, 1.0, 1.0);
 
 		glBegin(GL_POLYGON);

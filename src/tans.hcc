@@ -162,7 +162,9 @@ Tan ()
 	  _rot(1),
 	  _desired_rot(1),
 	  _conj(false),
-	  _shape()
+	  _shape(),
+	  _points(),
+	  _points_valid(false)
 {
 }
 
@@ -172,7 +174,9 @@ Tan (point p0, point p1, point p2)
 	: _rot(1),
 	  _desired_rot(1),
 	  _conj(false),
-	  _shape(3)
+	  _shape(3),
+	  _points(),
+	  _points_valid(false)
 {
 	_shape[0] = p0;
 	_shape[1] = p1;
@@ -189,7 +193,9 @@ Tan(point p0, point p1, point p2, point p3)
 	: _rot(1),
 	  _desired_rot(1),
 	  _conj(false),
-	  _shape(4)
+	  _shape(4),
+	  _points(),
+	  _points_valid(false)
 {
 	_shape[0] = p0;
 	_shape[1] = p1;
@@ -210,7 +216,9 @@ Tan (const Tan<GT2> & other)
 	  _rot(other._rot),
 	  _desired_rot(other._desired_rot),
 	  _conj(other._conj),
-	  _shape(other._shape)
+	  _shape(other._shape),
+	  _points(),
+	  _points_valid(false)
 {
 }
 
