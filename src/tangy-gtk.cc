@@ -47,8 +47,7 @@ TanView(BaseObjectType * base, const Glib::RefPtr<Gtk::Builder> &)
 {
 	Glib::RefPtr<Gdk::GL::Config> glconfig;
    
-	glconfig = Gdk::GL::Config::create (Gdk::GL::MODE_RGB   |
-	                                    Gdk::GL::MODE_DEPTH |
+	glconfig = Gdk::GL::Config::create (Gdk::GL::MODE_RGBA  |
 									    Gdk::GL::MODE_DOUBLE);
 	set_gl_capability(glconfig);
 }
@@ -67,6 +66,10 @@ on_realize ()
 	gl_begin();
 
 	glClearColor(1.0, 1.0, 1.0, 1.0);
+	glEnable(GL_LINE_SMOOTH);
+	glEnable(GL_BLEND);
+
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	gl_end();
 
