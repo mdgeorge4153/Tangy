@@ -1,6 +1,5 @@
 #include <GL/gl.h>
 #include <iterator>
-#include <iostream>
 
 template<typename TanSet>
 void
@@ -11,8 +10,6 @@ render_opengl (const TanSet & tans)
 	float x;
 
 	glReadPixels(5, 5, 1, 1, GL_FLOAT, GL_ALPHA, &x);
-
-	std::cout << "alpha " << x << std::endl;
 
 	for (typename TanSet::container::const_iterator i = tans.tans().begin(); i != tans.tans().end(); i++)
 	{
@@ -44,16 +41,6 @@ render_opengl (const TanSet & tans)
 
 		glEnd();
 	}
-
-	/*
-	glColor4f(1.0, 1.0, 1.0, 1.0);
-	glBegin(GL_QUADS);
-	glVertex2f(-10.0, -10.0);
-	glVertex2f(-10.0,  10.0);
-	glVertex2f( 10.0,  10.0);
-	glVertex2f( 10.0, -10.0);
-	glEnd();
-	*/
 }
 
 /*
