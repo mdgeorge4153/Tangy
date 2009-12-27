@@ -7,7 +7,6 @@
 #include <cassert>
 #include <numeric>
 #include <stdexcept>
-#include <iostream>
 
 ExtendedRational::
 ExtendedRational (int a1, int a2, int a3, int a6, unsigned int d)
@@ -282,8 +281,6 @@ normalize (const Vector & v)
 
 	float theta = atan2(v.real(), v.imag());
 
-	std::cout << v << ": " << theta;
-
 	if (theta < 0)
 		theta += 2 * PI;
 
@@ -293,8 +290,6 @@ normalize (const Vector & v)
 
 	int n = int(theta) % 24;
 	
-	std::cout << " --> " << n << std::endl;
-
 	return std::pow(ROT15, n);
 }
 
