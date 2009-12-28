@@ -278,9 +278,13 @@ add_obstacle (PointIter begin, PointIter end)
 template<typename GT>
 void
 TanSet<GT>::
-pan (const vector &)
+pan (const vector & off)
 {
-	// TODO
+	for (typename container::iterator i = _tans.begin(); i != _tans.end(); i++)
+	{
+		i->_pos += off;
+		i->_points_valid = false;
+	}
 }
 
 template<typename GT>
