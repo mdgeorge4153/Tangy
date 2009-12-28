@@ -19,7 +19,7 @@ render_opengl (const TanSet & tans)
 		i->points(std::back_inserter(points));
 
 		glColor4f(0.3, 0.0, 1.0, 1.0);
-		glPolygonMode(GL_FRONT, GL_FILL);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glBegin(GL_POLYGON);
 
 		for (typename pointset::iterator j = points.begin(); j != points.end(); j++)

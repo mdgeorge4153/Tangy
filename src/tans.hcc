@@ -1,7 +1,5 @@
-
 #include<iterator>
 #include<algorithm>
-#include<iostream>
 
 /*
 ** Tans ************************************************************************
@@ -129,36 +127,25 @@ bool
 Tan<GT>::
 contains (const point & p) const
 {
-	//
-	// note: we could alternately do this by conjugating and rotating point - _pos
-	//
+	typedef typename std::vector<vector> pointset;
 
-	typedef typename std::vector<point> pointset;
+	vector offset = p - this->_pos;
+	offset *= std::conj(this->_rot);
+	if (this->_conj)
+		offset = std::conj(offset);
 
-	pointset points;
-	this->points(std::back_inserter(points));
-
-	std::cout << "contains" << std::fixed << approximate(p) << "   " << points.size() << std::endl;
-
-	point l = points.back();
-	for (typename pointset::iterator i = points.begin(); i != points.end(); i++)
+	int l = _shape.size() - 1;
+	for (unsigned i = 0; i < _shape.size(); i++)
 	{
-		vector ltop =  p - l;
-		vector ltoi = *i - l;
+		vector ltop = offset    - _shape[l];
+		vector ltoi = _shape[i] - _shape[l];
 
 		vector angle = ltop * std::conj(ltoi);
 
-		std::cout << "  comparing to " << l << " -- " << *i;
-
 		if (angle.imag() > typename GT::number(0))
-		{
-			std::cout << ": fail" << std::endl;
 			return false;
-		}
-		else
-			std::cout << ": pass" << std::endl;
 
-		l = *i;
+		l = i;
 	}
 
 	return true;
