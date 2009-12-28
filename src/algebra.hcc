@@ -180,13 +180,35 @@ template<typename Ch, typename Tr>
 basic_ostream<Ch, Tr> &
 operator<< (basic_ostream<Ch, Tr> & out, const ExtendedRational & a)
 {
-	out << "[" << a._n[0];
+	int nonzero = 0;
+	for (int i = 0; i < 3; i++)
+		nonzero += (a._n[i] != 0);
 
-	with_sign(out, a._n[1]); out << "*sqrt(2)";
-	with_sign(out, a._n[2]); out << "*sqrt(3)";
-	with_sign(out, a._n[3]); out << "*sqrt(6)";
+	if (nonzero == 0)
+		return out << 0;
 
-	out << "]/" << a._d;
+	if (nonzero > 1 && a._d != 1)
+		out << "[";
+
+	bool first = true;
+	std::string labels[4] = {"", "*sqrt(2)", "*sqrt(3)", "*sqrt(6)"};
+	for (int i = 0; i < 3; i++)
+		if (a._n[i])
+		{
+			if (first)
+				out << a._n[i];
+			else
+				with_sign(out, a._n[i]);
+
+			out << labels[i];
+			first = false;
+		}
+
+	if (nonzero > 1 && a._d != 1)
+		out << "]";
+
+	if (a._d != 1)
+		out << "/" << a._d;
 
 	return out;
 }
