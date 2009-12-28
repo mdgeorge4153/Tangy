@@ -1,6 +1,7 @@
 
 #include<iterator>
 #include<algorithm>
+#include<iostream>
 
 /*
 ** Tans ************************************************************************
@@ -134,8 +135,10 @@ contains (const point & p) const
 
 	typedef typename std::vector<point> pointset;
 
-	pointset points(_shape.size());
+	pointset points;
 	this->points(std::back_inserter(points));
+
+	std::cout << "contains" << std::fixed << approximate(p) << "   " << points.size() << std::endl;
 
 	point l = points.back();
 	for (typename pointset::iterator i = points.begin(); i != points.end(); i++)
@@ -145,8 +148,15 @@ contains (const point & p) const
 
 		vector angle = ltop * std::conj(ltoi);
 
+		std::cout << "  comparing to " << l << " -- " << *i;
+
 		if (angle.imag() > typename GT::number(0))
+		{
+			std::cout << ": fail" << std::endl;
 			return false;
+		}
+		else
+			std::cout << ": pass" << std::endl;
 
 		l = *i;
 	}
@@ -236,7 +246,7 @@ TanSet ()
 
 	// shapes
 	_tans.push_back(tan(point(0,0), point(0,2), point(2,0)));             // big triangle
-	_tans.push_back(tan(point(2,0), point(2,2), point(0,2)));             // big triangle
+	_tans.push_back(tan(point(2,0), point(0,2), point(2,2)));             // big triangle
 	_tans.push_back(tan(point(0,0), point(0,2), point(1,1)));             // medium triangle
 	_tans.push_back(tan(point(0,1), point(1,1), point(1,0)));             // small triangle
 	_tans.push_back(tan(point(0,0), point(1,1), point(2,1), point(1,0))); // parallelogram
