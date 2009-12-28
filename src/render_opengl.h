@@ -1,24 +1,28 @@
 #include <GL/gl.h>
 #include <iterator>
 
-template<typename TanSet>
+template<typename GameTraits>
 void
-render_opengl (const TanSet & tans)
+render_opengl (const typename GameTraits::controller & c)
 {
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	float x;
+	typedef typename GameTraits::tanset tanset;
 
-	glReadPixels(5, 5, 1, 1, GL_FLOAT, GL_ALPHA, &x);
+	const tanset & tans = c.tans();
 
-	for (typename TanSet::container::const_iterator i = tans.tans().begin(); i != tans.tans().end(); i++)
+	for (typename tanset::container::const_iterator i = tans.tans().begin(); i != tans.tans().end(); i++)
 	{
-		typedef typename std::vector<typename TanSet::point> pointset;
+		typedef typename std::vector<typename GameTraits::point> pointset;
 
 		pointset points;
 		i->points(std::back_inserter(points));
 
-		glColor4f(0.3, 0.0, 1.0, 1.0);
+		if (&(*i) == c.selection())
+			glColor4f(0.4, 0.4, 1.0, 1.0);
+		else
+			glColor4f(0.3, 0.0, 1.0, 1.0);
+
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glBegin(GL_POLYGON);
 
@@ -29,7 +33,7 @@ render_opengl (const TanSet & tans)
 
 		glEnd();
 
-		glColor4f(0.0, 0.0, 0.0, 1.0);
+		glColor4f(0.1, 0.1, 0.1, 1.0);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		glLineWidth(2.0);
 		glBegin(GL_POLYGON);

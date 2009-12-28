@@ -12,6 +12,8 @@ struct GameTraits
 
 	typedef TanSet<GameTraits>   tanset;
 	typedef Tan<GameTraits>      tan;
+
+	typedef SimpleMouseController<GameTraits> controller;
 };
 
 #endif

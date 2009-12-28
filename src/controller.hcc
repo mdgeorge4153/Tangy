@@ -63,6 +63,22 @@ right_up ()
 	_state->right_up ();
 }
 
+template<typename GameTraits>
+const typename GameTraits::tanset &
+SimpleMouseController<GameTraits>::
+tans () const
+{
+	return _tans;
+}
+
+template<typename GameTraits>
+const typename GameTraits::tan *
+SimpleMouseController<GameTraits>::
+selection () const
+{
+	return _selection;
+}
+
 /*
 ** SimpleMouseController::State ************************************************
 */
@@ -265,7 +281,7 @@ typename SimpleMouseController<GameTraits>::vector
 SimpleMouseController<GameTraits>::Rotating::
 offset ()
 {
-	return this->_context._pos - this->_context._selection->pos();
+	return std::conj(this->_context._pos - this->_context._selection->pos());
 }
 
 

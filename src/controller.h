@@ -34,6 +34,8 @@ public:
 	void right_down ();
 	void right_up   ();
 
+	const tanset & tans () const; 
+	const tan    * selection () const;
 private:
 
 	// this class uses the state design pattern internally to manage the mouse state

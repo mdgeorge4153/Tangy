@@ -186,7 +186,7 @@ render()
 {
 	gl_begin();
 
-	render_opengl(tans);
+	render_opengl<GameTraits> (mouse);
 
 	gl_flush();
 	gl_end();
