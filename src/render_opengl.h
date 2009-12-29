@@ -19,9 +19,9 @@ render_opengl (const typename GameTraits::controller & c)
 		i->points(std::back_inserter(points));
 
 		if (&(*i) == c.selection())
-			glColor4f(0.4, 0.4, 1.0, 1.0);
+			glColor4f(0.2, 0.0, 1.0, 1.0);
 		else
-			glColor4f(0.3, 0.0, 1.0, 1.0);
+			glColor4f(0.13, 0.0, 0.66, 1.0);
 
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glBegin(GL_POLYGON);
@@ -33,7 +33,7 @@ render_opengl (const typename GameTraits::controller & c)
 
 		glEnd();
 
-		glColor4f(0.1, 0.1, 0.1, 1.0);
+		glColor4f(0.06, 0.0, 0.32, 1.0);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		glLineWidth(2.0);
 		glBegin(GL_POLYGON);
