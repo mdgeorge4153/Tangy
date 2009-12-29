@@ -86,9 +86,9 @@ points (OutputIterator out) const
 		for (unsigned i = 0; i < _shape.size(); i++)
 		{
 			vector offset = _shape[i];
+			offset *= _rot;
 			if (_conj)
 				offset = std::conj(offset);
-			offset *= _rot;
 			_points.push_back (_pos + offset);
 		}
 
@@ -130,9 +130,9 @@ contains (const point & p) const
 	typedef typename std::vector<vector> pointset;
 
 	vector offset = p - this->_pos;
-	offset *= std::conj(this->_rot);
 	if (this->_conj)
 		offset = std::conj(offset);
+	offset *= std::conj(this->_rot);
 
 	int l = _shape.size() - 1;
 	for (unsigned i = 0; i < _shape.size(); i++)
