@@ -1,7 +1,10 @@
-#include "tans.h"
-
 #ifndef __tangy_traits_h__
 #define __tangy_traits_h__
+
+#include <complex>
+#include "algebra.h"
+#include "tans.h"
+#include "controller.h"
 
 struct GameTraits
 {

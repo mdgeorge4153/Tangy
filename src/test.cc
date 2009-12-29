@@ -1,13 +1,19 @@
 #include <iostream>
-#include <complex>
-#include "algebra.h"
-#include "controller.h"
-#include "tans.h"
+#include "geometry.h"
 #include "traits.h"
+
 
 int main(int, char **)
 {
-	GameTraits::tanset tans;
-	SimpleMouseController<GameTraits> controller (tans);
+	typedef GameTraits::point       point;
+	typedef GameTraits::tanset      tanset;
+	typedef ObstacleSet<GameTraits> obstacle_set;
+
+	tanset       tans;
+	obstacle_set obs (tans.find (point (1, 1)), tans);
+
+	std::cout << obs.closest (point (2, 2)) << std::endl;
+
+	return 0;
 }
 

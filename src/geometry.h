@@ -5,6 +5,7 @@
 #ifndef __tangy_geometry_h__
 #define __tangy_geometry_h__ 1
 
+#include <CGAL/Extended_cartesian.h>
 #include <CGAL/Nef_polyhedron_2.h>
 
 
@@ -23,9 +24,9 @@ public:
 private:
 	typedef typename GameTraits::number number;
 
-	typedef CGAL::Extended_cartesian<number> kernel;
-	typedef CGAL::Nef_polyhedron_2<kernel>   polygon;
-	typedef polygon::Point                   cgal_point;
+	typedef typename CGAL::Extended_cartesian<number> kernel;
+	typedef typename CGAL::Nef_polyhedron_2<kernel>   polygon;
+	typedef typename polygon::Point                   cgal_point;
 };
 
 #include "geometry.hcc"
