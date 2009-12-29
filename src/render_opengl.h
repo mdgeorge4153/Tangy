@@ -18,7 +18,7 @@ render_opengl (const typename GameTraits::controller & c)
 		pointset points;
 		i->points(std::back_inserter(points));
 
-		if (&(*i) == c.selection())
+		if (i == c.selection())
 			glColor4f(0.2, 0.0, 1.0, 1.0);
 		else
 			glColor4f(0.13, 0.0, 0.66, 1.0);

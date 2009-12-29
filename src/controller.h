@@ -18,10 +18,11 @@ template<typename GameTraits>
 class SimpleMouseController
 {
 public:
-	typedef typename GameTraits::tanset tanset;
-	typedef typename GameTraits::tan    tan;
-	typedef typename GameTraits::point  position;
-	typedef typename GameTraits::vector vector;
+	typedef typename GameTraits::tanset           tanset;
+	typedef typename GameTraits::tan_handle       tan_handle;
+	typedef typename GameTraits::const_tan_handle const_tan_handle;
+	typedef typename GameTraits::point            position;
+	typedef typename GameTraits::vector           vector;
 
 	SimpleMouseController (tanset &);
 	~SimpleMouseController ();
@@ -34,18 +35,18 @@ public:
 	void right_down ();
 	void right_up   ();
 
-	const tanset & tans () const; 
-	const tan    * selection () const;
+	const tanset &   tans () const; 
+	const_tan_handle selection () const;
 private:
 
 	// this class uses the state design pattern internally to manage the mouse state
 
 	class State;
 
-	position _pos;
-	tanset & _tans;
-	tan    * _selection;
-	State  * _state;
+	position   _pos;
+	tanset &   _tans;
+	tan_handle _selection;
+	State  *   _state;
 
 	struct State
 	{

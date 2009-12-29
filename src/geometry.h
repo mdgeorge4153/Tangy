@@ -13,11 +13,12 @@ template<typename GameTraits>
 class ObstacleSet
 {
 public:
-	typedef typename GameTraits::point  point;
-	typedef typename GameTraits::tan    tan;
-	typedef typename GameTraits::tanset tanset;
+	typedef typename GameTraits::point            point;
+	typedef typename GameTraits::tanset           tanset;
+	typedef typename GameTraits::tan_handle       tan_handle;
+	typedef typename GameTraits::const_tan_handle const_tan_handle;
 
-	ObstacleSet (const tan *, const tanset &);
+	ObstacleSet (const_tan_handle, const tanset &);
 
 	point closest (const point &) const;
 
@@ -28,7 +29,7 @@ private:
 	typedef typename CGAL::Nef_polyhedron_2<kernel>   polygon;
 	typedef typename polygon::Point                   cgal_point;
 
-	void add_sum(const tan &, const tan &);
+	void add_sum(const_tan_handle, const_tan_handle);
 
 	polygon _impl;
 };

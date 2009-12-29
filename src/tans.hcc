@@ -1,5 +1,6 @@
 #include<iterator>
 #include<algorithm>
+#include<functional>
 
 /*
 ** Tans ************************************************************************
@@ -304,28 +305,55 @@ selection () const
 }
 
 template<typename GT>
-const typename TanSet<GT>::tan *
+typename TanSet<GT>::const_tan_handle
 TanSet<GT>::
 find (const point & p) const
 {
 	for (typename container::iterator i = _tans.begin(); i != _tans.end(); i++)
 		if (i->contains(p))
-			return &(* i);
+			return i;
 
 	return NULL;
 }
 
 template<typename GT>
-typename TanSet<GT>::tan *
+typename TanSet<GT>::tan_handle
 TanSet<GT>::
 find (const point & p)
 {
-	// TODO: duplication
-	for (typename container::iterator i = _tans.begin(); i != _tans.end (); i++)
-		if (i->contains(p))
-			return &(* i);
+	return std::find_if (begin(), end(), bind2nd(mem_fun_ref(&tan::contains), p));
+}
 
-	return NULL;
+template<typename GT>
+typename TanSet<GT>::const_tan_handle
+TanSet<GT>::
+begin () const
+{
+	return _tans.begin();
+}
+
+template<typename GT>
+typename TanSet<GT>::tan_handle
+TanSet<GT>::
+begin ()
+{
+	return _tans.begin();
+}
+
+template<typename GT>
+typename TanSet<GT>::const_tan_handle
+TanSet<GT>::
+end () const
+{
+	return _tans.end();
+}
+
+template<typename GT>
+typename TanSet<GT>::tan_handle
+TanSet<GT>::
+end ()
+{
+	return _tans.end ();
 }
 
 /*

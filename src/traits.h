@@ -16,6 +16,9 @@ struct GameTraits
 	typedef TanSet<GameTraits>   tanset;
 	typedef Tan<GameTraits>      tan;
 
+	typedef tanset::tan_handle       tan_handle;
+	typedef tanset::const_tan_handle const_tan_handle;
+
 	typedef SimpleMouseController<GameTraits> controller;
 };
 

@@ -105,7 +105,10 @@ public:
 	typedef typename GameTraits::point  point;
 	typedef typename GameTraits::vector vector;
 
-	typedef std::vector<tan>         container;
+	typedef std::vector<tan> container;
+
+	typedef typename container::iterator       tan_handle;
+	typedef typename container::const_iterator const_tan_handle;
 
 	/////////////////////////
 	// public constructors //
@@ -134,8 +137,14 @@ public:
 	const container& tans      () const;
 	const tan&       selection () const;
 
-	const tan * find (const point &) const;
-	      tan * find (const point &);
+	const_tan_handle find (const point &) const;
+	      tan_handle find (const point &);
+
+	const_tan_handle begin () const;
+	      tan_handle begin ();
+
+	const_tan_handle end () const;
+	      tan_handle end ();
 
 protected:
 

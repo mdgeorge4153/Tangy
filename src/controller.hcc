@@ -72,7 +72,7 @@ tans () const
 }
 
 template<typename GameTraits>
-const typename GameTraits::tan *
+typename GameTraits::const_tan_handle
 SimpleMouseController<GameTraits>::
 selection () const
 {
@@ -124,7 +124,7 @@ left_down ()
 {
 	this->_context._selection = this->_context._tans.find (this->_context._pos);
 
-	if (this->_context._selection)
+	if (this->_context._selection != this->_context._tans.end())
 	{
 		transition (new Dragging (this->_context));
 	}
@@ -139,10 +139,10 @@ void
 SimpleMouseController<GameTraits>::Inactive::
 right_down ()
 {
-	if (!this->_context._selection)
+	if (this->_context._selection == this->_context._tans.end())
 		return;
 
-	tan * inside = this->_context._tans.find (this->_context._pos);
+	tan_handle inside = this->_context._tans.find (this->_context._pos);
 
 	if (this->_context._selection == inside)
 	{
