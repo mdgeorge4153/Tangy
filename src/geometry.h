@@ -27,6 +27,10 @@ private:
 	typedef typename CGAL::Extended_cartesian<number> kernel;
 	typedef typename CGAL::Nef_polyhedron_2<kernel>   polygon;
 	typedef typename polygon::Point                   cgal_point;
+
+	void add_sum(const tan &, const tan &);
+
+	polygon _impl;
 };
 
 #include "geometry.hcc"

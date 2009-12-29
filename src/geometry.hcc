@@ -17,8 +17,11 @@ namespace CGAL {
 template<typename GameTraits>
 ObstacleSet<GameTraits>::
 ObstacleSet (const tan * moving, const tanset & fixed)
+	: _impl(polygon::EMPTY)
 {
-
+	for (typename tanset::container::iterator i = fixed.tans().begin(); i != fixed.tans().end(); i++)
+		if (&(*i) != moving)
+			add_sum(* moving, * i);
 }
 
 template<typename GameTraits>
@@ -27,6 +30,14 @@ ObstacleSet<GameTraits>::
 closest (const point & p) const
 {
 	return p;
+}
+
+template<typename GameTraits>
+void
+ObstacleSet<GameTraits>::
+add_sum (const tan & moving, const tan & fixed)
+{
+	
 }
 
 /*
