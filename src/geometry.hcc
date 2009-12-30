@@ -1,4 +1,9 @@
+#include <vector>
+#include <algorithm>
+#include <iterator>
+#include <iostream>
 #include "algebra.h"
+
 
 namespace CGAL {
 	template<>
@@ -22,6 +27,8 @@ ObstacleSet (const_tan_handle moving, const tanset & fixed)
 	for (const_tan_handle i = fixed.begin(); i != fixed.end(); i++)
 		if (i != moving)
 			add_sum(moving, i);
+
+	std::cout << _impl << std::endl;
 }
 
 template<typename GameTraits>
@@ -33,11 +40,77 @@ closest (const point & p) const
 }
 
 template<typename GameTraits>
+typename ObstacleSet<GameTraits>::cgal_point
+ObstacleSet<GameTraits>::
+convert (const point & p)
+{
+	return cgal_point(p.real(), p.imag());
+}
+
+template<typename GameTraits>
+bool
+ObstacleSet<GameTraits>::
+less_rot (const point & a, const point & b)
+{
+	if (a.imag() > number(0) && b.imag() < number(0))
+		// angle(a) < 180 < angle(b)
+		return true;
+	else if (a.imag() < number(0) && b.imag() > number(0))
+		// angle(b) < 180 < angle(a)
+		return false;
+	else
+		// a and b are in same half-plane so
+		// -180 < angle(b) - angle(a) < 180
+		return (b * std::conj(a)).imag() < number(0);
+}
+
+template<typename GameTraits>
+bool
+ObstacleSet<GameTraits>::
+south_of (const point & a, const point & b)
+{
+	return a.imag() < b.imag();
+}
+
+template<typename GameTraits>
 void
 ObstacleSet<GameTraits>::
 add_sum (const_tan_handle fixed, const_tan_handle moving)
 {
-	
+	typedef std::vector<point>           container;
+	typedef typename container::iterator iterator;
+
+	// let fps and mps be the points of fixed and moving respectively
+	container fps, mps;
+	fixed ->points(std::back_inserter(fps));
+	moving->points(std::back_inserter(mps));
+
+	// reorder both so that the southmost vertex is first
+	iterator min = std::min_element(fps.begin(), fps.end(), south_of);
+	std::rotate(fps.begin(), min, fps.end());
+
+	min = std::min_element(mps.begin(), mps.end(), south_of);
+	std::rotate(mps.begin(), min, mps.end());
+
+	// convert to lists of vectors
+	// fps[0] = southernmost, fps[1] = next - southernmost, ...
+	std::adjacent_difference (fps.begin(), fps.end(), fps.begin());
+	std::adjacent_difference (mps.begin(), mps.end(), mps.begin());
+
+	// merge sort vectors
+	container result;
+	result.push_back(mps[0]);
+	std::merge(fps.begin() + 1, fps.end(), mps.begin() + 1, mps.end(), std::back_inserter(result), less_rot);
+
+	// turn back into points
+	std::partial_sum (result.begin(), result.end(), result.begin());
+
+	// convert to CGAL points
+	std::vector<cgal_point> rps;
+	std::transform (result.begin(), result.end(), std::back_inserter(rps), convert);
+
+	// union in results
+	_impl += polygon(rps.begin(), rps.end(), polygon::EXCLUDED);
 }
 
 /*

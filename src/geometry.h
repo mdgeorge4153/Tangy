@@ -31,6 +31,11 @@ private:
 
 	void add_sum(const_tan_handle, const_tan_handle);
 
+	// helper functions
+	static cgal_point convert  (const point &);
+	static bool       less_rot (const point &, const point &);
+	static bool       south_of (const point &, const point &);
+
 	polygon _impl;
 };
 

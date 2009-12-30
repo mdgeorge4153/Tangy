@@ -7,7 +7,6 @@
 
 int main(int, char **)
 {
-	/*
 	typedef GameTraits::point       point;
 	typedef GameTraits::tanset      tanset;
 	typedef ObstacleSet<GameTraits> obstacle_set;
@@ -16,9 +15,7 @@ int main(int, char **)
 	obstacle_set obs (tans.find (point (1, 1)), tans);
 
 	std::cout << obs.closest (point (2, 2)) << std::endl;
-	*/
-
-
+	/*
 	typedef GameTraits::number number;
 
 	typedef CGAL::Extended_cartesian<number> kernel;
@@ -60,9 +57,9 @@ int main(int, char **)
 	h = u.locate(point(quarter,quarter));
 	std::cout << " 1/4, 1/4: " << u.contains(h) << std::endl;
 	//std::cout << h << std::endl;
+	*/
 
 	return 0;
-
 }
 
 /*
