@@ -85,6 +85,17 @@ add_sum (const_tan_handle fixed, const_tan_handle moving)
 	fixed ->points(std::back_inserter(fps));
 	moving->points(std::back_inserter(mps));
 
+	// print
+	std::cout << "sum ([";
+	for (iterator i = fps.begin(); i != fps.end(); i++)
+		std::cout << *i << " ";
+	std::cout << "]" << std::endl;
+
+	std::cout << "     [";
+	for (iterator i = mps.begin(); i != mps.end(); i++)
+		std::cout << *i << " ";
+	std::cout << "]" << std::endl;
+
 	// reorder both so that the southmost vertex is first
 	iterator min = std::min_element(fps.begin(), fps.end(), south_of);
 	std::rotate(fps.begin(), min, fps.end());
@@ -105,12 +116,20 @@ add_sum (const_tan_handle fixed, const_tan_handle moving)
 	// turn back into points
 	std::partial_sum (result.begin(), result.end(), result.begin());
 
+	// print
+	std::cout << "  --> [";
+	for (iterator i = result.begin(); i != result.end(); i++)
+		std::cout << *i << " ";
+	std::cout << "]" << std::endl << std::endl;
+
 	// convert to CGAL points
 	std::vector<cgal_point> rps;
 	std::transform (result.begin(), result.end(), std::back_inserter(rps), convert);
 
 	// union in results
-	_impl += polygon(rps.begin(), rps.end(), polygon::EXCLUDED);
+	polygon bdry (rps.begin(), rps.end(), polygon::EXCLUDED);
+
+	_impl += bdry;
 }
 
 /*
