@@ -1,5 +1,6 @@
 #include <vector>
 #include <algorithm>
+#include <functional>
 #include <iterator>
 #include <iostream>
 #include "algebra.h"
@@ -75,7 +76,7 @@ south_of (const point & a, const point & b)
 template<typename GameTraits>
 void
 ObstacleSet<GameTraits>::
-add_sum (const_tan_handle fixed, const_tan_handle moving)
+add_sum (const_tan_handle moving, const_tan_handle fixed)
 {
 	typedef std::vector<point>           container;
 	typedef typename container::iterator iterator;
@@ -84,6 +85,10 @@ add_sum (const_tan_handle fixed, const_tan_handle moving)
 	container fps, mps;
 	fixed ->points(std::back_inserter(fps));
 	moving->points(std::back_inserter(mps));
+
+	// flip moving tan
+	std::reverse(mps.begin(), mps.end());
+	std::transform(mps.begin(), mps.end(), mps.begin(), std::negate<point> ());
 
 	// print
 	std::cout << "sum ([";
@@ -110,7 +115,7 @@ add_sum (const_tan_handle fixed, const_tan_handle moving)
 
 	// merge sort vectors
 	container result;
-	result.push_back(mps[0]);
+	result.push_back(fps[0]);
 	std::merge(fps.begin() + 1, fps.end(), mps.begin() + 1, mps.end(), std::back_inserter(result), less_rot);
 
 	// turn back into points
