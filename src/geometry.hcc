@@ -61,8 +61,8 @@ less_rot (const point & a, const point & b)
 		return false;
 	else
 		// a and b are in same half-plane so
-		// -180 < angle(b) - angle(a) < 180
-		return (b * std::conj(a)).imag() < number(0);
+		// -180 < angle(a) - angle(b) < 180
+		return (a * std::conj(b)).imag() < number(0);
 }
 
 template<typename GameTraits>
@@ -86,46 +86,57 @@ add_sum (const_tan_handle moving, const_tan_handle fixed)
 	fixed ->points(std::back_inserter(fps));
 	moving->points(std::back_inserter(mps));
 
+	// print
+	std::cout << "\\begin{tikzpicture}" << std::endl;
+	std::cout << "\\draw[dotted] (-5, 0) -- (5, 0) (0, -5) -- (0, 5);" << std::endl;
+
+	std::cout << "\\draw[moving]    " << approximate(moving->pos()) << " circle (2pt);" << std::endl;
+	std::cout << "\\draw[moving,->] ";
+	for (iterator i = mps.begin(); i != mps.end(); i++)
+		std::cout << approximate(*i) << " node {" << i - mps.begin() << "} -- ";
+	std::cout << "cycle;" << std::endl << std::endl;
+
+	std::cout << "\\draw[fixed]     " << approximate(fixed->pos()) << " circle (2pt);" << std::endl;
+	std::cout << "\\draw[fixed,->]  ";
+	for (iterator i = fps.begin(); i != fps.end(); i++)
+		std::cout << approximate(*i) << " node {" << i - fps.begin() << "} -- " << std::endl;
+	std::cout << "cycle;" << std::endl << std::endl;
+
 	// flip moving tan
-	std::reverse(mps.begin(), mps.end());
 	std::transform(mps.begin(), mps.end(), mps.begin(), std::negate<point> ());
 
-	// print
-	std::cout << "sum ([";
-	for (iterator i = fps.begin(); i != fps.end(); i++)
-		std::cout << *i << " ";
-	std::cout << "]" << std::endl;
+	// find southmost vertices
+	iterator fmin = std::min_element(fps.begin(), fps.end(), south_of);
+	iterator mmin = std::min_element(mps.begin(), mps.end(), south_of);
 
-	std::cout << "     [";
-	for (iterator i = mps.begin(); i != mps.end(); i++)
-		std::cout << *i << " ";
-	std::cout << "]" << std::endl;
+	point fsouth = * fmin;
+	point msouth = * mmin;
 
-	// reorder both so that the southmost vertex is first
-	iterator min = std::min_element(fps.begin(), fps.end(), south_of);
-	std::rotate(fps.begin(), min, fps.end());
-
-	min = std::min_element(mps.begin(), mps.end(), south_of);
-	std::rotate(mps.begin(), min, mps.end());
+	// reorder both so that the southmost vertex is last
+	std::rotate(fps.begin(), ++fmin, fps.end());
+	std::rotate(mps.begin(), ++mmin, mps.end());
 
 	// convert to lists of vectors
-	// fps[0] = southernmost, fps[1] = next - southernmost, ...
 	std::adjacent_difference (fps.begin(), fps.end(), fps.begin());
 	std::adjacent_difference (mps.begin(), mps.end(), mps.begin());
 
+	fps[0] -= fsouth;
+	mps[0] -= msouth;
+
 	// merge sort vectors
 	container result;
-	result.push_back(fps[0]);
-	std::merge(fps.begin() + 1, fps.end(), mps.begin() + 1, mps.end(), std::back_inserter(result), less_rot);
+	std::merge(fps.begin(), fps.end(), mps.begin(), mps.end(), std::back_inserter(result), less_rot);
 
 	// turn back into points
+	result[0] += fsouth + msouth + moving->pos();
 	std::partial_sum (result.begin(), result.end(), result.begin());
 
 	// print
-	std::cout << "  --> [";
+	std::cout << "\\draw[result] ";
 	for (iterator i = result.begin(); i != result.end(); i++)
-		std::cout << *i << " ";
-	std::cout << "]" << std::endl << std::endl;
+		std::cout << approximate(*i) << " node {" << i - result.begin() << "}" << " -- ";
+	std::cout << "cycle;" << std::endl << std::endl;
+	std::cout << "\\end{tikzpicture}" << std::endl << std::endl;
 
 	// convert to CGAL points
 	std::vector<cgal_point> rps;

@@ -141,7 +141,7 @@ contains (const point & p) const
 		vector ltop = offset    - _shape[l];
 		vector ltoi = _shape[i] - _shape[l];
 
-		vector angle = ltop * std::conj(ltoi);
+		vector angle = std::conj(ltop) * ltoi;
 
 		if (angle.imag() > typename GT::number(0))
 			return false;
@@ -233,13 +233,13 @@ TanSet ()
 	typedef typename GT::number number;
 
 	// shapes
-	_tans.push_back(tan(point(0,0), point(0,2), point(2,0)));             // big triangle
-	_tans.push_back(tan(point(2,0), point(0,2), point(2,2)));             // big triangle
-	_tans.push_back(tan(point(0,0), point(0,2), point(1,1)));             // medium triangle
-	_tans.push_back(tan(point(0,1), point(1,1), point(1,0)));             // small triangle
-	_tans.push_back(tan(point(0,0), point(1,1), point(2,1), point(1,0))); // parallelogram
-	_tans.push_back(tan(point(0,0), point(1,1), point(1,0)));             // small triangle
-	_tans.push_back(tan(point(0,0), point(0,1), point(1,1), point(1,0))); // square
+	_tans.push_back(tan(point(0,2), point(0,0), point(2,0)));             // big triangle
+	_tans.push_back(tan(point(0,2), point(2,0), point(2,2)));             // big triangle
+	_tans.push_back(tan(point(0,2), point(0,0), point(1,1)));             // medium triangle
+	_tans.push_back(tan(point(1,1), point(0,1), point(1,0)));             // small triangle
+	_tans.push_back(tan(point(0,0), point(1,0), point(2,1), point(1,1))); // parallelogram
+	_tans.push_back(tan(point(1,1), point(0,0), point(1,0)));             // small triangle
+	_tans.push_back(tan(point(0,1), point(0,0), point(1,0), point(1,1))); // square
 
 	// positions
 	_tans[0]._pos += point(1,1)  / number(2);
