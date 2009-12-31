@@ -7,6 +7,7 @@
 
 int main(int, char **)
 {
+	/*
 	typedef GameTraits::point       point;
 	typedef GameTraits::tanset      tanset;
 	typedef ObstacleSet<GameTraits> obstacle_set;
@@ -15,7 +16,8 @@ int main(int, char **)
 	obstacle_set obs (tans.find (point (1, 1)), tans);
 
 	std::cout << obs.closest (point (2, 2)) << std::endl;
-	/*
+	*/
+
 	typedef GameTraits::number number;
 
 	typedef CGAL::Extended_cartesian<number> kernel;
@@ -37,27 +39,11 @@ int main(int, char **)
 	t2.push_back(point(1,0));
 	t2.push_back(point(1,1));
 
-	polyset ps;
-	ps.push_back(pair(t1.begin(), t1.end()));
-	ps.push_back(pair(t2.begin(), t2.end()));
+	mask u (mask::EMPTY);
+	u += mask(t1.begin(), t1.end(), mask::EXCLUDED);
+	u += mask(t2.begin(), t2.end(), mask::EXCLUDED);
 
-	mask u (ps.begin(), ps.end(), mask::POLYGONS);
-
-	number half    = number(1)/2;
-	number quarter = half / 2;
-
-	mask::Object_handle h = u.locate(point(-half,-half));
-	std::cout << "-1/2,-1/2: " << u.contains(h) << std::endl;
-	//std::cout << h << std::endl;
-
-	h = u.locate(point(half,half));
-	std::cout << " 1/2, 1/2: " << u.contains(h) << std::endl;
-	//std::cout << h << std::endl;
-
-	h = u.locate(point(quarter,quarter));
-	std::cout << " 1/4, 1/4: " << u.contains(h) << std::endl;
-	//std::cout << h << std::endl;
-	*/
+	print_map(u);
 
 	return 0;
 }
