@@ -20,55 +20,14 @@ namespace CGAL {
 	};
 }
 
-template<typename polygon>
-void
-print_map(const polygon & poly)
-{
-	typedef typename polygon::Explorer                 explorer;
-	typedef typename explorer::Vertex_const_iterator   vert_iter;
-	typedef typename explorer::Halfedge_const_iterator edge_iter;
-
-	explorer E = poly.explorer();
-
-	for (vert_iter i = E.vertices_begin(); i != E.vertices_end(); i++)
-		if (E.is_standard(i))
-			std::cout << "\\draw[result] (" << float(E.point(i).x()) << ", " << float(E.point(i).y()) << ") circle (2pt);" << std::endl;
-
-	for (edge_iter i = E.halfedges_begin(); i != E.halfedges_end(); i++)
-		if (E.is_standard(E.source(i)) && E.is_standard(E.target(i)))
-			std::cout << "\\draw[result] (" << float(E.point(E.source(i)).x()) << ", " << float(E.point(E.source(i)).y()) << ") -- ("
-			                                << float(E.point(E.target(i)).x()) << ", " << float(E.point(E.target(i)).y()) << ");" << std::endl;
-}
-
 template<typename GameTraits>
 ObstacleSet<GameTraits>::
 ObstacleSet (const_tan_handle moving, const tanset & fixed)
-	: _impl(polygon::EMPTY)
+	: _impl(polygon::COMPLETE)
 {
 	for (const_tan_handle i = fixed.begin(); i != fixed.end(); i++)
 		if (i != moving)
 			add_sum(moving, i);
-
-	std::cout << "\\begin{tikzpicture}" << std::endl;
-	std::cout << "\\draw (-1, 0) -- (10, 0) (-1, 0) -- (6,0);" << std::endl;
-
-	for (const_tan_handle i = fixed.begin(); i != fixed.end(); i++)
-	{
-		std::vector<point> ps;
-		i->points(std::back_inserter(ps));
-
-		std::cout << "\\draw"
-		          << (i == moving ? "[moving] " : "[fixed]  ")
-		          << approximate(i->pos())
-		          << " circle (2pt) " << std::endl;
-		for (typename std::vector<point>::iterator j = ps.begin (); j != ps.end(); j++)
-			std::cout << approximate(*j) << " -- " << std::endl << "              ";
-		std::cout << "cycle;" << std::endl;
-	}
-
-	print_map(_impl);
-
-	std::cout << "\\end{tikzpicture}" << std::endl;
 }
 
 template<typename GameTraits>
@@ -125,22 +84,6 @@ add_sum (const_tan_handle moving, const_tan_handle fixed)
 	fixed ->points(std::back_inserter(fps));
 	moving->points(std::back_inserter(mps));
 
-	// print
-	std::cout << "\\begin{tikzpicture}" << std::endl;
-	std::cout << "\\draw[dotted] (-5, 0) -- (5, 0) (0, -5) -- (0, 5);" << std::endl;
-
-	std::cout << "\\draw[moving]    " << approximate(moving->pos()) << " circle (2pt);" << std::endl;
-	std::cout << "\\draw[moving,->] ";
-	for (iterator i = mps.begin(); i != mps.end(); i++)
-		std::cout << approximate(*i) << " node {" << i - mps.begin() << "} -- ";
-	std::cout << "cycle;" << std::endl << std::endl;
-
-	std::cout << "\\draw[fixed]     " << approximate(fixed->pos()) << " circle (2pt);" << std::endl;
-	std::cout << "\\draw[fixed,->]  ";
-	for (iterator i = fps.begin(); i != fps.end(); i++)
-		std::cout << approximate(*i) << " node {" << i - fps.begin() << "} -- " << std::endl;
-	std::cout << "cycle;" << std::endl << std::endl;
-
 	// flip moving tan
 	std::transform(mps.begin(), mps.end(), mps.begin(), std::negate<point> ());
 
@@ -170,13 +113,6 @@ add_sum (const_tan_handle moving, const_tan_handle fixed)
 	result[0] += fsouth + msouth + moving->pos();
 	std::partial_sum (result.begin(), result.end(), result.begin());
 
-	// print
-	std::cout << "\\draw[result] ";
-	for (iterator i = result.begin(); i != result.end(); i++)
-		std::cout << approximate(*i) << " node {" << i - result.begin() << "}" << " -- ";
-	std::cout << "cycle;" << std::endl << std::endl;
-	std::cout << "\\end{tikzpicture}" << std::endl << std::endl;
-
 	// convert to CGAL points
 	std::vector<cgal_point> rps;
 	std::transform (result.begin(), result.end(), std::back_inserter(rps), convert);
@@ -184,7 +120,7 @@ add_sum (const_tan_handle moving, const_tan_handle fixed)
 	// union in results
 	polygon bdry (rps.begin(), rps.end(), polygon::EXCLUDED);
 
-	_impl += bdry;
+	_impl -= bdry;
 }
 
 /*

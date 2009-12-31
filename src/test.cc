@@ -43,8 +43,6 @@ int main(int, char **)
 	u += mask(t1.begin(), t1.end(), mask::EXCLUDED);
 	u += mask(t2.begin(), t2.end(), mask::EXCLUDED);
 
-	print_map(u);
-
 	return 0;
 }
 
