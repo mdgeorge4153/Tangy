@@ -5,7 +5,6 @@
 #include <iostream>
 #include "algebra.h"
 
-
 namespace CGAL {
 	template<>
 	class Algebraic_structure_traits<ExtendedRational>
@@ -21,6 +20,24 @@ namespace CGAL {
 }
 
 template<typename GameTraits>
+struct ObstacleSet<GameTraits>::closest_to
+{
+	typedef typename ObstacleSet<GameTraits>::cgal_point cgal_point;
+	const cgal_point & _p;
+
+	closest_to (const cgal_point & p)
+		: _p(p)
+	{
+	}
+
+	bool operator() (const cgal_point & a, const cgal_point & b)
+	{
+		return CGAL::compare_distance_to_point (_p, a, b) == CGAL::SMALLER;
+	}
+};
+
+
+template<typename GameTraits>
 ObstacleSet<GameTraits>::
 ObstacleSet (const_tan_handle moving, const tanset & fixed)
 	: _impl(polygon::COMPLETE)
@@ -33,9 +50,84 @@ ObstacleSet (const_tan_handle moving, const tanset & fixed)
 template<typename GameTraits>
 typename ObstacleSet<GameTraits>::point
 ObstacleSet<GameTraits>::
-closest (const point & p) const
+closest (const point & _p) const
 {
-	return p;
+	typedef typename polygon::Object_handle                   object;
+	typedef typename explorer::Face_const_handle              face;
+	typedef typename explorer::Isolated_vertex_const_iterator vertex;
+	typedef typename explorer::Halfedge_const_iterator        edge;
+	typedef typename explorer::Hole_const_iterator            hole;
+
+	cgal_point p = convert(_p);
+	explorer   e = mask();
+
+	object o = _impl.locate(p);
+	if (_impl.contains(o))
+		return _p;
+
+	// by construction, all standard vertices and edges are contained in _impl
+	// so o must be a face
+	face f;
+	assert (CGAL::assign(f, o));
+
+	//
+	// iterate over features adjacent to f to find the closest point on each feature
+	//
+	std::vector<cgal_point> candidates;
+
+	// isolated vertices
+	for (vertex i = e.isolated_vertices_begin(f); i != e.isolated_vertices_end(f); i++)
+		candidates.push_back(e.point(i));
+
+	// holes
+	for (hole i = e.holes_begin(f); i != e.holes_end(f); i++)
+	{
+		edge j = i;
+		do
+		{
+			candidates.push_back(closest(p, e.point(e.source(j)), e.point(e.target(j))));
+		} while (++j != i);
+	}
+
+	// outer edge
+	edge i = e.face_cycle (f);
+	if (i != 0 && !e.is_frame_edge(i))
+		do
+		{
+			candidates.push_back(closest(p, e.point(e.source(i)), e.point(e.target(i))));
+		} while (++i != e.face_cycle(f));
+
+	//
+	// select and return the best candidate
+	//
+	typename std::vector<cgal_point>::iterator best = std::min_element(candidates.begin(), candidates.end(), closest_to(p));
+
+	return point(best->x(), best->y());
+}
+
+template<typename GameTraits>
+typename ObstacleSet<GameTraits>::explorer
+ObstacleSet<GameTraits>::
+mask () const
+{
+	return _impl.explorer();
+}
+
+template<typename GameTraits>
+typename ObstacleSet<GameTraits>::cgal_point
+ObstacleSet<GameTraits>::
+closest (const cgal_point & p, const cgal_point & source, const cgal_point & target)
+{
+	number dot = (p - source) * (target - source);
+
+	if (dot < number(0))
+		return source;
+
+	else if (dot > (target - source) * (target - source))
+		return target;
+
+	else
+		return source + dot * (target - source) / ((target - source) * (target - source));
 }
 
 template<typename GameTraits>
@@ -118,9 +210,8 @@ add_sum (const_tan_handle moving, const_tan_handle fixed)
 	std::transform (result.begin(), result.end(), std::back_inserter(rps), convert);
 
 	// union in results
-	polygon bdry (rps.begin(), rps.end(), polygon::EXCLUDED);
+	_impl -= polygon (rps.begin(), rps.end(), polygon::EXCLUDED);
 
-	_impl -= bdry;
 }
 
 /*

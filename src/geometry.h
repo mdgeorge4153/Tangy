@@ -12,29 +12,37 @@
 template<typename GameTraits>
 class ObstacleSet
 {
+private:
+	typedef typename GameTraits::number number;
+
+	typedef typename CGAL::Extended_cartesian<number> kernel;
+	typedef typename CGAL::Nef_polyhedron_2<kernel>   polygon;
+	typedef typename kernel::Standard_point_2         cgal_point;
+
 public:
 	typedef typename GameTraits::point            point;
 	typedef typename GameTraits::tanset           tanset;
 	typedef typename GameTraits::tan_handle       tan_handle;
 	typedef typename GameTraits::const_tan_handle const_tan_handle;
 
+	typedef typename polygon::Explorer explorer;
+
 	ObstacleSet (const_tan_handle, const tanset &);
 
 	point closest (const point &) const;
 
+	explorer mask () const;
+
 private:
-	typedef typename GameTraits::number number;
-
-	typedef typename CGAL::Extended_cartesian<number> kernel;
-	typedef typename CGAL::Nef_polyhedron_2<kernel>   polygon;
-	typedef typename polygon::Point                   cgal_point;
-
 	void add_sum(const_tan_handle, const_tan_handle);
 
 	// helper functions
+	struct closest_to;
+
 	static cgal_point convert  (const point &);
 	static bool       less_rot (const point &, const point &);
 	static bool       south_of (const point &, const point &);
+	static cgal_point closest  (const cgal_point &, const cgal_point &, const cgal_point &);
 
 	polygon _impl;
 };
