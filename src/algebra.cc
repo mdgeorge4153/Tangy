@@ -19,11 +19,6 @@ ExtendedRational (int a1, int a2, int a3, int a6, unsigned int d)
 
 	_d    = d;
 
-	if (_d == 0)
-	{
-		throw std::logic_error("denominator must be non-zero");
-	}
-
 	reduce();
 }
 
@@ -164,9 +159,6 @@ ExtendedRational::
 inv () const
 {
 	ExtendedRational result  = (*this);
-
-	if (_n[0] == 0 && _n[1] == 0 && _n[2] == 0 && _n[3] == 0)
-		throw std::logic_error("divide by zero");
 
 	//
 	// result = (*this) * factor1
