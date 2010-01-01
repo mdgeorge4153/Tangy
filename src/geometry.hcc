@@ -2,7 +2,6 @@
 #include <algorithm>
 #include <functional>
 #include <iterator>
-#include <iostream>
 #include "algebra.h"
 
 namespace CGAL {
@@ -57,6 +56,7 @@ closest (const point & _p) const
 	typedef typename explorer::Isolated_vertex_const_iterator vertex;
 	typedef typename explorer::Halfedge_const_iterator        edge;
 	typedef typename explorer::Hole_const_iterator            hole;
+	typedef typename explorer::Halfedge_around_face_const_circulator face_edge;
 
 	cgal_point p = convert(_p);
 	explorer   e = mask();
@@ -90,7 +90,7 @@ closest (const point & _p) const
 	}
 
 	// outer edge
-	edge i = e.face_cycle (f);
+	face_edge i = e.face_cycle (f);
 	if (i != 0 && !e.is_frame_edge(i))
 		do
 		{
