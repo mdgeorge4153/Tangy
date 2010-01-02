@@ -261,9 +261,9 @@ template<typename GameTraits>
 SimpleMouseController<GameTraits>::Rotating::
 Rotating (SimpleMouseController & context)
 	: State  (context),
-	  _rot_offset (std::conj(offset()) * this->_context._selection->rot ())
+	  _rot_offset (this->_context._selection->rot () * std::conj(offset()))
 {
-	std::cout << "Rotating" << this->_context._pos << std::endl;
+	std::cout << "Rotating" << approximate(this->_context._pos) << std::endl;
 }
 
 template<typename GameTraits>
@@ -289,7 +289,7 @@ typename SimpleMouseController<GameTraits>::vector
 SimpleMouseController<GameTraits>::Rotating::
 offset ()
 {
-	return std::conj(this->_context._pos - this->_context._selection->pos());
+	return this->_context._pos - this->_context._selection->pos();
 }
 
 

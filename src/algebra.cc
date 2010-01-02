@@ -6,7 +6,6 @@
 #include <cmath>
 #include <cassert>
 #include <numeric>
-#include <stdexcept>
 
 ExtendedRational::
 ExtendedRational (int a1, int a2, int a3, int a6, unsigned int d)
@@ -271,7 +270,7 @@ normalize (const Vector & v)
 	// perhaps there is a better algorithm?
 	//
 
-	float theta = atan2(v.real(), v.imag());
+	float theta = atan2(v.imag(), v.real());
 
 	if (theta < 0)
 		theta += 2 * PI;
