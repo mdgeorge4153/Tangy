@@ -39,8 +39,6 @@ public:
 	void set_pos  (const point  &);
 	void set_rot  (const vector &);
 
-	void pacify();
-
 	//////////////////////
 	// public accessors //
 	//////////////////////
@@ -54,11 +52,6 @@ public:
 	template<typename OutputIterator>
 	OutputIterator points (OutputIterator) const;
 
-	bool is_offset   () const;
-
-	const point  & desired_pos () const;
-	const vector & desired_rot () const;
-
 	bool contains (const point &) const;
 
 protected:
@@ -68,11 +61,7 @@ protected:
 	/////////////////////
 
 	point            _pos;
-	point            _desired_pos;
-
 	vector           _rot;
-	vector           _desired_rot;
-
 	bool             _conj;
 
 	vector_container _shape;
@@ -84,8 +73,6 @@ protected:
 	Tan (point, point, point);
 	Tan (point, point, point, point);
 
-	template<typename GT>
-	Tan (const Tan<GT> &);
 };
 
 /*
@@ -116,26 +103,15 @@ public:
 
 	TanSet ();
 
-	template<typename TS>
-	TanSet (const TS &);
-
 	/////////////////////
 	// public mutators //
 	/////////////////////
-
-	void set_size     (int, int);
-
-	template<typename PointIter>
-	void add_obstacle (PointIter, PointIter);
 
 	void pan (const vector &);
 
 	//////////////////////
 	// public accessors //
 	//////////////////////
-
-	const container& tans      () const;
-	const tan&       selection () const;
 
 	const_tan_handle find (const point &) const;
 	      tan_handle find (const point &);
@@ -153,7 +129,6 @@ protected:
 	/////////////////////
 
 	container _tans;
-	int       _selection;
 };
 
 /*

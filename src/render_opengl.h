@@ -11,7 +11,7 @@ render_opengl (const typename GameTraits::controller & c)
 
 	const tanset & tans = c.tans();
 
-	for (typename tanset::container::const_iterator i = tans.tans().begin(); i != tans.tans().end(); i++)
+	for (typename tanset::container::const_iterator i = tans.begin(); i != tans.end(); i++)
 	{
 		typedef typename std::vector<typename GameTraits::point> pointset;
 

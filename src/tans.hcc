@@ -20,7 +20,7 @@ void
 Tan<GT>::
 set_pos (const point & pos)
 {
-	this->_pos = this->_desired_pos = pos;
+	this->_pos = pos;
 	this->_points_valid = false;
 }
 
@@ -29,18 +29,8 @@ void
 Tan<GT>::
 set_rot (const vector & rot)
 {
-	this->_desired_rot = rot;
 	this->_rot = normalize(rot);
 	this->_points_valid = false;
-}
-
-template<typename GT>
-void
-Tan<GT>::
-pacify ()
-{
-	this->_desired_pos = this->_pos;
-	this->_desired_rot = this->_rot;
 }
 
 template<typename GT>
@@ -102,30 +92,6 @@ points (OutputIterator out) const
 template<typename GT>
 bool
 Tan<GT>::
-is_offset () const
-{
-	return _pos != _desired_pos;
-}
-
-template<typename GT>
-const typename Tan<GT>::point &
-Tan<GT>::
-desired_pos () const
-{
-	return _desired_pos;
-}
-
-template<typename GT>
-const typename Tan<GT>::vector &
-Tan<GT>::
-desired_rot () const
-{
-	return _desired_rot;
-}
-
-template<typename GT>
-bool
-Tan<GT>::
 contains (const point & p) const
 {
 	typedef typename std::vector<vector> pointset;
@@ -156,9 +122,7 @@ template<typename GT>
 Tan<GT>::
 Tan ()
 	: _pos(0,0),
-	  _desired_pos(0,0),
 	  _rot(1),
-	  _desired_rot(1),
 	  _conj(false),
 	  _shape(),
 	  _points(),
@@ -170,7 +134,6 @@ template<typename GT>
 Tan<GT>::
 Tan (point p0, point p1, point p2)
 	: _rot(1),
-	  _desired_rot(1),
 	  _conj(false),
 	  _shape(3),
 	  _points(),
@@ -182,14 +145,12 @@ Tan (point p0, point p1, point p2)
 
 	_pos = _shape.sum() / point(3);
 	_shape -= _pos;
-	_desired_pos = _pos;
 }
 
 template<typename GT>
 Tan<GT>::
 Tan(point p0, point p1, point p2, point p3)
 	: _rot(1),
-	  _desired_rot(1),
 	  _conj(false),
 	  _shape(4),
 	  _points(),
@@ -202,22 +163,6 @@ Tan(point p0, point p1, point p2, point p3)
 
 	_pos = _shape.sum() / point(4);
 	_shape -= _pos;
-	_desired_pos = _pos;
-}
-
-template<typename GT>
-template<typename GT2>
-Tan<GT>::
-Tan (const Tan<GT2> & other)
-	: _pos(other._pos),
-	  _desired_pos(other._desired_pos),
-	  _rot(other._rot),
-	  _desired_rot(other._desired_rot),
-	  _conj(other._conj),
-	  _shape(other._shape),
-	  _points(),
-	  _points_valid(false)
-{
 }
 
 /*
@@ -252,31 +197,6 @@ TanSet ()
 }
 
 template<typename GT>
-template<typename TS>
-TanSet<GT>::
-TanSet (const TS & other)
-	: _tans(other.tans()), _selection(other._selection)
-{
-}
-
-template<typename GT>
-void
-TanSet<GT>::
-set_size (int w, int h)
-{
-	// TODO
-}
-
-template<typename GT>
-template<typename PointIter>
-void
-TanSet<GT>::
-add_obstacle (PointIter begin, PointIter end)
-{
-	// TODO
-}
-
-template<typename GT>
 void
 TanSet<GT>::
 pan (const vector & off)
@@ -289,31 +209,11 @@ pan (const vector & off)
 }
 
 template<typename GT>
-const typename TanSet<GT>::container &
-TanSet<GT>::
-tans () const
-{
-	return _tans;
-}
-
-template<typename GT>
-const typename TanSet<GT>::tan &
-TanSet<GT>::
-selection () const
-{
-	// TODO
-}
-
-template<typename GT>
 typename TanSet<GT>::const_tan_handle
 TanSet<GT>::
 find (const point & p) const
 {
-	for (typename container::iterator i = _tans.begin(); i != _tans.end(); i++)
-		if (i->contains(p))
-			return i;
-
-	return NULL;
+	return std::find_if (begin(), end(), bind2nd(mem_fun_ref(&tan::contains), p));
 }
 
 template<typename GT>

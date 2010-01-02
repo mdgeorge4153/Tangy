@@ -79,6 +79,14 @@ selection () const
 	return _selection;
 }
 
+template<typename GameTraits>
+void
+SimpleMouseController<GameTraits>::
+pacify ()
+{
+	this->_selection->set_pos(this->_selection->pos());
+}
+
 /*
 ** SimpleMouseController::State ************************************************
 */
@@ -213,7 +221,7 @@ void
 SimpleMouseController<GameTraits>::Dragging::
 left_up ()
 {
-	this->_context._selection->pacify();
+	this->_context.pacify();
 	transition (new Inactive(this->_context));
 }
 
@@ -241,7 +249,7 @@ void
 SimpleMouseController<GameTraits>::Flipping::
 right_up ()
 {
-	this->_context._selection->pacify ();
+	this->_context.pacify();
 	transition (new Inactive(this->_context));
 }
 
@@ -271,7 +279,7 @@ void
 SimpleMouseController<GameTraits>::Rotating::
 right_up ()
 {
-	this->_context._selection->pacify ();
+	this->_context.pacify();
 	transition (new Inactive (this->_context));
 }
 

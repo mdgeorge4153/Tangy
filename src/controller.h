@@ -48,6 +48,8 @@ private:
 	tan_handle _selection;
 	State  *   _state;
 
+	void pacify();
+
 	struct State
 	{
 		State (SimpleMouseController &);
