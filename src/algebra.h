@@ -8,6 +8,7 @@
 
 #include <complex>
 #include <valarray>
+#include <gmpxx.h>
 
 using std::valarray;
 using std::basic_ostream;
@@ -40,7 +41,6 @@ public:
 	// conversion operators                                                   //
 	////////////////////////////////////////////////////////////////////////////
 
-	operator float  () const;
 	operator double () const;
 
 	////////////////////////////////////////////////////////////////////////////
@@ -65,9 +65,10 @@ public:
 	friend basic_ostream<Ch, Tr>& operator<< (basic_ostream<Ch,Tr> &, const ExtendedRational &);
 
 private:
+	typedef mpz_class number;
 
-	valarray<long> _n;
-	long  _d;
+	valarray<number> _n;
+	number  _d;
 
 	ExtendedRational inv()   const;
 	ExtendedRational conj2() const;

@@ -166,9 +166,9 @@ operator> (const ExtendedRational & a, const ExtendedRational & b)
 }
 
 
-template<typename Ch, typename Tr>
+template<typename Ch, typename Tr, typename number>
 void
-with_sign(basic_ostream<Ch,Tr>& out, int n)
+with_sign(basic_ostream<Ch,Tr>& out, number n)
 {
 	if (n < 0)
 		out << " - " << -n;
@@ -193,7 +193,7 @@ operator<< (basic_ostream<Ch, Tr> & out, const ExtendedRational & a)
 	bool first = true;
 	std::string labels[4] = {"", "*sqrt(2)", "*sqrt(3)", "*sqrt(6)"};
 	for (int i = 0; i < 3; i++)
-		if (a._n[i])
+		if (a._n[i] != 0)
 		{
 			if (first)
 				out << a._n[i];

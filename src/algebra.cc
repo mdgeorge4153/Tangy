@@ -7,6 +7,22 @@
 #include <cassert>
 #include <numeric>
 
+template<typename number>
+inline
+double
+to_double (const number & n)
+{
+	return (double) n;
+}
+
+template<>
+inline
+double
+to_double  (const mpz_class & n)
+{
+	return n.get_d();
+}
+
 ExtendedRational::
 ExtendedRational (int a1, int a2, int a3, int a6, unsigned int d)
 	: _n(4)
@@ -37,16 +53,24 @@ operator= (const ExtendedRational & other)
 	return (* this);
 }
 
+/*
 ExtendedRational::
 operator float () const
 {
 	return (_n[0] + _n[1]*sqrt(2.0f) + _n[2]*sqrt(3.0f) + _n[3]*sqrt(6.0f)) / _d;
 }
+*/
 
 ExtendedRational::
 operator double () const
 {
-	return (_n[0] + _n[1]*sqrt(2.0)  + _n[2]*sqrt(3.0)  + _n[3]*sqrt(6.0)) / _d;
+	double result = to_double(_n[0]);
+	result += to_double(_n[1])*sqrt(2.0);
+	result += to_double(_n[2])*sqrt(3.0);
+	result += to_double(_n[3])*sqrt(6.0);
+	result /= to_double(_d);
+
+	return result;
 }
 
 ExtendedRational &
@@ -79,15 +103,15 @@ ExtendedRational &
 ExtendedRational::
 operator*= (const ExtendedRational & other)
 {
-	long a1 = _n[0];
-	long a2 = _n[1];
-	long a3 = _n[2];
-	long a6 = _n[3];
+	number a1 = _n[0];
+	number a2 = _n[1];
+	number a3 = _n[2];
+	number a6 = _n[3];
 
-	long b1 = other._n[0];
-	long b2 = other._n[1];
-	long b3 = other._n[2];
-	long b6 = other._n[3];
+	number b1 = other._n[0];
+	number b2 = other._n[1];
+	number b3 = other._n[2];
+	number b6 = other._n[3];
 
 
 	//     *    ||    1      |  sqrt(2)  |  sqrt(3)  |  srqt(6) 
@@ -164,19 +188,19 @@ inv () const
 	//
 	ExtendedRational factor1 = conj2();
 	result *= factor1;
-	assert(!result._n[1] && !result._n[3]);
+	assert(result._n[1] == 0 && result._n[3] == 0);
 
 	//
 	// result = (*this) * factor1 * factor2
 	//
 	ExtendedRational factor2 = conj3();
 	result *= factor2;
-	assert(result._n[0] && !result._n[1] && !result._n[2] && !result._n[3]);
+	assert(result._n[1] == 0 && result._n[2] == 0 && result._n[3] == 0);
 
 	//                       1
 	// result = ---------------------------
 	//          (*this) * factor1 * factor2
-	long d       = result._d;
+	number d       = result._d;
 	result._d    = result._n[0];
 	result._n[0] = d;
 
@@ -213,18 +237,18 @@ conj3 () const
 	return result;
 }
 
-static
-long
-gcd(long a, long b)
+template<typename number>
+number
+gcd(number a, number b)
 {
-	return b == 0 ? a : gcd(b, a%b);
+	return b == 0 ? a : gcd(b, number(a%b));
 }
 
 void
 ExtendedRational::
 reduce ()
 {
-	long divisor = std::accumulate(&(_n[0]), &(_n[4]), _d, *gcd);
+	number divisor = std::accumulate(&(_n[0]), &(_n[4]), _d, &gcd<number>);
 
 	if (divisor * _d < 0)
 		divisor = -divisor;

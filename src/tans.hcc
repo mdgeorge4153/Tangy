@@ -12,6 +12,7 @@ Tan<GT>::
 flip ()
 {
 	this->_conj = !this->_conj;
+	this->_rot  = std::conj(this->_rot);
 	this->_points_valid = false;
 }
 
@@ -77,9 +78,9 @@ points (OutputIterator out) const
 		for (unsigned i = 0; i < _shape.size(); i++)
 		{
 			vector offset = _shape[i];
-			offset *= _rot;
 			if (_conj)
 				offset = std::conj(offset);
+			offset *= _rot;
 			_points.push_back (_pos + offset);
 		}
 
