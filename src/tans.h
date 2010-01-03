@@ -70,8 +70,8 @@ protected:
 	mutable bool               _points_valid;
 
 	Tan ();
-	Tan (point, point, point);
-	Tan (point, point, point, point);
+	Tan (const point &, const point &, const point &);
+	Tan (const point &, const point &, const point &, const point &);
 
 };
 

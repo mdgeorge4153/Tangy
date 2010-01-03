@@ -133,7 +133,7 @@ Tan ()
 
 template<typename GT>
 Tan<GT>::
-Tan (point p0, point p1, point p2)
+Tan (const point & p0, const point & p1, const point & p2)
 	: _rot(1),
 	  _conj(false),
 	  _shape(3),
@@ -150,7 +150,7 @@ Tan (point p0, point p1, point p2)
 
 template<typename GT>
 Tan<GT>::
-Tan(point p0, point p1, point p2, point p3)
+Tan (const point & p0, const point & p1, const point & p2, const point & p3)
 	: _rot(1),
 	  _conj(false),
 	  _shape(4),
