@@ -1,0 +1,18 @@
+
+template<typename GameTraits>
+NoCollideTan<GameTraits>::
+NoCollideTan(const point & p1, const point & p2, const point & p3)
+	: Tan<GameTraits>(p1, p2, p3)
+{
+}
+
+template<typename GameTraits>
+NoCollideTan<GameTraits>::
+NoCollideTan(const point & p1, const point & p2, const point & p3, const point & p4)
+	: Tan<GameTraits>(p1, p2, p3, p4)
+{
+}
+
+/*
+** vim: ts=4 sw=4 cindent syntax=cpp
+*/

@@ -5,7 +5,6 @@
 
 #include "tans.h"
 #include "render_opengl.h"
-#include "algebra.h"
 #include "controller.h"
 #include "traits.h"
 
@@ -34,8 +33,8 @@ protected:
 
 	bool render   ();
 
-	TanSet<GameTraits>                tans;
-	SimpleMouseController<GameTraits> mouse;
+	GameTraits::tanset      tans;
+	GameTraits::controller  mouse;
 };
 
 TanView::

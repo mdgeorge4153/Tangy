@@ -2,25 +2,27 @@
 #define __tangy_traits_h__
 
 #include <complex>
-#include "algebra.h"
-#include "tans.h"
 #include "controller.h"
+#include "numbers.h"
+#include "tans.h"
 
-struct GameTraits
+struct SimpleGameTraits
 {
-	typedef ExtendedRational     number;
+	typedef float number;
 
 	typedef std::complex<number> point;
 	typedef std::complex<number> vector;
 
-	typedef TanSet<GameTraits>   tanset;
-	typedef Tan<GameTraits>      tan;
+	typedef TanSet<SimpleGameTraits>   tanset;
+	typedef Tan<SimpleGameTraits>      tan;
 
 	typedef tanset::tan_handle       tan_handle;
 	typedef tanset::const_tan_handle const_tan_handle;
 
-	typedef SimpleMouseController<GameTraits> controller;
+	typedef SimpleMouseController<SimpleGameTraits> controller;
 };
+
+typedef SimpleGameTraits GameTraits;
 
 #endif
 

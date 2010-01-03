@@ -5,15 +5,22 @@
 #include "tans.h"
 #include "geometry.h"
 
+template<typename> class NoCollideTan;
+template<typename> class NoCollideTanSet;
+
 template<typename GameTraits>
 class NoCollideTan
 	: public Tan<GameTraits>
 {
 public:
-	
+	typedef typename GameTraits::point point;
+
 protected:
-	NoCollideTan(point, point, point);
-	NoCollideTan(point, point, point, point);
+	NoCollideTan(const point &, const point &, const point &);
+	NoCollideTan(const point &, const point &, const point &, const point &);
+
+	friend class TanSet<GameTraits>;
+	friend class NoCollideTanSet<GameTraits>;
 };
 
 template<typename GameTraits>
@@ -23,6 +30,8 @@ class NoCollideTanSet
 public:
 
 };
+
+#include "tans_nocollide.hcc"
 
 #endif
 
