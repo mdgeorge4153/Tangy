@@ -47,6 +47,21 @@ ObstacleSet (const_tan_handle moving, const tanset & fixed)
 }
 
 template<typename GameTraits>
+ObstacleSet<GameTraits>::
+ObstacleSet ()
+	: _impl(polygon::COMPLETE)
+{
+}
+
+template<typename GameTraits>
+ObstacleSet<GameTraits> &
+ObstacleSet<GameTraits>::
+operator= (const ObstacleSet<GameTraits> & other)
+{
+	_impl = other._impl;
+}
+
+template<typename GameTraits>
 typename ObstacleSet<GameTraits>::point
 ObstacleSet<GameTraits>::
 closest (const point & _p) const

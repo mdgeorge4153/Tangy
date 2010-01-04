@@ -28,6 +28,8 @@ public:
 	typedef typename polygon::Explorer explorer;
 
 	ObstacleSet (const_tan_handle, const tanset &);
+	ObstacleSet ();  
+	ObstacleSet & operator= (const ObstacleSet &);
 
 	point closest (const point &) const;
 
