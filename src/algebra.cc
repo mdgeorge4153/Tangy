@@ -181,19 +181,19 @@ ExtendedRational
 ExtendedRational::
 inv () const
 {
-	ExtendedRational result  = (*this);
+	ExtendedRational result = (*this);
 
 	//
 	// result = (*this) * factor1
 	//
-	ExtendedRational factor1 = conj2();
+	ExtendedRational factor1 = result.conj2();
 	result *= factor1;
 	assert(result._n[1] == 0 && result._n[3] == 0);
 
 	//
 	// result = (*this) * factor1 * factor2
 	//
-	ExtendedRational factor2 = conj3();
+	ExtendedRational factor2 = result.conj3();
 	result *= factor2;
 	assert(result._n[1] == 0 && result._n[2] == 0 && result._n[3] == 0);
 
