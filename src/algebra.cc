@@ -244,6 +244,15 @@ gcd(number a, number b)
 	return b == 0 ? a : gcd(b, number(a%b));
 }
 
+template<>
+mpz_class
+gcd<mpz_class> (mpz_class a, mpz_class b)
+{
+	mpz_class result;
+	mpz_gcd (result.get_mpz_t(), a.get_mpz_t(), b.get_mpz_t());
+	return result;
+}
+
 void
 ExtendedRational::
 reduce ()
