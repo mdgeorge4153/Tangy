@@ -9,6 +9,10 @@
 #include <valarray>
 #include <complex>
 
+/*
+********************************************************************************
+*/
+
 template<typename> class Tan;
 template<typename> class TanSet;
 
@@ -92,10 +96,9 @@ public:
 	typedef typename GameTraits::point  point;
 	typedef typename GameTraits::vector vector;
 
-	typedef std::vector<tan> container;
-
-	typedef typename container::iterator       tan_handle;
-	typedef typename container::const_iterator const_tan_handle;
+	typedef typename GameTraits::tan_container    container;
+	typedef typename GameTraits::tan_handle       tan_handle;
+	typedef typename GameTraits::const_tan_handle const_tan_handle;
 
 	/////////////////////////
 	// public constructors //

@@ -6,7 +6,7 @@
 #include "tans.h"
 #include "render_opengl.h"
 #include "controller.h"
-#include "traits.h"
+#include "traits_nocollide.h"
 
 class TanView
 	: public Gtk::DrawingArea,

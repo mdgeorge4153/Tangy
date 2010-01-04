@@ -1,16 +1,62 @@
+#include <algorithm>
+
+template<typename GameTraits>
+void
+NoCollideTan<GameTraits>::
+flip ()
+{
+	Tan<GameTraits>::flip();
+}
+
+template<typename GameTraits>
+void
+NoCollideTan<GameTraits>::
+set_pos (const point & pos)
+{
+	Tan<GameTraits>::set_pos (pos);
+}
+
+template<typename GameTraits>
+void
+NoCollideTan<GameTraits>::
+set_rot (const vector & rot)
+{
+	Tan<GameTraits>::set_rot (rot);
+}
 
 template<typename GameTraits>
 NoCollideTan<GameTraits>::
 NoCollideTan(const point & p1, const point & p2, const point & p3)
-	: Tan<GameTraits>(p1, p2, p3)
+	: Tan<GameTraits>(p1, p2, p3),
+	  _container(0)
 {
 }
 
 template<typename GameTraits>
 NoCollideTan<GameTraits>::
 NoCollideTan(const point & p1, const point & p2, const point & p3, const point & p4)
-	: Tan<GameTraits>(p1, p2, p3, p4)
+	: Tan<GameTraits>(p1, p2, p3, p4),
+	  _container(0)
 {
+}
+
+template<typename GameTraits>
+void
+NoCollideTan<GameTraits>::
+set_tanset(tanset * container)
+{
+	assert(!this->_container);
+	this->_container = container;
+}
+
+template<typename GameTraits>
+NoCollideTanSet<GameTraits>::
+NoCollideTanSet ()
+	: TanSet<GameTraits> (),
+	  _obstruction (),
+	  _dragged (0)
+{
+	std::for_each(this->begin(), this->end(), std::bind2nd(std::mem_fun_ref(&NoCollideTan<GameTraits>::set_tanset), this));
 }
 
 /*

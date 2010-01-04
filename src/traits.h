@@ -2,6 +2,7 @@
 #define __tangy_traits_h__
 
 #include <complex>
+#include <vector>
 #include "controller.h"
 #include "numbers.h"
 #include "tans.h"
@@ -16,8 +17,9 @@ struct SimpleGameTraits
 	typedef TanSet<SimpleGameTraits>   tanset;
 	typedef Tan<SimpleGameTraits>      tan;
 
-	typedef tanset::tan_handle       tan_handle;
-	typedef tanset::const_tan_handle const_tan_handle;
+	typedef std::vector<tan>              tan_container;
+	typedef tan_container::iterator       tan_handle;
+	typedef tan_container::const_iterator const_tan_handle;
 
 	typedef SimpleMouseController<SimpleGameTraits> controller;
 };
