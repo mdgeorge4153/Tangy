@@ -38,11 +38,11 @@ struct ObstacleSet<GameTraits>::closest_to
 
 template<typename GameTraits>
 ObstacleSet<GameTraits>::
-ObstacleSet (const_tan_handle moving, const tanset & fixed)
+ObstacleSet (const tan * moving, const tanset & fixed)
 	: _impl(polygon::COMPLETE)
 {
 	for (const_tan_handle i = fixed.begin(); i != fixed.end(); i++)
-		if (i != moving)
+		if (&(* i) != moving)
 			add_sum(moving, i);
 }
 
@@ -59,6 +59,7 @@ ObstacleSet<GameTraits>::
 operator= (const ObstacleSet<GameTraits> & other)
 {
 	_impl = other._impl;
+	return (*this);
 }
 
 template<typename GameTraits>
@@ -181,7 +182,7 @@ south_of (const point & a, const point & b)
 template<typename GameTraits>
 void
 ObstacleSet<GameTraits>::
-add_sum (const_tan_handle moving, const_tan_handle fixed)
+add_sum (const tan * moving, const_tan_handle fixed)
 {
 	typedef std::vector<point>           container;
 	typedef typename container::iterator iterator;

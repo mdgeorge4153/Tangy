@@ -21,13 +21,14 @@ private:
 
 public:
 	typedef typename GameTraits::point            point;
+	typedef typename GameTraits::tan              tan;
 	typedef typename GameTraits::tanset           tanset;
 	typedef typename GameTraits::tan_handle       tan_handle;
 	typedef typename GameTraits::const_tan_handle const_tan_handle;
 
 	typedef typename polygon::Explorer explorer;
 
-	ObstacleSet (const_tan_handle, const tanset &);
+	ObstacleSet (const tan *, const tanset &);
 	ObstacleSet ();  
 	ObstacleSet & operator= (const ObstacleSet &);
 
@@ -36,7 +37,7 @@ public:
 	explorer mask () const;
 
 private:
-	void add_sum(const_tan_handle, const_tan_handle);
+	void add_sum(const tan *, const_tan_handle);
 
 	// helper functions
 	struct closest_to;

@@ -6,6 +6,9 @@ NoCollideTan<GameTraits>::
 flip ()
 {
 	Tan<GameTraits>::flip();
+	_container->_dragged = 0;
+	this->set_pos (this->pos());
+
 }
 
 template<typename GameTraits>
@@ -13,7 +16,13 @@ void
 NoCollideTan<GameTraits>::
 set_pos (const point & pos)
 {
-	Tan<GameTraits>::set_pos (pos);
+	if (_container->_dragged != this)
+	{
+		_container->_obstruction = ObstacleSet<GameTraits> (this, *_container);
+		_container->_dragged = this;
+	}
+
+	Tan<GameTraits>::set_pos (_container->_obstruction.closest(pos));
 }
 
 template<typename GameTraits>
@@ -22,6 +31,9 @@ NoCollideTan<GameTraits>::
 set_rot (const vector & rot)
 {
 	Tan<GameTraits>::set_rot (rot);
+
+	_container->_dragged = 0;
+	this->set_pos (this->pos());
 }
 
 template<typename GameTraits>

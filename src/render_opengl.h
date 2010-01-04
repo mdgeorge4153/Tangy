@@ -23,10 +23,10 @@ render_opengl (const typename GameTraits::controller & c)
 		else
 			glColor4f(0.13, 0.0, 0.66, 1.0);
 
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glPolygonMode(GL_FRONT, GL_FILL);
 		glBegin(GL_POLYGON);
 
-		for (typename pointset::iterator j = points.begin(); j != points.end(); j++)
+		for (typename pointset::reverse_iterator j = points.rbegin(); j != points.rend(); j++)
 		{
 			glVertex2f(j->real(), j->imag());
 		}
@@ -38,7 +38,7 @@ render_opengl (const typename GameTraits::controller & c)
 		glLineWidth(2.0);
 		glBegin(GL_POLYGON);
 
-		for (typename pointset::iterator j = points.begin(); j != points.end(); j++)
+		for (typename pointset::reverse_iterator j = points.rbegin(); j != points.rend(); j++)
 		{
 			glVertex2f(j->real(), j->imag());
 		}

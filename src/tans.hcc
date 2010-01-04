@@ -87,7 +87,10 @@ points (OutputIterator out) const
 		_points_valid = true;
 	}
 
-	return std::copy(_points.begin(), _points.end(), out);
+	if (_conj)
+		return std::reverse_copy(_points.begin(), _points.end(), out);
+	else
+		return std::copy(_points.begin(), _points.end(), out);
 }
 
 template<typename GT>
