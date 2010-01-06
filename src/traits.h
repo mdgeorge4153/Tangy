@@ -24,7 +24,5 @@ struct SimpleGameTraits
 	typedef SimpleMouseController<SimpleGameTraits> controller;
 };
 
-typedef SimpleGameTraits GameTraits;
-
 #endif
 
