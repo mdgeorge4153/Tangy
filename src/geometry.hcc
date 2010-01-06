@@ -35,6 +35,51 @@ struct ObstacleSet<GameTraits>::closest_to
 	}
 };
 
+/*
+template<typename GameTraits>
+struct ObstacleSet<GameTraits>::union_traits
+{
+	typedef typename arrangement::Vertex_handle   Vertex_handle_A,   Vertex_handle_B,   Vertex_handle_R;
+	typedef typename arrangement::Halfedge_handle Halfedge_handle_A, Halfedge_handle_B, Halfedge_handle_R;
+	typedef typename arrangement::Face_handle     Face_handle_A,     Face_handle_B,     Face_handle_R;
+
+	inline void create_vertex (Vertex_handle_A   a, Vertex_handle_B   b, Vertex_handle_R r) {r.set_data(false);}
+	inline void create_vertex (Vertex_handle_A   a, Halfedge_handle_B b, Vertex_handle_R r) {r.set_data(false);}
+	inline void create_vertex (Vertex_handle_A   a, Face_handle_B     b, Vertex_handle_R r) {r.set_data(b.data());}
+	inline void create_vertex (Halfedge_handle_A a, Vertex_handle_B   b, Vertex_handle_R r) {r.set_data(false);}
+	inline void create_vertex (Halfedge_handle_A a, Halfedge_handle_B b, Vertex_handle_R r) {r.set_data(false);}
+	inline void create_vertex (Face_handle_A     a, Halfedge_handle_B b, Vertex_handle_R r) {r.set_data(a.data());}
+
+	inline void create_edge (Halfedge_handle_A a, Halfedge_handle_B b, Halfedge_handle_R r) {r.set_data(false);}
+	inline void create_edge (Halfedge_handle_A a, Face_handle_B     b, Halfedge_handle_R r) {r.set_data(b.data());}
+	inline void create_edge (Face_handle_A     a, Halfedge_handle_B b, Halfedge_handle_R r) {r.set_data(a.data());}
+
+	inline void create_face (Face_handle_A a, Face_handle_B b, Face_handle_R r)             {r.set_data(a.data() || b.data());}
+};
+
+template<typename GameTraits>
+template<typename InputIterator>
+void
+ObstacleSet<GameTraits>::
+join (InputIterator begin, InputIterator end, arrangement & out)
+{
+	assert (begin != end);
+
+	if (begin - end == 1)
+		out = *begin;
+
+	else
+	{
+		arrangement left, right;
+		InputIterator mid = begin + (end - begin) / 2;
+		join (begin, mid, left);
+		join (mid, end, right);
+
+		union_traits ut;
+		CGAL::overlay (left, right, out, ut);
+	}
+}
+*/
 
 template<typename GameTraits>
 ObstacleSet<GameTraits>::

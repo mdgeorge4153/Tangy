@@ -41,6 +41,7 @@ private:
 
 	// helper functions
 	struct closest_to;
+	// struct union_traits;
 
 	static cgal_point convert  (const point &);
 	static bool       less_rot (const point &, const point &);
@@ -48,6 +49,11 @@ private:
 	static cgal_point closest  (const cgal_point &, const cgal_point &, const cgal_point &);
 
 	polygon _impl;
+	/*
+	template<typename InputIterator>
+	static arrangement join     (InputIterator, InputIterator, arrangement &);
+	*/
+
 };
 
 #include "geometry.hcc"
