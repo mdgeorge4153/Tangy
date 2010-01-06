@@ -2,12 +2,11 @@
 #include <vector>
 #include <utility>
 #include "geometry.h"
-#include "traits.h"
+#include "traits_nocollide.h"
 
 
 int main(int, char **)
 {
-	/*
 	typedef GameTraits::point       point;
 	typedef GameTraits::tanset      tanset;
 	typedef ObstacleSet<GameTraits> obstacle_set;
@@ -16,7 +15,6 @@ int main(int, char **)
 	obstacle_set obs (&(*tans.find (point (1, 1))), tans);
 
 	std::cout << obs.closest (point (2, 2)) << std::endl;
-	*/
 
 	/*
 	typedef GameTraits::number number;
@@ -45,10 +43,12 @@ int main(int, char **)
 	u += mask(t2.begin(), t2.end(), mask::EXCLUDED);
 	*/
 
+	/*
 	ExtendedRational n (3, 2, 1, 2, 5);
 	ExtendedRational m (1);
 
 	std::cout << m / n << std::endl;
+	*/
 
 	return 0;
 }
