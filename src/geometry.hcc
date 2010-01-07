@@ -6,40 +6,14 @@
 #include "utils.h"
 
 /*
-** forward declarations of helpers *********************************************
+** Helper functions ************************************************************
 */
 
-template<typename TanA, typename TanB, typename Out> Out sum(TanA, TanB, Out);
-
-template<typename point>  bool  south_of (const point &,  const point &);
-template<typename vector> bool  less_rot (const vector &, const vector &); 
-
-template<typename kernel> CGAL::Point_2<kernel> closest_point_on_segment (const CGAL::Point_2<kernel> &,  const CGAL::Point_2<kernel> &, const CGAL::Point_2<kernel> &);
-
-template<typename in, typename out> out convert_from_complex (const in &);
 
 /*
-** CGAL type traits for ExtendedRationals **************************************
-*/
-
-namespace CGAL {
-	template<>
-	class Algebraic_structure_traits<ExtendedRational>
-		: public Algebraic_structure_traits_base<ExtendedRational, Field_tag>
-	{
-	};
-
-	template<>
-	class Real_embeddable_traits<ExtendedRational>
-		: public INTERN_RET::Real_embeddable_traits_base<ExtendedRational, Tag_true>
-	{
-	};
-}
-
-/*
-** Implementation **************************************************************
-*/
-
+ * closest_to(p) returns a comparator that ranks points by
+ * their distance from p
+ */
 template<typename cgal_point>
 struct closest_to_t
 {
@@ -61,6 +35,91 @@ closest_to_t<cgal_point>
 closest_to (const cgal_point & p)
 {
 	return closest_to_t<cgal_point> (p);
+}
+
+/*
+ * convert_from_complex is a function object that turns
+ * std::complex numbers into other representations
+ */
+template<typename in, typename out>
+out
+convert_from_complex (const in & p)
+{
+	return out(p.real(), p.imag());
+}
+
+/*
+ * less_rot is a comparator that ranks vectors by the angle
+ * they make with the x-axis
+ */
+template<typename vector>
+bool
+less_rot (const vector & a, const vector & b)
+{
+	typedef typename vector::value_type number;
+
+	if (a.imag() > number(0) && b.imag() < number(0))
+		// angle(a) < 180 < angle(b)
+		return true;
+	else if (a.imag() < number(0) && b.imag() > number(0))
+		// angle(b) < 180 < angle(a)
+		return false;
+	else
+		// a and b are in same half-plane so
+		// -180 < angle(a) - angle(b) < 180
+		return (a * std::conj(b)).imag() < number(0);
+}
+
+/*
+ * south_of is a copmarator that ranks points by their y
+ * component.
+ */
+template<typename point>
+bool
+south_of (const point & a, const point & b)
+{
+	return a.imag() < b.imag();
+}
+
+/*
+ * sum outputs the minkowski sum of two tans into an
+ * output_iterator<point>.
+ */
+template<typename TanA, typename TanB, typename Out>
+Out
+sum (TanA moving, TanB fixed, Out out)
+{
+	typedef typename std::iterator_traits<TanA>::value_type tan;
+	typedef typename tan::point          point;
+	typedef typename std::vector<point>  container;
+	typedef typename container::iterator iterator;
+
+	// let fps and mps be the points of fixed and moving respectively
+	container fps, mps;
+	fixed ->points(std::back_inserter(fps));
+	moving->points(std::back_inserter(mps));
+
+	// flip moving tan
+	std::transform(mps.begin(), mps.end(), mps.begin(), std::negate<point> ());
+
+	// find southmost vertices
+	iterator fmin = std::min_element(fps.begin(), fps.end(), south_of<point>);
+	iterator mmin = std::min_element(mps.begin(), mps.end(), south_of<point>);
+
+	// reorder both so that the southmost vertex is last
+	std::rotate(fps.begin(), ++fmin, fps.end());
+	std::rotate(mps.begin(), ++mmin, mps.end());
+
+	// convert to lists of vectors
+	point fsouth = circular_difference (fps.begin(), fps.end(), fps.begin());
+	point msouth = circular_difference (mps.begin(), mps.end(), mps.begin());
+
+	// merge sort vectors by the angle they form with the x-axis
+	container result;
+	std::merge(fps.begin(), fps.end(), mps.begin(), mps.end(), std::back_inserter(result), less_rot<point>);
+
+	// turn the vectors back into points
+	return circular_sum (result.begin(), result.end(), out, fsouth + msouth + moving->pos());
 }
 
 /*
@@ -109,6 +168,10 @@ join (InputIterator begin, InputIterator end, arrangement & out)
 }
 */
 
+/*
+** ObstacleSet Implementation **************************************************
+*/
+
 template<typename GameTraits>
 ObstacleSet<GameTraits>::
 ObstacleSet (const tan * moving, const tanset & fixed)
@@ -127,8 +190,6 @@ ObstacleSet (const tan * moving, const tanset & fixed)
 			                convert_from_complex<point, cgal_point>);
 			_impl -= polygon(cgal_points.begin(), cgal_points.end(), polygon::EXCLUDED);
 		}
-
-	
 }
 
 template<typename GameTraits>
@@ -232,74 +293,24 @@ closest_point_on_segment (const CGAL::Point_2<kernel> & p, const CGAL::Point_2<k
 		return source + dot * (target - source) / ((target - source) * (target - source));
 }
 
-template<typename in, typename out>
-out
-convert_from_complex (const in & p)
-{
-	return out(p.real(), p.imag());
+/*
+** CGAL type traits for ExtendedRationals **************************************
+*/
+
+namespace CGAL {
+	template<>
+	class Algebraic_structure_traits<ExtendedRational>
+		: public Algebraic_structure_traits_base<ExtendedRational, Field_tag>
+	{
+	};
+
+	template<>
+	class Real_embeddable_traits<ExtendedRational>
+		: public INTERN_RET::Real_embeddable_traits_base<ExtendedRational, Tag_true>
+	{
+	};
 }
 
-template<typename vector>
-bool
-less_rot (const vector & a, const vector & b)
-{
-	typedef typename vector::value_type number;
-
-	if (a.imag() > number(0) && b.imag() < number(0))
-		// angle(a) < 180 < angle(b)
-		return true;
-	else if (a.imag() < number(0) && b.imag() > number(0))
-		// angle(b) < 180 < angle(a)
-		return false;
-	else
-		// a and b are in same half-plane so
-		// -180 < angle(a) - angle(b) < 180
-		return (a * std::conj(b)).imag() < number(0);
-}
-
-template<typename point>
-bool
-south_of (const point & a, const point & b)
-{
-	return a.imag() < b.imag();
-}
-
-template<typename TanA, typename TanB, typename Out>
-Out
-sum (TanA moving, TanB fixed, Out out)
-{
-	typedef typename std::iterator_traits<TanA>::value_type tan;
-	typedef typename tan::point          point;
-	typedef typename std::vector<point>  container;
-	typedef typename container::iterator iterator;
-
-	// let fps and mps be the points of fixed and moving respectively
-	container fps, mps;
-	fixed ->points(std::back_inserter(fps));
-	moving->points(std::back_inserter(mps));
-
-	// flip moving tan
-	std::transform(mps.begin(), mps.end(), mps.begin(), std::negate<point> ());
-
-	// find southmost vertices
-	iterator fmin = std::min_element(fps.begin(), fps.end(), south_of<point>);
-	iterator mmin = std::min_element(mps.begin(), mps.end(), south_of<point>);
-
-	// reorder both so that the southmost vertex is last
-	std::rotate(fps.begin(), ++fmin, fps.end());
-	std::rotate(mps.begin(), ++mmin, mps.end());
-
-	// convert to lists of vectors
-	point fsouth = circular_difference (fps.begin(), fps.end(), fps.begin());
-	point msouth = circular_difference (mps.begin(), mps.end(), mps.begin());
-
-	// merge sort vectors
-	container result;
-	std::merge(fps.begin(), fps.end(), mps.begin(), mps.end(), std::back_inserter(result), less_rot<point>);
-
-	// turn back into points
-	return circular_sum (result.begin(), result.end(), out, fsouth + msouth + moving->pos());
-}
 
 /*
 ** vim: ts=4 sw=4 cindent syntax=cpp

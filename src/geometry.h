@@ -37,14 +37,8 @@ public:
 	explorer mask () const;
 
 private:
-	// helper functions
-	// struct union_traits;
 
 	polygon _impl;
-	/*
-	template<typename InputIterator>
-	static arrangement join     (InputIterator, InputIterator, arrangement &);
-	*/
 
 };
 
