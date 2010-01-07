@@ -4,25 +4,169 @@
 #include <iterator>
 #include "algebra.h"
 #include "utils.h"
-#include <CGAL/Kernel_traits.h>
 
 /*
-** Helper function declarations ************************************************
+** Helper functions ************************************************************
 */
 
-template<typename in, typename out> out convert_from_cgal_point (const in &);
-template<typename in, typename out> out convert_from_complex    (const in &);
 
-template<typename cgal_point> struct closest_to_t;
-template<typename cgal_point> closest_to_t<cgal_point> closest_to (const cgal_point &);
-template<typename cgal_point> cgal_point               closest_point_on_segment (const cgal_point &, const cgal_point &, const cgal_point &);
+/*
+ * closest_to(p) returns a comparator that ranks points by
+ * their distance from p
+ */
+template<typename cgal_point>
+struct closest_to_t
+{
+	const cgal_point & _p;
 
-template<typename point>      bool south_of (const point  & a, const point  & b);
-template<typename vector>     bool less_rot (const vector & a, const vector & b);
+	closest_to_t (const cgal_point & p)
+		: _p(p)
+	{
+	}
 
-template<typename TanA, typename TanB, typename Out> Out sum (TanA, TanB, Out);
+	bool operator() (const cgal_point & a, const cgal_point & b)
+	{
+		return CGAL::compare_distance_to_point (_p, a, b) == CGAL::SMALLER;
+	}
+};
 
+template<typename cgal_point>
+closest_to_t<cgal_point>
+closest_to (const cgal_point & p)
+{
+	return closest_to_t<cgal_point> (p);
+}
 
+/*
+ * convert_from_complex is a function object that turns
+ * std::complex numbers into other representations
+ */
+template<typename in, typename out>
+out
+convert_from_complex (const in & p)
+{
+	return out(p.real(), p.imag());
+}
+
+/*
+ * less_rot is a comparator that ranks vectors by the angle
+ * they make with the x-axis
+ */
+template<typename vector>
+bool
+less_rot (const vector & a, const vector & b)
+{
+	typedef typename vector::value_type number;
+
+	if (a.imag() > number(0) && b.imag() < number(0))
+		// angle(a) < 180 < angle(b)
+		return true;
+	else if (a.imag() < number(0) && b.imag() > number(0))
+		// angle(b) < 180 < angle(a)
+		return false;
+	else
+		// a and b are in same half-plane so
+		// -180 < angle(a) - angle(b) < 180
+		return (a * std::conj(b)).imag() < number(0);
+}
+
+/*
+ * south_of is a copmarator that ranks points by their y
+ * component.
+ */
+template<typename point>
+bool
+south_of (const point & a, const point & b)
+{
+	return a.imag() < b.imag();
+}
+
+/*
+ * sum outputs the minkowski sum of two tans into an
+ * output_iterator<point>.
+ */
+template<typename TanA, typename TanB, typename Out>
+Out
+sum (TanA moving, TanB fixed, Out out)
+{
+	typedef typename std::iterator_traits<TanA>::value_type tan;
+	typedef typename tan::point          point;
+	typedef typename std::vector<point>  container;
+	typedef typename container::iterator iterator;
+
+	// let fps and mps be the points of fixed and moving respectively
+	container fps, mps;
+	fixed ->points(std::back_inserter(fps));
+	moving->points(std::back_inserter(mps));
+
+	// flip moving tan
+	std::transform(mps.begin(), mps.end(), mps.begin(), std::negate<point> ());
+
+	// find southmost vertices
+	iterator fmin = std::min_element(fps.begin(), fps.end(), south_of<point>);
+	iterator mmin = std::min_element(mps.begin(), mps.end(), south_of<point>);
+
+	// reorder both so that the southmost vertex is last
+	std::rotate(fps.begin(), ++fmin, fps.end());
+	std::rotate(mps.begin(), ++mmin, mps.end());
+
+	// convert to lists of vectors
+	point fsouth = circular_difference (fps.begin(), fps.end(), fps.begin());
+	point msouth = circular_difference (mps.begin(), mps.end(), mps.begin());
+
+	// merge sort vectors by the angle they form with the x-axis
+	container result;
+	std::merge(fps.begin(), fps.end(), mps.begin(), mps.end(), std::back_inserter(result), less_rot<point>);
+
+	// turn the vectors back into points
+	return circular_sum (result.begin(), result.end(), out, fsouth + msouth + moving->pos());
+}
+
+/*
+template<typename GameTraits>
+struct ObstacleSet<GameTraits>::union_traits
+{
+	typedef typename arrangement::Vertex_handle   Vertex_handle_A,   Vertex_handle_B,   Vertex_handle_R;
+	typedef typename arrangement::Halfedge_handle Halfedge_handle_A, Halfedge_handle_B, Halfedge_handle_R;
+	typedef typename arrangement::Face_handle     Face_handle_A,     Face_handle_B,     Face_handle_R;
+
+	inline void create_vertex (Vertex_handle_A   a, Vertex_handle_B   b, Vertex_handle_R r) {r.set_data(false);}
+	inline void create_vertex (Vertex_handle_A   a, Halfedge_handle_B b, Vertex_handle_R r) {r.set_data(false);}
+	inline void create_vertex (Vertex_handle_A   a, Face_handle_B     b, Vertex_handle_R r) {r.set_data(b.data());}
+	inline void create_vertex (Halfedge_handle_A a, Vertex_handle_B   b, Vertex_handle_R r) {r.set_data(false);}
+	inline void create_vertex (Halfedge_handle_A a, Halfedge_handle_B b, Vertex_handle_R r) {r.set_data(false);}
+	inline void create_vertex (Face_handle_A     a, Halfedge_handle_B b, Vertex_handle_R r) {r.set_data(a.data());}
+
+	inline void create_edge (Halfedge_handle_A a, Halfedge_handle_B b, Halfedge_handle_R r) {r.set_data(false);}
+	inline void create_edge (Halfedge_handle_A a, Face_handle_B     b, Halfedge_handle_R r) {r.set_data(b.data());}
+	inline void create_edge (Face_handle_A     a, Halfedge_handle_B b, Halfedge_handle_R r) {r.set_data(a.data());}
+
+	inline void create_face (Face_handle_A a, Face_handle_B b, Face_handle_R r)             {r.set_data(a.data() || b.data());}
+};
+
+template<typename GameTraits>
+template<typename InputIterator>
+void
+ObstacleSet<GameTraits>::
+join (InputIterator begin, InputIterator end, arrangement & out)
+{
+	assert (begin != end);
+
+	if (begin - end == 1)
+		out = *begin;
+
+	else
+	{
+		arrangement left, right;
+		InputIterator mid = begin + (end - begin) / 2;
+		join (begin, mid, left);
+		join (mid, end, right);
+
+		union_traits ut;
+		CGAL::overlay (left, right, out, ut);
+	}
+}
+*/
 
 /*
 ** ObstacleSet Implementation **************************************************
@@ -123,6 +267,24 @@ closest (const point & _p) const
 	return point(best->x(), best->y());
 }
 
+template<typename kernel>
+typename CGAL::Point_2<kernel>
+closest_point_on_segment (const CGAL::Point_2<kernel> & p, const CGAL::Point_2<kernel> & source, const CGAL::Point_2<kernel> & target)
+{
+	typedef typename kernel::RT number;
+
+	number dot = (p - source) * (target - source);
+
+	if (dot < number(0))
+		return source;
+
+	else if (dot > (target - source) * (target - source))
+		return target;
+
+	else
+		return source + dot * (target - source) / ((target - source) * (target - source));
+}
+
 /*
 ** CGAL type traits for ExtendedRationals **************************************
 */
@@ -139,199 +301,6 @@ namespace CGAL {
 		: public INTERN_RET::Real_embeddable_traits_base<ExtendedRational, Tag_true>
 	{
 	};
-}
-
-/*
-** Nef policy implementation ***************************************************
-*/
-
-/*
-** Arrangement policy implementation *******************************************
-*/
-
-/*
-template<typename GameTraits>
-struct ObstacleSet<GameTraits>::union_traits
-{
-	typedef typename arrangement::Vertex_handle   Vertex_handle_A,   Vertex_handle_B,   Vertex_handle_R;
-	typedef typename arrangement::Halfedge_handle Halfedge_handle_A, Halfedge_handle_B, Halfedge_handle_R;
-	typedef typename arrangement::Face_handle     Face_handle_A,     Face_handle_B,     Face_handle_R;
-
-	inline void create_vertex (Vertex_handle_A   a, Vertex_handle_B   b, Vertex_handle_R r) {r.set_data(false);}
-	inline void create_vertex (Vertex_handle_A   a, Halfedge_handle_B b, Vertex_handle_R r) {r.set_data(false);}
-	inline void create_vertex (Vertex_handle_A   a, Face_handle_B     b, Vertex_handle_R r) {r.set_data(b.data());}
-	inline void create_vertex (Halfedge_handle_A a, Vertex_handle_B   b, Vertex_handle_R r) {r.set_data(false);}
-	inline void create_vertex (Halfedge_handle_A a, Halfedge_handle_B b, Vertex_handle_R r) {r.set_data(false);}
-	inline void create_vertex (Face_handle_A     a, Halfedge_handle_B b, Vertex_handle_R r) {r.set_data(a.data());}
-
-	inline void create_edge (Halfedge_handle_A a, Halfedge_handle_B b, Halfedge_handle_R r) {r.set_data(false);}
-	inline void create_edge (Halfedge_handle_A a, Face_handle_B     b, Halfedge_handle_R r) {r.set_data(b.data());}
-	inline void create_edge (Face_handle_A     a, Halfedge_handle_B b, Halfedge_handle_R r) {r.set_data(a.data());}
-
-	inline void create_face (Face_handle_A a, Face_handle_B b, Face_handle_R r)             {r.set_data(a.data() || b.data());}
-};
-
-template<typename GameTraits>
-template<typename InputIterator>
-void
-ObstacleSet<GameTraits>::
-join (InputIterator begin, InputIterator end, arrangement & out)
-{
-	assert (begin != end);
-
-	if (begin - end == 1)
-		out = *begin;
-
-	else
-	{
-		arrangement left, right;
-		InputIterator mid = begin + (end - begin) / 2;
-		join (begin, mid, left);
-		join (mid, end, right);
-
-		union_traits ut;
-		CGAL::overlay (left, right, out, ut);
-	}
-}
-*/
-
-/*
-** Helper functions ************************************************************
-*/
-
-/*
- * closest_to(p) returns a comparator that ranks points by
- * their distance from p
- */
-template<typename cgal_point>
-struct closest_to_t
-{
-	const cgal_point & _p;
-
-	closest_to_t (const cgal_point & p)
-		: _p(p)
-	{
-	}
-
-	bool operator() (const cgal_point & a, const cgal_point & b)
-	{
-		return CGAL::compare_distance_to_point (_p, a, b) == CGAL::SMALLER;
-	}
-};
-
-template<typename cgal_point>
-closest_to_t<cgal_point>
-closest_to (const cgal_point & p)
-{
-	return closest_to_t<cgal_point> (p);
-}
-
-/* turns std::complex style points into other representations */
-template<typename in, typename out>
-out
-convert_from_complex (const in & p)
-{
-	return out(p.real(), p.imag());
-}
-
-/* turns CGAL::Point_2 style points into other representations.  */
-template<typename in, typename out>
-out
-convert_from_cgal_point (const in & p)
-{
-	return out(p.x(), p.y());
-}
-
-/*
- * less_rot is a comparator that ranks vectors by the angle
- * they form with the x-axis
- */
-template<typename vector>
-bool
-less_rot (const vector & a, const vector & b)
-{
-	typedef typename vector::value_type number;
-
-	if (a.imag() > number(0) && b.imag() < number(0))
-		// angle(a) < 180 < angle(b)
-		return true;
-	else if (a.imag() < number(0) && b.imag() > number(0))
-		// angle(b) < 180 < angle(a)
-		return false;
-	else
-		// a and b are in same half-plane so
-		// -180 < angle(a) - angle(b) < 180
-		return (a * std::conj(b)).imag() < number(0);
-}
-
-/*
- * south_of is a copmarator that ranks points by their y
- * component.
- */
-template<typename point>
-bool
-south_of (const point & a, const point & b)
-{
-	return a.imag() < b.imag();
-}
-
-/*
- * sum outputs the minkowski sum of two tans into an
- * output_iterator<point>.
- */
-template<typename TanA, typename TanB, typename Out>
-Out
-sum (TanA moving, TanB fixed, Out out)
-{
-	typedef typename std::iterator_traits<TanA>::value_type tan;
-	typedef typename tan::point          point;
-	typedef typename std::vector<point>  container;
-	typedef typename container::iterator iterator;
-
-	// let fps and mps be the points of fixed and moving respectively
-	container fps, mps;
-	fixed ->points(std::back_inserter(fps));
-	moving->points(std::back_inserter(mps));
-
-	// flip moving tan
-	std::transform(mps.begin(), mps.end(), mps.begin(), std::negate<point> ());
-
-	// find southmost vertices
-	iterator fmin = std::min_element(fps.begin(), fps.end(), south_of<point>);
-	iterator mmin = std::min_element(mps.begin(), mps.end(), south_of<point>);
-
-	// reorder both so that the southmost vertex is last
-	std::rotate(fps.begin(), ++fmin, fps.end());
-	std::rotate(mps.begin(), ++mmin, mps.end());
-
-	// convert to lists of vectors
-	point fsouth = circular_difference (fps.begin(), fps.end(), fps.begin());
-	point msouth = circular_difference (mps.begin(), mps.end(), mps.begin());
-
-	// merge sort vectors by the angle they form with the x-axis
-	container result;
-	std::merge(fps.begin(), fps.end(), mps.begin(), mps.end(), std::back_inserter(result), less_rot<point>);
-
-	// turn the vectors back into points
-	return circular_sum (result.begin(), result.end(), out, fsouth + msouth + moving->pos());
-}
-
-template<typename cgal_point>
-cgal_point
-closest_point_on_segment (const cgal_point & p, const cgal_point & source, const cgal_point & target)
-{
-	typedef typename CGAL::Kernel_traits<cgal_point>::Kernel::RT number;
-
-	number dot = (p - source) * (target - source);
-
-	if (dot < number(0))
-		return source;
-
-	else if (dot > (target - source) * (target - source))
-		return target;
-
-	else
-		return source + dot * (target - source) / ((target - source) * (target - source));
 }
 
 
