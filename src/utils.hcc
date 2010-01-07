@@ -1,0 +1,61 @@
+
+#include <functional>
+
+template<typename In, typename Out, typename BinOp>
+typename std::iterator_traits<In>::value_type
+circular_difference (In in, In end, Out out, BinOp op)
+{
+	typedef typename std::iterator_traits<In> ::value_type value;
+
+	assert (in != end);
+
+	value prev  = *(--end)++; // *(end - 1)
+
+	while (in != end) 
+	{
+		value current = *in++;
+		*out++ = op(current, prev);
+		prev   = current;
+	}
+
+	return prev;
+}
+
+template<typename In, typename Out>
+typename std::iterator_traits<In>::value_type
+circular_difference (In in, In end, Out out)
+{
+	typedef typename std::minus<typename std::iterator_traits<In>::value_type> minus;
+	return circular_difference (in, end, out, minus());
+}
+
+template<typename In, typename Out, typename T, typename  BinOp>
+Out
+circular_sum (In in, In end, Out out, T first, BinOp op)
+{
+	typedef typename std::iterator_traits<In> ::value_type diff;
+
+	if (in == end)
+		return out;
+
+	T total = first;
+	while (in != end)
+	{
+		total = op(total, *in++);
+		*out++ = total;
+	}
+
+	return out;
+}
+
+template<typename In, typename Out, typename T>
+Out
+circular_sum (In in, In end, Out out, T first)
+{
+	typedef typename std::plus<T> plus;
+	return circular_sum (in, end, out, first, plus());
+}
+
+/*
+** vim: ts=4 sw=4 cindent syntax=cpp
+*/

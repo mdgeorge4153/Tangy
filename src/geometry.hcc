@@ -3,6 +3,7 @@
 #include <functional>
 #include <iterator>
 #include "algebra.h"
+#include "utils.h"
 
 namespace CGAL {
 	template<>
@@ -244,27 +245,20 @@ add_sum (const tan * moving, const_tan_handle fixed)
 	iterator fmin = std::min_element(fps.begin(), fps.end(), south_of);
 	iterator mmin = std::min_element(mps.begin(), mps.end(), south_of);
 
-	point fsouth = * fmin;
-	point msouth = * mmin;
-
 	// reorder both so that the southmost vertex is last
 	std::rotate(fps.begin(), ++fmin, fps.end());
 	std::rotate(mps.begin(), ++mmin, mps.end());
 
 	// convert to lists of vectors
-	std::adjacent_difference (fps.begin(), fps.end(), fps.begin());
-	std::adjacent_difference (mps.begin(), mps.end(), mps.begin());
-
-	fps[0] -= fsouth;
-	mps[0] -= msouth;
+	point fsouth = circular_difference (fps.begin(), fps.end(), fps.begin());
+	point msouth = circular_difference (mps.begin(), mps.end(), mps.begin());
 
 	// merge sort vectors
 	container result;
 	std::merge(fps.begin(), fps.end(), mps.begin(), mps.end(), std::back_inserter(result), less_rot);
 
 	// turn back into points
-	result[0] += fsouth + msouth + moving->pos();
-	std::partial_sum (result.begin(), result.end(), result.begin());
+	circular_sum (result.begin(), result.end(), result.begin(), fsouth + msouth + moving->pos());
 
 	// convert to CGAL points
 	std::vector<cgal_point> rps;
