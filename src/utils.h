@@ -2,12 +2,21 @@
 #define __tangy_utils_h__ 1
 
 #include <iterator>
+#include <complex>
 
-/* circular_difference and circular_sum are similar to std::adjacent_difference
- * and std::partial_sum, but work for types (such as points, or pointers) where
- * the types of differences between values are different than the types of the
- * values themselves.  As with std::adjacent_difference and std::partial_sum,
- * circular_difference and circular_sum are two-sided inverses.
+/*
+** circular_difference *********************************************************
+*/
+
+
+/* circular_difference and circular_sum are similar to
+ * std::adjacent_difference and std::partial_sum, but work
+ * for types (such as points, or pointers) where the types
+ * of differences between values are different than the
+ * types of the values themselves.  As with
+ * std::adjacent_difference and std::partial_sum,
+ * circular_difference and circular_sum are two-sided
+ * inverses.
  */
 
 /* t = circular_difference (c.begin(), c.end(), out)
@@ -38,6 +47,14 @@ Out circular_sum (In, In, Out, T, BinOp op);
 
 template<typename In, typename Out, typename T>
 Out circular_sum (In, In, Out, T);
+
+
+/*
+** complex<float> **************************************************************
+*/
+
+std::complex<float> approximate (const std::complex<float> &);
+std::complex<float> normalize   (const std::complex<float> &);
 
 #include "utils.hcc"
 

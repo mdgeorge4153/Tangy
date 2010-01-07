@@ -1,6 +1,10 @@
 
 #include <functional>
 
+/*
+********************************************************************************
+*/
+
 template<typename In, typename Out, typename BinOp>
 typename std::iterator_traits<In>::value_type
 circular_difference (In in, In end, Out out, BinOp op)
@@ -54,6 +58,24 @@ circular_sum (In in, In end, Out out, T first)
 {
 	typedef typename std::plus<T> plus;
 	return circular_sum (in, end, out, first, plus());
+}
+
+/*
+********************************************************************************
+*/
+
+inline
+std::complex<float>
+approximate (const std::complex<float> & n)
+{
+	return n;
+}
+
+inline
+std::complex<float>
+normalize (const std::complex<float> & n)
+{
+	return n / std::abs(n);
 }
 
 /*

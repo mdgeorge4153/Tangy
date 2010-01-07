@@ -4,7 +4,7 @@
 #include <complex>
 #include <vector>
 #include "controller.h"
-#include "numbers.h"
+#include "utils.h"
 #include "tans.h"
 
 struct SimpleGameTraits
