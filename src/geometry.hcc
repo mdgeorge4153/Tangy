@@ -5,6 +5,23 @@
 #include "algebra.h"
 #include "utils.h"
 
+/*
+** forward declarations of helpers *********************************************
+*/
+
+template<typename TanA, typename TanB, typename Out> Out sum(TanA, TanB, Out);
+
+template<typename point>  bool  south_of (const point &,  const point &);
+template<typename vector> bool  less_rot (const vector &, const vector &); 
+
+template<typename kernel> CGAL::Point_2<kernel> closest_point_on_segment (const CGAL::Point_2<kernel> &,  const CGAL::Point_2<kernel> &, const CGAL::Point_2<kernel> &);
+
+template<typename in, typename out> out convert_from_complex (const in &);
+
+/*
+** CGAL type traits for ExtendedRationals **************************************
+*/
+
 namespace CGAL {
 	template<>
 	class Algebraic_structure_traits<ExtendedRational>
@@ -19,13 +36,16 @@ namespace CGAL {
 	};
 }
 
-template<typename GameTraits>
-struct ObstacleSet<GameTraits>::closest_to
+/*
+** Implementation **************************************************************
+*/
+
+template<typename cgal_point>
+struct closest_to_t
 {
-	typedef typename ObstacleSet<GameTraits>::cgal_point cgal_point;
 	const cgal_point & _p;
 
-	closest_to (const cgal_point & p)
+	closest_to_t (const cgal_point & p)
 		: _p(p)
 	{
 	}
@@ -35,6 +55,13 @@ struct ObstacleSet<GameTraits>::closest_to
 		return CGAL::compare_distance_to_point (_p, a, b) == CGAL::SMALLER;
 	}
 };
+
+template<typename cgal_point>
+closest_to_t<cgal_point>
+closest_to (const cgal_point & p)
+{
+	return closest_to_t<cgal_point> (p);
+}
 
 /*
 template<typename GameTraits>
@@ -87,9 +114,21 @@ ObstacleSet<GameTraits>::
 ObstacleSet (const tan * moving, const tanset & fixed)
 	: _impl(polygon::COMPLETE)
 {
+	typename std::vector<typename std::vector<cgal_point> > polygons;
 	for (const_tan_handle i = fixed.begin(); i != fixed.end(); i++)
 		if (&(* i) != moving)
-			add_sum(moving, i);
+		{
+			std::vector<point> points;
+			sum(moving, i, std::back_inserter(points));
+
+			std::vector<cgal_point> cgal_points;
+			std::transform (points.begin(), points.end(),
+			                std::back_inserter(cgal_points),
+			                convert_from_complex<point, cgal_point>);
+			_impl -= polygon(cgal_points.begin(), cgal_points.end(), polygon::EXCLUDED);
+		}
+
+	
 }
 
 template<typename GameTraits>
@@ -120,7 +159,7 @@ closest (const point & _p) const
 	typedef typename explorer::Hole_const_iterator            hole;
 	typedef typename explorer::Halfedge_around_face_const_circulator face_edge;
 
-	cgal_point p = convert(_p);
+	cgal_point p = convert_from_complex<point, cgal_point>(_p);
 	explorer   e = mask();
 
 	object o = _impl.locate(p);
@@ -147,7 +186,7 @@ closest (const point & _p) const
 		edge j = i;
 		do
 		{
-			candidates.push_back(closest(p, e.point(e.source(j)), e.point(e.target(j))));
+			candidates.push_back(closest_point_on_segment(p, e.point(e.source(j)), e.point(e.target(j))));
 		} while (++j != i);
 	}
 
@@ -156,7 +195,7 @@ closest (const point & _p) const
 	if (i != 0 && !e.is_frame_edge(i))
 		do
 		{
-			candidates.push_back(closest(p, e.point(e.source(i)), e.point(e.target(i))));
+			candidates.push_back(closest_point_on_segment(p, e.point(e.source(i)), e.point(e.target(i))));
 		} while (++i != e.face_cycle(f));
 
 	//
@@ -175,11 +214,12 @@ mask () const
 	return _impl.explorer();
 }
 
-template<typename GameTraits>
-typename ObstacleSet<GameTraits>::cgal_point
-ObstacleSet<GameTraits>::
-closest (const cgal_point & p, const cgal_point & source, const cgal_point & target)
+template<typename kernel>
+typename CGAL::Point_2<kernel>
+closest_point_on_segment (const CGAL::Point_2<kernel> & p, const CGAL::Point_2<kernel> & source, const CGAL::Point_2<kernel> & target)
 {
+	typedef typename kernel::RT number;
+
 	number dot = (p - source) * (target - source);
 
 	if (dot < number(0))
@@ -192,19 +232,19 @@ closest (const cgal_point & p, const cgal_point & source, const cgal_point & tar
 		return source + dot * (target - source) / ((target - source) * (target - source));
 }
 
-template<typename GameTraits>
-typename ObstacleSet<GameTraits>::cgal_point
-ObstacleSet<GameTraits>::
-convert (const point & p)
+template<typename in, typename out>
+out
+convert_from_complex (const in & p)
 {
-	return cgal_point(p.real(), p.imag());
+	return out(p.real(), p.imag());
 }
 
-template<typename GameTraits>
+template<typename vector>
 bool
-ObstacleSet<GameTraits>::
-less_rot (const point & a, const point & b)
+less_rot (const vector & a, const vector & b)
 {
+	typedef typename vector::value_type number;
+
 	if (a.imag() > number(0) && b.imag() < number(0))
 		// angle(a) < 180 < angle(b)
 		return true;
@@ -217,20 +257,20 @@ less_rot (const point & a, const point & b)
 		return (a * std::conj(b)).imag() < number(0);
 }
 
-template<typename GameTraits>
+template<typename point>
 bool
-ObstacleSet<GameTraits>::
 south_of (const point & a, const point & b)
 {
 	return a.imag() < b.imag();
 }
 
-template<typename GameTraits>
-void
-ObstacleSet<GameTraits>::
-add_sum (const tan * moving, const_tan_handle fixed)
+template<typename TanA, typename TanB, typename Out>
+Out
+sum (TanA moving, TanB fixed, Out out)
 {
-	typedef std::vector<point>           container;
+	typedef typename std::iterator_traits<TanA>::value_type tan;
+	typedef typename tan::point          point;
+	typedef typename std::vector<point>  container;
 	typedef typename container::iterator iterator;
 
 	// let fps and mps be the points of fixed and moving respectively
@@ -242,8 +282,8 @@ add_sum (const tan * moving, const_tan_handle fixed)
 	std::transform(mps.begin(), mps.end(), mps.begin(), std::negate<point> ());
 
 	// find southmost vertices
-	iterator fmin = std::min_element(fps.begin(), fps.end(), south_of);
-	iterator mmin = std::min_element(mps.begin(), mps.end(), south_of);
+	iterator fmin = std::min_element(fps.begin(), fps.end(), south_of<point>);
+	iterator mmin = std::min_element(mps.begin(), mps.end(), south_of<point>);
 
 	// reorder both so that the southmost vertex is last
 	std::rotate(fps.begin(), ++fmin, fps.end());
@@ -255,18 +295,10 @@ add_sum (const tan * moving, const_tan_handle fixed)
 
 	// merge sort vectors
 	container result;
-	std::merge(fps.begin(), fps.end(), mps.begin(), mps.end(), std::back_inserter(result), less_rot);
+	std::merge(fps.begin(), fps.end(), mps.begin(), mps.end(), std::back_inserter(result), less_rot<point>);
 
 	// turn back into points
-	circular_sum (result.begin(), result.end(), result.begin(), fsouth + msouth + moving->pos());
-
-	// convert to CGAL points
-	std::vector<cgal_point> rps;
-	std::transform (result.begin(), result.end(), std::back_inserter(rps), convert);
-
-	// union in results
-	_impl -= polygon (rps.begin(), rps.end(), polygon::EXCLUDED);
-
+	return circular_sum (result.begin(), result.end(), out, fsouth + msouth + moving->pos());
 }
 
 /*
