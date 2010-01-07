@@ -172,8 +172,8 @@ join (InputIterator begin, InputIterator end, arrangement & out)
 ** ObstacleSet Implementation **************************************************
 */
 
-template<typename GameTraits>
-ObstacleSet<GameTraits>::
+template<typename GameTraits, template<typename> class UnionPolicy>
+ObstacleSet<GameTraits, UnionPolicy>::
 ObstacleSet (const tan * moving, const tanset & fixed)
 	: _impl(polygon::COMPLETE)
 {
@@ -192,25 +192,25 @@ ObstacleSet (const tan * moving, const tanset & fixed)
 		}
 }
 
-template<typename GameTraits>
-ObstacleSet<GameTraits>::
+template<typename GameTraits, template<typename> class UnionPolicy>
+ObstacleSet<GameTraits, UnionPolicy>::
 ObstacleSet ()
 	: _impl(polygon::COMPLETE)
 {
 }
 
-template<typename GameTraits>
-ObstacleSet<GameTraits> &
-ObstacleSet<GameTraits>::
-operator= (const ObstacleSet<GameTraits> & other)
+template<typename GameTraits, template<typename> class UnionPolicy>
+ObstacleSet<GameTraits, UnionPolicy> &
+ObstacleSet<GameTraits, UnionPolicy>::
+operator= (const ObstacleSet<GameTraits, UnionPolicy> & other)
 {
 	_impl = other._impl;
 	return (*this);
 }
 
-template<typename GameTraits>
-typename ObstacleSet<GameTraits>::point
-ObstacleSet<GameTraits>::
+template<typename GameTraits, template<typename> class UnionPolicy>
+typename ObstacleSet<GameTraits, UnionPolicy>::point
+ObstacleSet<GameTraits, UnionPolicy>::
 closest (const point & _p) const
 {
 	typedef typename polygon::Object_handle                   object;
@@ -221,7 +221,7 @@ closest (const point & _p) const
 	typedef typename explorer::Halfedge_around_face_const_circulator face_edge;
 
 	cgal_point p = convert_from_complex<point, cgal_point>(_p);
-	explorer   e = mask();
+	explorer   e = _impl.explorer();
 
 	object o = _impl.locate(p);
 	if (_impl.contains(o))
@@ -265,14 +265,6 @@ closest (const point & _p) const
 	typename std::vector<cgal_point>::iterator best = std::min_element(candidates.begin(), candidates.end(), closest_to(p));
 
 	return point(best->x(), best->y());
-}
-
-template<typename GameTraits>
-typename ObstacleSet<GameTraits>::explorer
-ObstacleSet<GameTraits>::
-mask () const
-{
-	return _impl.explorer();
 }
 
 template<typename kernel>

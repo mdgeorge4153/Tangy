@@ -8,9 +8,12 @@
 #include <CGAL/Extended_cartesian.h>
 #include <CGAL/Nef_polyhedron_2.h>
 
+template<typename> class NefUnionPolicy;
+template<typename> class ArrUnionPolicy;
 
-template<typename GameTraits>
+template<typename GameTraits, template<typename number> class UnionPolicy = NefUnionPolicy>
 class ObstacleSet
+	: public UnionPolicy<typename GameTraits::number>
 {
 private:
 	typedef typename GameTraits::number number;
@@ -19,14 +22,14 @@ private:
 	typedef typename CGAL::Nef_polyhedron_2<kernel>   polygon;
 	typedef typename kernel::Standard_point_2         cgal_point;
 
+	typedef typename polygon::Explorer explorer;
+
+
 public:
 	typedef typename GameTraits::point            point;
 	typedef typename GameTraits::tan              tan;
 	typedef typename GameTraits::tanset           tanset;
-	typedef typename GameTraits::tan_handle       tan_handle;
 	typedef typename GameTraits::const_tan_handle const_tan_handle;
-
-	typedef typename polygon::Explorer explorer;
 
 	ObstacleSet (const tan *, const tanset &);
 	ObstacleSet ();  
@@ -34,11 +37,21 @@ public:
 
 	point closest (const point &) const;
 
-	explorer mask () const;
-
 private:
 
 	polygon _impl;
+
+};
+
+template<typename number>
+class NefUnionPolicy
+{
+
+};
+
+template<typename number>
+class ArrUnionPolicy
+{
 
 };
 
