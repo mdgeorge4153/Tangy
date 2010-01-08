@@ -8,12 +8,8 @@
 #include <CGAL/Extended_cartesian.h>
 #include <CGAL/Nef_polyhedron_2.h>
 
-template<typename> class NefUnionPolicy;
-template<typename> class ArrUnionPolicy;
-
-template<typename GameTraits, template<typename number> class UnionPolicy = NefUnionPolicy>
+template<typename GameTraits>
 class ObstacleSet
-	: public UnionPolicy<typename GameTraits::number>
 {
 private:
 	typedef typename GameTraits::number number;
@@ -40,18 +36,6 @@ public:
 private:
 
 	polygon _impl;
-
-};
-
-template<typename number>
-class NefUnionPolicy
-{
-
-};
-
-template<typename number>
-class ArrUnionPolicy
-{
 
 };
 

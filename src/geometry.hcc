@@ -28,8 +28,8 @@ template<typename TanA, typename TanB, typename Out> Out sum (TanA, TanB, Out);
 ** ObstacleSet Implementation **************************************************
 */
 
-template<typename GameTraits, template<typename> class UnionPolicy>
-ObstacleSet<GameTraits, UnionPolicy>::
+template<typename GameTraits>
+ObstacleSet<GameTraits>::
 ObstacleSet (const tan * moving, const tanset & fixed)
 	: _impl(polygon::COMPLETE)
 {
@@ -48,25 +48,25 @@ ObstacleSet (const tan * moving, const tanset & fixed)
 		}
 }
 
-template<typename GameTraits, template<typename> class UnionPolicy>
-ObstacleSet<GameTraits, UnionPolicy>::
+template<typename GameTraits>
+ObstacleSet<GameTraits>::
 ObstacleSet ()
 	: _impl(polygon::COMPLETE)
 {
 }
 
-template<typename GameTraits, template<typename> class UnionPolicy>
-ObstacleSet<GameTraits, UnionPolicy> &
-ObstacleSet<GameTraits, UnionPolicy>::
-operator= (const ObstacleSet<GameTraits, UnionPolicy> & other)
+template<typename GameTraits>
+ObstacleSet<GameTraits> &
+ObstacleSet<GameTraits>::
+operator= (const ObstacleSet<GameTraits> & other)
 {
 	_impl = other._impl;
 	return (*this);
 }
 
-template<typename GameTraits, template<typename> class UnionPolicy>
-typename ObstacleSet<GameTraits, UnionPolicy>::point
-ObstacleSet<GameTraits, UnionPolicy>::
+template<typename GameTraits>
+typename ObstacleSet<GameTraits>::point
+ObstacleSet<GameTraits>::
 closest (const point & _p) const
 {
 	typedef typename polygon::Object_handle                   object;
