@@ -82,7 +82,7 @@ ObstacleSet<GameTraits> &
 ObstacleSet<GameTraits>::
 operator= (const ObstacleSet<GameTraits> & other)
 {
-	_pl.detach();
+	//_pl.detach();
 	_impl = other._impl;
 	_pl.attach(_impl);
 	return (*this);

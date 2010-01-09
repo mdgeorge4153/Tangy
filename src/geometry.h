@@ -24,7 +24,7 @@ private:
 	typedef typename CGAL::Arrangement_2<traits, dcel>  arrangement;
 	typedef typename traits::Point_2                    cgal_point;
 
-	typedef typename CGAL::Arr_naive_point_location<arrangement> point_locator;
+	typedef typename CGAL::Arr_landmarks_point_location<arrangement> point_locator;
 
 public:
 	typedef typename GameTraits::point            point;
