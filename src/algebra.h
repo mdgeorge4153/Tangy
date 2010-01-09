@@ -9,6 +9,7 @@
 #include <complex>
 #include <valarray>
 #include <gmpxx.h>
+#include <iostream>
 
 using std::valarray;
 using std::basic_ostream;
@@ -104,7 +105,10 @@ bool operator>= (const ExtendedRational & a, const ExtendedRational & b);
 bool operator>  (const ExtendedRational & a, const ExtendedRational & b);
 
 template<typename Ch, typename Tr>
-basic_ostream<Ch, Tr>& operator<< (basic_ostream<Ch,Tr> &, const ExtendedRational &);
+std::basic_ostream<Ch, Tr>& operator<< (std::basic_ostream<Ch,Tr> &, const ExtendedRational &);
+
+template<typename Ch, typename Tr>
+std::basic_istream<Ch, Tr>& operator>> (std::basic_istream<Ch,Tr> &, ExtendedRational &);
 
 
 /*

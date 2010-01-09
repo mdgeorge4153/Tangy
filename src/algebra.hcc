@@ -213,6 +213,14 @@ operator<< (basic_ostream<Ch, Tr> & out, const ExtendedRational & a)
 	return out;
 }
 
+template<typename Ch, typename Tr>
+std::basic_istream<Ch, Tr>&
+operator>> (std::basic_istream<Ch,Tr> & in, ExtendedRational &)
+{
+	return in;
+}
+
+
 /*
 ** vim: syntax=cpp ts=4 sw=4 cindent
 */
