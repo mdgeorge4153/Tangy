@@ -1,5 +1,3 @@
-#include <iostream>
-
 /*
 ** Simple Mouse Controller *****************************************************
 */
@@ -122,7 +120,6 @@ SimpleMouseController<GameTraits>::Inactive::
 Inactive (SimpleMouseController & context)
 	: State (context)
 {
-	std::cout << "Inactive " << approximate(this->_context._pos) << std::endl;
 }
 
 template<typename GameTraits>
@@ -173,7 +170,6 @@ Panning (SimpleMouseController & context)
 	: State (context),
 	  _last_pos(this->_context._pos)
 {
-	std::cout << "Panning " << approximate (this->_context._pos) << std::endl;
 }
 
 template<typename GameTraits>
@@ -205,7 +201,6 @@ Dragging (SimpleMouseController & context)
 	: State   (context),
 	  _offset (this->_context._selection->pos() - this->_context._pos)
 {
-	std::cout << "Dragging " << approximate (this->_context._pos) << std::endl;
 }
 
 template<typename GameTraits>
@@ -234,7 +229,6 @@ SimpleMouseController<GameTraits>::Flipping::
 Flipping (SimpleMouseController & context)
 	: State   (context)
 {
-	std::cout << "Flipping " << approximate (this->_context._pos) << std::endl;
 }
 
 template<typename GameTraits>
@@ -263,7 +257,6 @@ Rotating (SimpleMouseController & context)
 	: State  (context),
 	  _rot_offset (this->_context._selection->rot () * std::conj(offset()))
 {
-	std::cout << "Rotating" << approximate(this->_context._pos) << std::endl;
 }
 
 template<typename GameTraits>
