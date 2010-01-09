@@ -5,8 +5,12 @@
 #ifndef __tangy_geometry_h__
 #define __tangy_geometry_h__ 1
 
-#include <CGAL/Extended_cartesian.h>
-#include <CGAL/Nef_polyhedron_2.h>
+#include <CGAL/Cartesian.h>
+#include <CGAL/Arrangement_2.h>
+#include <CGAL/Arr_segment_traits_2.h>
+#include <CGAL/Arr_extended_dcel.h>
+#include <CGAL/Arr_landmarks_point_location.h>
+#include <CGAL/Arr_naive_point_location.h>
 
 template<typename GameTraits>
 class ObstacleSet
@@ -14,12 +18,13 @@ class ObstacleSet
 private:
 	typedef typename GameTraits::number number;
 
-	typedef typename CGAL::Extended_cartesian<number> kernel;
-	typedef typename CGAL::Nef_polyhedron_2<kernel>   polygon;
-	typedef typename kernel::Standard_point_2         cgal_point;
+	typedef typename CGAL::Cartesian<number>            kernel;
+	typedef typename CGAL::Arr_segment_traits_2<kernel> traits;
+	typedef typename CGAL::Arr_extended_dcel<traits, bool, bool, bool> dcel;
+	typedef typename CGAL::Arrangement_2<traits, dcel>  arrangement;
+	typedef typename traits::Point_2                    cgal_point;
 
-	typedef typename polygon::Explorer explorer;
-
+	typedef typename CGAL::Arr_naive_point_location<arrangement> point_locator;
 
 public:
 	typedef typename GameTraits::point            point;
@@ -35,7 +40,8 @@ public:
 
 private:
 
-	polygon _impl;
+	arrangement    _impl;
+	point_locator  _pl;
 
 };
 

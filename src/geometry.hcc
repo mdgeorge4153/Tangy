@@ -5,6 +5,11 @@
 #include "algebra.h"
 #include "utils.h"
 #include <CGAL/Kernel_traits.h>
+#include <CGAL/Arr_overlay_2.h>
+#include <CGAL/IO/Arr_iostream.h>
+#include <CGAL/IO/Arr_text_formatter.h>
+
+#include <iostream>
 
 /*
 ** Helper function declarations ************************************************
@@ -20,9 +25,12 @@ template<typename cgal_point> cgal_point               closest_point_on_segment 
 template<typename point>      bool south_of (const point  & a, const point  & b);
 template<typename vector>     bool less_rot (const vector & a, const vector & b);
 
-template<typename TanA, typename TanB, typename Out> Out sum (TanA, TanB, Out);
+template<typename Tan, typename Out> Out sum (const Tan &, const Tan &, Out);
 
+template<typename InputIterator, typename arrangement> void join_all  (InputIterator, InputIterator, arrangement &);
+template<typename InputIterator, typename arrangement> void make_poly (InputIterator, InputIterator, arrangement &);
 
+template<typename arrangement> void print_tikz (const arrangement &);
 
 /*
 ** ObstacleSet Implementation **************************************************
@@ -31,28 +39,42 @@ template<typename TanA, typename TanB, typename Out> Out sum (TanA, TanB, Out);
 template<typename GameTraits>
 ObstacleSet<GameTraits>::
 ObstacleSet (const tan * moving, const tanset & fixed)
-	: _impl(polygon::COMPLETE)
+	: _impl(), _pl()
 {
-	typename std::vector<typename std::vector<cgal_point> > polygons;
+	std::vector<arrangement> polygons;
+
+	std::cout << "\\documentclass{article}" << std::endl;
+	std::cout << "\\usepackage{tikz}" << std::endl;
+	std::cout << "\\begin{document}" << std::endl;
+
 	for (const_tan_handle i = fixed.begin(); i != fixed.end(); i++)
 		if (&(* i) != moving)
 		{
 			std::vector<point> points;
-			sum(moving, i, std::back_inserter(points));
+			sum(* moving, * i, std::back_inserter(points));
 
 			std::vector<cgal_point> cgal_points;
 			std::transform (points.begin(), points.end(),
 			                std::back_inserter(cgal_points),
 			                convert_from_complex<point, cgal_point>);
-			_impl -= polygon(cgal_points.begin(), cgal_points.end(), polygon::EXCLUDED);
+
+
+			polygons.push_back(arrangement());
+			make_poly (cgal_points.begin(), cgal_points.end(), polygons.back());
 		}
+
+	join_all(polygons.begin(), polygons.end(), _impl);
+	_pl.attach(_impl);
+
+	std::cout << "\\end{document}" << std::endl;
 }
 
 template<typename GameTraits>
 ObstacleSet<GameTraits>::
 ObstacleSet ()
-	: _impl(polygon::COMPLETE)
+	: _impl(), _pl()
 {
+	_pl.attach(_impl);
 }
 
 template<typename GameTraits>
@@ -60,7 +82,9 @@ ObstacleSet<GameTraits> &
 ObstacleSet<GameTraits>::
 operator= (const ObstacleSet<GameTraits> & other)
 {
+	_pl.detach();
 	_impl = other._impl;
+	_pl.attach(_impl);
 	return (*this);
 }
 
@@ -69,24 +93,30 @@ typename ObstacleSet<GameTraits>::point
 ObstacleSet<GameTraits>::
 closest (const point & _p) const
 {
-	typedef typename polygon::Object_handle                   object;
-	typedef typename explorer::Face_const_handle              face;
-	typedef typename explorer::Isolated_vertex_const_iterator vertex;
-	typedef typename explorer::Halfedge_const_iterator        edge;
-	typedef typename explorer::Hole_const_iterator            hole;
-	typedef typename explorer::Halfedge_around_face_const_circulator face_edge;
+	typedef typename CGAL::Object                                       object;
+	typedef typename arrangement::Face_const_handle                     face;
+	typedef typename arrangement::Vertex_const_iterator                 vertex;
+	typedef typename arrangement::Halfedge_const_iterator               edge;
+	typedef typename arrangement::Hole_const_iterator                   hole;
+	typedef typename arrangement::Ccb_halfedge_const_circulator         face_edge;
+	typedef typename arrangement::Isolated_vertex_const_iterator        face_vert;
 
-	cgal_point p = convert_from_complex<point, cgal_point>(_p);
-	explorer   e = _impl.explorer();
+	cgal_point  p = convert_from_complex<point, cgal_point>(_p);
 
-	object o = _impl.locate(p);
-	if (_impl.contains(o))
+	face   f;
+	edge   e;
+	vertex v;
+
+	object o = _pl.locate(p);
+
+	if (CGAL::assign(e, o))
 		return _p;
-
-	// by construction, all standard vertices and edges are contained in _impl
-	// so o must be a face
-	face f;
+	else if (CGAL::assign(v, o))
+		return _p;
 	assert (CGAL::assign(f, o));
+
+	if (!f->data())
+		return _p;
 
 	//
 	// iterate over features adjacent to f to find the closest point on each feature
@@ -94,26 +124,28 @@ closest (const point & _p) const
 	std::vector<cgal_point> candidates;
 
 	// isolated vertices
-	for (vertex i = e.isolated_vertices_begin(f); i != e.isolated_vertices_end(f); i++)
-		candidates.push_back(e.point(i));
+	for (face_vert i = f->isolated_vertices_begin(); i != f->isolated_vertices_end(); i++)
+		candidates.push_back(i->point());
 
 	// holes
-	for (hole i = e.holes_begin(f); i != e.holes_end(f); i++)
+	for (hole i = f->holes_begin(); i != f->holes_end(); i++)
 	{
-		edge j = i;
+		edge j = *i;
 		do
 		{
-			candidates.push_back(closest_point_on_segment(p, e.point(e.source(j)), e.point(e.target(j))));
-		} while (++j != i);
+			candidates.push_back(closest_point_on_segment(p, j->source()->point(), j->target()->point()));
+		} while (++j != *i);
 	}
 
 	// outer edge
-	face_edge i = e.face_cycle (f);
-	if (i != 0 && !e.is_frame_edge(i))
+	if (!f->is_unbounded())
+	{
+		face_edge i = f->outer_ccb();
 		do
 		{
-			candidates.push_back(closest_point_on_segment(p, e.point(e.source(i)), e.point(e.target(i))));
-		} while (++i != e.face_cycle(f));
+			candidates.push_back(closest_point_on_segment(p, i->source()->point(), i->target()->point()));
+		} while (++i != f->outer_ccb());
+	}
 
 	//
 	// select and return the best candidate
@@ -149,51 +181,78 @@ namespace CGAL {
 ** Arrangement policy implementation *******************************************
 */
 
-/*
-template<typename GameTraits>
-struct ObstacleSet<GameTraits>::union_traits
+template<typename arrangement>
+struct union_traits
 {
-	typedef typename arrangement::Vertex_handle   Vertex_handle_A,   Vertex_handle_B,   Vertex_handle_R;
-	typedef typename arrangement::Halfedge_handle Halfedge_handle_A, Halfedge_handle_B, Halfedge_handle_R;
-	typedef typename arrangement::Face_handle     Face_handle_A,     Face_handle_B,     Face_handle_R;
+	typedef typename arrangement::Vertex_const_handle   Vertex_handle_A,   Vertex_handle_B;
+	typedef typename arrangement::Halfedge_const_handle Halfedge_handle_A, Halfedge_handle_B;
+	typedef typename arrangement::Face_const_handle     Face_handle_A,     Face_handle_B;
 
-	inline void create_vertex (Vertex_handle_A   a, Vertex_handle_B   b, Vertex_handle_R r) {r.set_data(false);}
-	inline void create_vertex (Vertex_handle_A   a, Halfedge_handle_B b, Vertex_handle_R r) {r.set_data(false);}
-	inline void create_vertex (Vertex_handle_A   a, Face_handle_B     b, Vertex_handle_R r) {r.set_data(b.data());}
-	inline void create_vertex (Halfedge_handle_A a, Vertex_handle_B   b, Vertex_handle_R r) {r.set_data(false);}
-	inline void create_vertex (Halfedge_handle_A a, Halfedge_handle_B b, Vertex_handle_R r) {r.set_data(false);}
-	inline void create_vertex (Face_handle_A     a, Halfedge_handle_B b, Vertex_handle_R r) {r.set_data(a.data());}
+	typedef typename arrangement::Vertex_handle   Vertex_handle_R;
+	typedef typename arrangement::Halfedge_handle Halfedge_handle_R;
+	typedef typename arrangement::Face_handle     Face_handle_R;
 
-	inline void create_edge (Halfedge_handle_A a, Halfedge_handle_B b, Halfedge_handle_R r) {r.set_data(false);}
-	inline void create_edge (Halfedge_handle_A a, Face_handle_B     b, Halfedge_handle_R r) {r.set_data(b.data());}
-	inline void create_edge (Face_handle_A     a, Halfedge_handle_B b, Halfedge_handle_R r) {r.set_data(a.data());}
+	inline void create_vertex (Vertex_handle_A   a, Vertex_handle_B   b, Vertex_handle_R r) {r->set_data(false);}
+	inline void create_vertex (Vertex_handle_A   a, Halfedge_handle_B b, Vertex_handle_R r) {r->set_data(false);}
+	inline void create_vertex (Vertex_handle_A   a, Face_handle_B     b, Vertex_handle_R r) {r->set_data(b->data());}
+	inline void create_vertex (Halfedge_handle_A a, Vertex_handle_B   b, Vertex_handle_R r) {r->set_data(false);}
+	inline void create_vertex (Halfedge_handle_A a, Halfedge_handle_B b, Vertex_handle_R r) {r->set_data(false);}
+	inline void create_vertex (Face_handle_A     a, Vertex_handle_B   b, Vertex_handle_R r) {r->set_data(a->data());}
 
-	inline void create_face (Face_handle_A a, Face_handle_B b, Face_handle_R r)             {r.set_data(a.data() || b.data());}
+	inline void create_edge (Halfedge_handle_A a, Halfedge_handle_B b, Halfedge_handle_R r) {r->set_data(false);     r->twin()->set_data(false);}
+	inline void create_edge (Halfedge_handle_A a, Face_handle_B     b, Halfedge_handle_R r) {r->set_data(b->data()); r->twin()->set_data(b->data());}
+	inline void create_edge (Face_handle_A     a, Halfedge_handle_B b, Halfedge_handle_R r) {r->set_data(a->data()); r->twin()->set_data(a->data());}
+
+	inline void create_face (Face_handle_A a, Face_handle_B b, Face_handle_R r)             {r->set_data(a->data() || b->data());}
 };
 
-template<typename GameTraits>
-template<typename InputIterator>
+template<typename arrangement>
 void
-ObstacleSet<GameTraits>::
-join (InputIterator begin, InputIterator end, arrangement & out)
+join (const arrangement & a, const arrangement & b, arrangement & result)
+{
+	typedef typename arrangement::Vertex_iterator vertex;
+	typedef typename arrangement::Edge_iterator   edge;
+
+	union_traits<arrangement> ut;
+	CGAL::overlay (a, b, result, ut);
+
+	std::vector<edge> extra_edges;
+
+	for (edge e = result.edges_begin(); e != result.edges_end(); e++)
+		if (e->data())
+			result.remove_edge(e, false, false);
+
+	for (vertex v = result.vertices_begin(); v != result.vertices_end(); v++)
+		if (v->data())
+			result.remove_isolated_vertex(v);
+
+	std::cout << "\\begin{tikzpicture}" << std::endl;
+	print_tikz(a, "blue");
+	print_tikz(b, "green");
+	print_tikz(result, "thick,black");
+	std::cout << "\\end{tikzpicture}" << std::endl << std::endl;
+
+}
+
+template<typename InputIterator, typename arrangement>
+void
+join_all (InputIterator begin, InputIterator end, arrangement & out)
 {
 	assert (begin != end);
 
-	if (begin - end == 1)
+	if (end - begin == 1)
 		out = *begin;
 
 	else
 	{
 		arrangement left, right;
 		InputIterator mid = begin + (end - begin) / 2;
-		join (begin, mid, left);
-		join (mid, end, right);
+		join_all (begin, mid, left);
+		join_all (mid, end, right);
 
-		union_traits ut;
-		CGAL::overlay (left, right, out, ut);
+		join (left, right, out);
 	}
 }
-*/
 
 /*
 ** Helper functions ************************************************************
@@ -279,19 +338,18 @@ south_of (const point & a, const point & b)
  * sum outputs the minkowski sum of two tans into an
  * output_iterator<point>.
  */
-template<typename TanA, typename TanB, typename Out>
+template<typename tan, typename Out>
 Out
-sum (TanA moving, TanB fixed, Out out)
+sum (const tan & moving, const tan & fixed, Out out)
 {
-	typedef typename std::iterator_traits<TanA>::value_type tan;
 	typedef typename tan::point          point;
 	typedef typename std::vector<point>  container;
 	typedef typename container::iterator iterator;
 
 	// let fps and mps be the points of fixed and moving respectively
 	container fps, mps;
-	fixed ->points(std::back_inserter(fps));
-	moving->points(std::back_inserter(mps));
+	fixed .points(std::back_inserter(fps));
+	moving.points(std::back_inserter(mps));
 
 	// flip moving tan
 	std::transform(mps.begin(), mps.end(), mps.begin(), std::negate<point> ());
@@ -313,7 +371,7 @@ sum (TanA moving, TanB fixed, Out out)
 	std::merge(fps.begin(), fps.end(), mps.begin(), mps.end(), std::back_inserter(result), less_rot<point>);
 
 	// turn the vectors back into points
-	return circular_sum (result.begin(), result.end(), out, fsouth + msouth + moving->pos());
+	return circular_sum (result.begin(), result.end(), out, fsouth + msouth + moving.pos());
 }
 
 template<typename cgal_point>
@@ -334,6 +392,90 @@ closest_point_on_segment (const cgal_point & p, const cgal_point & source, const
 		return source + dot * (target - source) / ((target - source) * (target - source));
 }
 
+template<typename InputIterator, typename Arrangement>
+void
+make_poly (InputIterator begin, InputIterator end, Arrangement & result)
+{
+	typedef typename Arrangement::Point_2               point;
+	typedef typename Arrangement::X_monotone_curve_2    segment;
+
+	typedef typename Arrangement::Halfedge_handle       edge;
+	typedef typename Arrangement::Vertex_handle         vertex;
+	typedef typename Arrangement::Face_handle           face;
+
+	if (begin == end)
+		return;
+
+	point  first_point = *begin++;
+	vertex first_vert  = result.insert_in_face_interior(first_point, result.unbounded_face());
+
+	point  prev_point  = first_point;
+	vertex prev_vert   = first_vert;
+
+	int n_points = 1;
+
+	while (begin != end)
+	{
+		point  next_point = *begin++;
+		vertex next_vert  = result.insert_in_face_interior (next_point, result.unbounded_face());
+
+		edge e = result.insert_at_vertices (segment(prev_point, next_point), prev_vert, next_vert);
+
+		prev_point = next_point;
+		prev_vert  = next_vert;
+		
+		n_points++;
+	}
+
+	if (n_points >= 2)
+	{
+		edge e = result.insert_at_vertices (segment(prev_point, first_point), prev_vert, first_vert);
+		e->face()->set_data(true);
+		e->twin()->face()->set_data(false);
+	}
+
+	for (vertex v = result.vertices_begin(); v != result.vertices_end(); v++)
+		v->set_data(false);
+
+	for (edge e = result.halfedges_begin(); e != result.halfedges_end(); e++)
+		e->set_data(false);
+}
+
+template<typename point>
+struct tikz_t
+{
+	const point & _p;
+	tikz_t (const point & p) : _p(p) {}
+};
+
+template<typename point>
+tikz_t<point>
+tikz (const point & p)
+{
+	return tikz_t<point> (p);
+}
+
+template<typename Ch, typename Tr, typename point>
+typename std::basic_ostream<Ch,Tr> &
+operator<< (typename std::basic_ostream<Ch,Tr> & out, const tikz_t<point> & t)
+{
+	return out << "(" << float(t._p.x()) << "," << float(t._p.y()) << ")";
+}
+
+template<typename arrangement>
+void
+print_tikz (const arrangement & arr, std::string tag)
+{
+	typedef typename arrangement::Vertex_const_iterator vertex;
+	typedef typename arrangement::Edge_const_iterator   edge;
+	typedef typename arrangement::Face_const_iterator   face;
+
+	for (vertex v = arr.vertices_begin(); v != arr.vertices_end(); v++)
+		std::cout << "\\draw[" << tag << "] " << tikz(v->point()) << " circle (2pt);" << std::endl;
+
+	for (edge e = arr.edges_begin(); e != arr.edges_end(); e++)
+		std::cout << "\\draw[" << tag << "] " << tikz(e->source()->point()) << " -- " << tikz(e->target()->point()) << ";" << std::endl;
+}
 
 /*
 ** vim: ts=4 sw=4 cindent syntax=cpp
