@@ -5,7 +5,7 @@
 #ifndef __tangy_geometry_h__
 #define __tangy_geometry_h__ 1
 
-#include <CGAL/Cartesian.h>
+#include <CGAL/Simple_cartesian.h>
 #include <CGAL/Arrangement_2.h>
 #include <CGAL/Arr_segment_traits_2.h>
 #include <CGAL/Arr_extended_dcel.h>
@@ -18,7 +18,7 @@ class ObstacleSet
 private:
 	typedef typename GameTraits::number number;
 
-	typedef typename CGAL::Cartesian<number>            kernel;
+	typedef typename CGAL::Simple_cartesian<number>     kernel;
 	typedef typename CGAL::Arr_segment_traits_2<kernel> traits;
 	typedef typename CGAL::Arr_extended_dcel<traits, bool, bool, bool> dcel;
 	typedef typename CGAL::Arrangement_2<traits, dcel>  arrangement;

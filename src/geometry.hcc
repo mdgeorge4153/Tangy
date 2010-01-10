@@ -21,6 +21,8 @@ template<typename in, typename out> out convert_from_complex    (const in &);
 template<typename cgal_point> struct closest_to_t;
 template<typename cgal_point> closest_to_t<cgal_point> closest_to (const cgal_point &);
 template<typename cgal_point> cgal_point               closest_point_on_segment (const cgal_point &, const cgal_point &, const cgal_point &);
+template<typename cgal_point> struct tikz_t;
+template<typename cgal_point> tikz_t<cgal_point>       tikz (const cgal_point &);
 
 template<typename point>      bool south_of (const point  & a, const point  & b);
 template<typename vector>     bool less_rot (const vector & a, const vector & b);
@@ -30,7 +32,7 @@ template<typename Tan, typename Out> Out sum (const Tan &, const Tan &, Out);
 template<typename InputIterator, typename arrangement> void join_all  (InputIterator, InputIterator, arrangement &);
 template<typename InputIterator, typename arrangement> void make_poly (InputIterator, InputIterator, arrangement &);
 
-template<typename arrangement> void print_tikz (const arrangement &);
+template<typename arrangement> void print_tikz (const arrangement &, std::string);
 
 /*
 ** ObstacleSet Implementation **************************************************
@@ -43,9 +45,9 @@ ObstacleSet (const tan * moving, const tanset & fixed)
 {
 	std::vector<arrangement> polygons;
 
-	std::cout << "\\documentclass{article}" << std::endl;
-	std::cout << "\\usepackage{tikz}" << std::endl;
-	std::cout << "\\begin{document}" << std::endl;
+	//std::cout << "\\documentclass{article}" << std::endl;
+	//std::cout << "\\usepackage{tikz}" << std::endl;
+	//std::cout << "\\begin{document}" << std::endl;
 
 	for (const_tan_handle i = fixed.begin(); i != fixed.end(); i++)
 		if (&(* i) != moving)
@@ -66,7 +68,7 @@ ObstacleSet (const tan * moving, const tanset & fixed)
 	join_all(polygons.begin(), polygons.end(), _impl);
 	_pl.attach(_impl);
 
-	std::cout << "\\end{document}" << std::endl;
+	// std::cout << "\\end{document}" << std::endl;
 }
 
 template<typename GameTraits>
@@ -226,11 +228,11 @@ join (const arrangement & a, const arrangement & b, arrangement & result)
 		if (v->data())
 			result.remove_isolated_vertex(v);
 
-	std::cout << "\\begin{tikzpicture}" << std::endl;
-	print_tikz(a, "blue");
-	print_tikz(b, "green");
-	print_tikz(result, "thick,black");
-	std::cout << "\\end{tikzpicture}" << std::endl << std::endl;
+	//std::cout << "\\begin{tikzpicture}" << std::endl;
+	// print_tikz(a, "blue");
+	// print_tikz(b, "green");
+	// print_tikz(result, "thick,black");
+	//std::cout << "\\end{tikzpicture}" << std::endl << std::endl;
 
 }
 
@@ -406,8 +408,12 @@ make_poly (InputIterator begin, InputIterator end, Arrangement & result)
 	if (begin == end)
 		return;
 
+	std::cout << "make poly" << std::endl;
+
 	point  first_point = *begin++;
 	vertex first_vert  = result.insert_in_face_interior(first_point, result.unbounded_face());
+
+	std::cout << "  first point: " << first_point << std::endl;
 
 	point  prev_point  = first_point;
 	vertex prev_vert   = first_vert;
@@ -419,6 +425,8 @@ make_poly (InputIterator begin, InputIterator end, Arrangement & result)
 		point  next_point = *begin++;
 		vertex next_vert  = result.insert_in_face_interior (next_point, result.unbounded_face());
 
+		std::cout << "  next point:  " << next_point << std::endl;
+
 		edge e = result.insert_at_vertices (segment(prev_point, next_point), prev_vert, next_vert);
 
 		prev_point = next_point;
@@ -429,11 +437,16 @@ make_poly (InputIterator begin, InputIterator end, Arrangement & result)
 
 	if (n_points >= 2)
 	{
+		std::cout << "  inserting last edge" << std::endl;
+		std::cout << "\\draw[blue] " << tikz(prev_point)  << " circle(3pt);" << std::endl;
+		std::cout << "\\draw[red]  " << tikz(first_point) << " circle(3pt);" << std::endl;
 		edge e = result.insert_at_vertices (segment(prev_point, first_point), prev_vert, first_vert);
 		e->face()->set_data(true);
 		e->twin()->face()->set_data(false);
+		print_tikz (result, "black");
 	}
 
+	std::cout << "  finishing up" << std::endl << std::endl;
 	for (vertex v = result.vertices_begin(); v != result.vertices_end(); v++)
 		v->set_data(false);
 
