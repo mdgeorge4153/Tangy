@@ -42,7 +42,8 @@ public:
 	// conversion operators                                                   //
 	////////////////////////////////////////////////////////////////////////////
 
-	operator double () const;
+	operator  double () const;
+	double as_double () const;
 
 	////////////////////////////////////////////////////////////////////////////
 	// operator overloading                                                   //

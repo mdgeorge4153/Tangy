@@ -73,6 +73,13 @@ operator double () const
 	return result;
 }
 
+double
+ExtendedRational::
+as_double () const
+{
+	return *this;
+}
+               
 ExtendedRational &
 ExtendedRational::
 operator+= (const ExtendedRational & other)
