@@ -71,6 +71,15 @@ NoCollideTanSet ()
 	std::for_each(this->begin(), this->end(), std::bind2nd(std::mem_fun_ref(&NoCollideTan<GameTraits>::set_tanset), this));
 }
 
+template<typename GameTraits>
+void
+NoCollideTanSet<GameTraits>::
+pan (const vector & v)
+{
+	TanSet<GameTraits>::pan(v);
+	this->_dragged = 0;
+}
+
 /*
 ** vim: ts=4 sw=4 cindent syntax=cpp
 */

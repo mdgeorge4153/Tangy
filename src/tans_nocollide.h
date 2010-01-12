@@ -50,12 +50,15 @@ class NoCollideTanSet
 	: public TanSet<GameTraits>
 {
 public:
-	typedef typename GameTraits::tan tan;
+	typedef typename GameTraits::tan                      tan;
 	typedef typename TanSet<GameTraits>::tan_handle       tan_handle;
 	typedef typename TanSet<GameTraits>::const_tan_handle const_tan_handle;
+	typedef typename GameTraits::vector                   vector;
 	typedef ObstacleSet<GameTraits>  obstacles;
 
 	NoCollideTanSet ();
+
+	void pan (const vector &);
 
 protected:
 	friend class NoCollideTan<GameTraits>;
