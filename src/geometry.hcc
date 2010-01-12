@@ -132,11 +132,14 @@ closest (const point & _p) const
 	// holes
 	for (hole i = f->holes_begin(); i != f->holes_end(); i++)
 	{
-		edge j = *i;
+		std::cout << "hole" << std::endl;
+		face_edge j = *i;
 		do
 		{
+			std::cout << "  edge " << tikz(j->source()->point()) << " -- " << tikz(j->target()->point()) << std::endl;
 			candidates.push_back(closest_point_on_segment(p, j->source()->point(), j->target()->point()));
 		} while (++j != *i);
+		std::cout << "end" << std::endl << std::endl;
 	}
 
 	// outer edge
