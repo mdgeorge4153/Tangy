@@ -132,14 +132,11 @@ closest (const point & _p) const
 	// holes
 	for (hole i = f->holes_begin(); i != f->holes_end(); i++)
 	{
-		std::cout << "hole" << std::endl;
 		face_edge j = *i;
 		do
 		{
-			std::cout << "  edge " << tikz(j->source()->point()) << " -- " << tikz(j->target()->point()) << std::endl;
 			candidates.push_back(closest_point_on_segment(p, j->source()->point(), j->target()->point()));
 		} while (++j != *i);
-		std::cout << "end" << std::endl << std::endl;
 	}
 
 	// outer edge
@@ -230,13 +227,6 @@ join (const arrangement & a, const arrangement & b, arrangement & result)
 	for (vertex v = result.vertices_begin(); v != result.vertices_end(); v++)
 		if (v->data())
 			result.remove_isolated_vertex(v);
-
-	//std::cout << "\\begin{tikzpicture}" << std::endl;
-	// print_tikz(a, "blue");
-	// print_tikz(b, "green");
-	// print_tikz(result, "thick,black");
-	//std::cout << "\\end{tikzpicture}" << std::endl << std::endl;
-
 }
 
 template<typename InputIterator, typename arrangement>
@@ -411,12 +401,8 @@ make_poly (InputIterator begin, InputIterator end, Arrangement & result)
 	if (begin == end)
 		return;
 
-	std::cout << "make poly" << std::endl;
-
 	point  first_point = *begin++;
 	vertex first_vert  = result.insert_in_face_interior(first_point, result.unbounded_face());
-
-	std::cout << "  first point: " << first_point << std::endl;
 
 	point  prev_point  = first_point;
 	vertex prev_vert   = first_vert;
@@ -428,8 +414,6 @@ make_poly (InputIterator begin, InputIterator end, Arrangement & result)
 		point  next_point = *begin++;
 		vertex next_vert  = result.insert_in_face_interior (next_point, result.unbounded_face());
 
-		std::cout << "  next point:  " << next_point << std::endl;
-
 		edge e = result.insert_at_vertices (segment(prev_point, next_point), prev_vert, next_vert);
 
 		prev_point = next_point;
@@ -440,16 +424,11 @@ make_poly (InputIterator begin, InputIterator end, Arrangement & result)
 
 	if (n_points >= 2)
 	{
-		std::cout << "  inserting last edge" << std::endl;
-		std::cout << "\\draw[blue] " << tikz(prev_point)  << " circle(3pt);" << std::endl;
-		std::cout << "\\draw[red]  " << tikz(first_point) << " circle(3pt);" << std::endl;
 		edge e = result.insert_at_vertices (segment(prev_point, first_point), prev_vert, first_vert);
 		e->face()->set_data(true);
 		e->twin()->face()->set_data(false);
-		print_tikz (result, "black");
 	}
 
-	std::cout << "  finishing up" << std::endl << std::endl;
 	for (vertex v = result.vertices_begin(); v != result.vertices_end(); v++)
 		v->set_data(false);
 
