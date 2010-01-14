@@ -112,7 +112,7 @@ void setShaders() {
 
 	f = glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
 
-	const char * fsource = textFileRead("organic.frag");
+	const char * fsource = textFileRead("../../data/shader.frag");
 	glShaderSourceARB(f, 1, &fsource,NULL);
 
 	glCompileShaderARB(f);
