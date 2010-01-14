@@ -22,6 +22,7 @@ struct NoCollideGameTraits
 	typedef tan_container::const_iterator const_tan_handle;
 
 	typedef SimpleMouseController<NoCollideGameTraits> controller;
+	typedef BasicRenderer<NoCollideGameTraits> renderer;
 };
 
 typedef NoCollideGameTraits GameTraits;

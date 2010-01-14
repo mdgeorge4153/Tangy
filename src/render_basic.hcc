@@ -1,0 +1,109 @@
+#include <GL/gl.h>
+#include <iterator>
+
+template<typename GameTraits>
+BasicRenderer<GameTraits>::
+BasicRenderer (const state & s)
+	: _state (s)
+{
+}
+
+template<typename GameTraits>
+void
+BasicRenderer<GameTraits>::
+init ()
+{
+	glClearColor(1.0, 1.0, 1.0, 1.0);
+	glEnable(GL_LINE_SMOOTH);
+	glEnable(GL_BLEND);
+
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+}
+
+template<typename GameTraits>
+void
+BasicRenderer<GameTraits>::
+reshape (int w, int h)
+{
+	_width = w; _height = h;
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+
+	double waspect = float (w) / float (h);
+	double haspect = float (h) / float (w);
+
+	if (waspect < 1.0)
+		waspect = 1.0;
+	else
+		haspect = 1.0;
+
+	gluOrtho2D(0.0, 8.0 * waspect, 8.0 * haspect, 0.0);
+	glViewport(0, 0, w, h);
+}
+
+template<typename GameTraits>
+typename GameTraits::point
+BasicRenderer<GameTraits>::
+transform (int x, int y) const
+{
+	point result (x, y);
+	int size = _width < _height ? _width : _height;
+
+	result /= size;
+	result *= 8;
+
+	return result;
+}
+
+template<typename GameTraits>
+void
+BasicRenderer<GameTraits>::
+render ()
+{
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	typedef typename GameTraits::tanset tanset;
+
+	const tanset & tans = _state.tans();
+
+	for (typename tanset::container::const_iterator i = tans.begin(); i != tans.end(); i++)
+	{
+		typedef typename std::vector<typename GameTraits::point> pointset;
+
+		pointset points;
+		i->points(std::back_inserter(points));
+
+		if (i == _state.selection())
+			glColor4f(0.2, 0.0, 1.0, 1.0);
+		else
+			glColor4f(0.13, 0.0, 0.66, 1.0);
+
+		glPolygonMode(GL_FRONT, GL_FILL);
+		glBegin(GL_POLYGON);
+
+		for (typename pointset::reverse_iterator j = points.rbegin(); j != points.rend(); j++)
+		{
+			glVertex2f(j->real(), j->imag());
+		}
+
+		glEnd();
+
+		glColor4f(0.06, 0.0, 0.32, 1.0);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glLineWidth(2.0);
+		glBegin(GL_POLYGON);
+
+		for (typename pointset::reverse_iterator j = points.rbegin(); j != points.rend(); j++)
+		{
+			glVertex2f(j->real(), j->imag());
+		}
+
+		glEnd();
+	}
+}
+
+/*
+** vim: ts=4 sw=4 cindent syntax=cpp
+*/
+

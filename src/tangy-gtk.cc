@@ -4,7 +4,7 @@
 #include <GL/glu.h>
 
 #include "tans.h"
-#include "render_opengl.h"
+#include "render_basic.h"
 #include "controller.h"
 #include "traits_nocollide.h"
 
@@ -35,6 +35,7 @@ protected:
 
 	GameTraits::tanset      tans;
 	GameTraits::controller  mouse;
+	GameTraits::renderer    renderer;
 };
 
 TanView::
@@ -42,7 +43,8 @@ TanView(BaseObjectType * base, const Glib::RefPtr<Gtk::Builder> &)
 	: Gtk::DrawingArea(base),
 	  Gtk::GL::Widget<TanView>(* this),
 	  tans(),
-	  mouse(tans)
+	  mouse(tans),
+	  renderer(mouse)
 {
 	Glib::RefPtr<Gdk::GL::Config> glconfig;
    
@@ -63,13 +65,7 @@ on_realize ()
 	Gtk::DrawingArea::on_realize ();
 
 	gl_begin();
-
-	glClearColor(1.0, 1.0, 1.0, 1.0);
-	glEnable(GL_LINE_SMOOTH);
-	glEnable(GL_BLEND);
-
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
+	renderer.init();
 	gl_end();
 
 	Glib::signal_idle().connect( sigc::mem_fun (*this, &TanView::render) );
@@ -82,21 +78,7 @@ on_configure_event (GdkEventConfigure * event)
 	bool result = Gtk::DrawingArea::on_configure_event (event);
 
 	gl_begin();
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-
-	double waspect = float (get_width  ()) / float (get_height ());
-	double haspect = float (get_height ()) / float (get_width  ());
-
-	if (waspect < 1.0)
-		waspect = 1.0;
-	else
-		haspect = 1.0;
-
-	gluOrtho2D(0.0, 8.0 * waspect, 8.0 * haspect, 0.0);
-	glViewport(0, 0, get_width(), get_height());
-
+	renderer.reshape(get_width(), get_height());
 	gl_end();
 
 	return result;
@@ -145,16 +127,8 @@ bool
 TanView::
 on_motion_notify_event (GdkEventMotion * event)
 {
-	Gtk::DrawingArea::on_motion_notify_event (event);
-
-	GameTraits::point pos (event->x, event->y);
-
-	int size = get_width () < get_height () ? get_width () : get_height ();
-	pos /= size;
-	pos *= 8;
-
-	mouse.move_to(pos);
-
+	GameTraits::point p = renderer.transform(event->x, event->y);
+	mouse.move_to(p);
 	return false;
 }
 
@@ -185,7 +159,7 @@ render()
 {
 	gl_begin();
 
-	render_opengl<GameTraits> (mouse);
+	renderer.render();
 
 	gl_flush();
 	gl_end();
