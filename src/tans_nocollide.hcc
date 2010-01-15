@@ -7,8 +7,7 @@ flip ()
 {
 	Tan<GameTraits>::flip();
 	_container->_dragged = 0;
-	this->set_pos (this->pos());
-
+	this->set_pos (this->_desired);
 }
 
 template<typename GameTraits>
@@ -22,6 +21,8 @@ set_pos (const point & pos)
 		_container->_dragged = this;
 	}
 
+	this->_desired = pos;
+
 	Tan<GameTraits>::set_pos (_container->_obstruction.closest(pos));
 }
 
@@ -33,7 +34,7 @@ set_rot (const vector & rot)
 	Tan<GameTraits>::set_rot (rot);
 
 	_container->_dragged = 0;
-	this->set_pos (this->pos());
+	this->set_pos (this->_desired);
 }
 
 template<typename GameTraits>

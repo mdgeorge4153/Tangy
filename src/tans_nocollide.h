@@ -37,6 +37,8 @@ protected:
 
 	tanset * _container;
 
+	point _desired;
+
 	friend class TanSet<GameTraits>;
 	friend class NoCollideTanSet<GameTraits>;
 };
