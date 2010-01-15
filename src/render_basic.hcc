@@ -38,7 +38,7 @@ reshape (int w, int h)
 	else
 		haspect = 1.0;
 
-	gluOrtho2D(0.0, 8.0 * waspect, 8.0 * haspect, 0.0);
+	gluOrtho2D(-4.0 * waspect, 4.0 * waspect, 4.0 * haspect, -4.0 * haspect);
 	glViewport(0, 0, w, h);
 }
 
@@ -48,6 +48,10 @@ BasicRenderer<GameTraits>::
 transform (int x, int y) const
 {
 	point result (x, y);
+	point origin (_width / 2, _height / 2);
+
+	result -= origin;
+
 	int size = _width < _height ? _width : _height;
 
 	result /= size;
