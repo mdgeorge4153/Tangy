@@ -38,17 +38,10 @@ set_rot (const vector & rot)
 }
 
 template<typename GameTraits>
+template<typename In>
 NoCollideTan<GameTraits>::
-NoCollideTan(const point & p1, const point & p2, const point & p3)
-	: Tan<GameTraits>(p1, p2, p3),
-	  _container(0)
-{
-}
-
-template<typename GameTraits>
-NoCollideTan<GameTraits>::
-NoCollideTan(const point & p1, const point & p2, const point & p3, const point & p4)
-	: Tan<GameTraits>(p1, p2, p3, p4),
+NoCollideTan(In begin, In end)
+	: Tan<GameTraits>(begin, end),
 	  _container(0)
 {
 }
@@ -79,6 +72,14 @@ pan (const vector & v)
 {
 	TanSet<GameTraits>::pan(v);
 	this->_dragged = 0;
+}
+
+template<typename GameTraits>
+const typename NoCollideTanSet<GameTraits>::obstacles &
+NoCollideTanSet<GameTraits>::
+get_obstacles() const
+{
+	return _obstruction;
 }
 
 /*

@@ -30,8 +30,7 @@ public:
 	void set_rot (const vector &);
 
 protected:
-	NoCollideTan(const point &, const point &, const point &);
-	NoCollideTan(const point &, const point &, const point &, const point &);
+	template<typename In> NoCollideTan(In, In);
 
 	void set_tanset(tanset *);
 
@@ -61,6 +60,8 @@ public:
 	NoCollideTanSet ();
 
 	void pan (const vector &);
+
+	const obstacles & get_obstacles() const;
 
 protected:
 	friend class NoCollideTan<GameTraits>;

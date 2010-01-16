@@ -21,12 +21,11 @@ private:
 	typedef typename CGAL::Simple_cartesian<number>     kernel;
 	typedef typename CGAL::Arr_segment_traits_2<kernel> traits;
 	typedef typename CGAL::Arr_extended_dcel<traits, bool, bool, bool> dcel;
-	typedef typename CGAL::Arrangement_2<traits, dcel>  arrangement;
 	typedef typename traits::Point_2                    cgal_point;
 
-	typedef typename CGAL::Arr_landmarks_point_location<arrangement> point_locator;
-
 public:
+	typedef typename CGAL::Arrangement_2<traits, dcel>  arrangement;
+
 	typedef typename GameTraits::point            point;
 	typedef typename GameTraits::tan              tan;
 	typedef typename GameTraits::tanset           tanset;
@@ -38,7 +37,11 @@ public:
 
 	point closest (const point &) const;
 
+	const arrangement & get_impl() const;
+
 private:
+
+	typedef typename CGAL::Arr_landmarks_point_location<arrangement> point_locator;
 
 	arrangement    _impl;
 	point_locator  _pl;

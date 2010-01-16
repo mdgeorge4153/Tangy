@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <functional>
 #include <iterator>
+#include <utility>
 #include "algebra.h"
 #include "utils.h"
 #include <CGAL/Kernel_traits.h>
@@ -19,10 +20,10 @@ template<typename in, typename out> out convert_from_cgal_point (const in &);
 template<typename in, typename out> out convert_from_complex    (const in &);
 
 template<typename cgal_point> struct closest_to_t;
-template<typename cgal_point> closest_to_t<cgal_point> closest_to (const cgal_point &);
-template<typename cgal_point> cgal_point               closest_point_on_segment (const cgal_point &, const cgal_point &, const cgal_point &);
+template<typename cgal_point> closest_to_t<cgal_point>         closest_to (const cgal_point &);
+template<typename cgal_point> std::pair<cgal_point,cgal_point>         closest_point_on_segment (const cgal_point &, const cgal_point &, const cgal_point &);
 template<typename cgal_point> struct tikz_t;
-template<typename cgal_point> tikz_t<cgal_point>       tikz (const cgal_point &);
+template<typename cgal_point> tikz_t<cgal_point>               tikz (const cgal_point &);
 
 template<typename point>      bool south_of (const point  & a, const point  & b);
 template<typename vector>     bool less_rot (const vector & a, const vector & b);
@@ -123,11 +124,12 @@ closest (const point & _p) const
 	//
 	// iterate over features adjacent to f to find the closest point on each feature
 	//
-	std::vector<cgal_point> candidates;
+	typedef std::vector<std::pair<cgal_point, cgal_point> > candidate_set;
+	candidate_set candidates;
 
 	// isolated vertices
 	for (face_vert i = f->isolated_vertices_begin(); i != f->isolated_vertices_end(); i++)
-		candidates.push_back(i->point());
+		candidates.push_back(std::make_pair(i->point(), i->point()));
 
 	// holes
 	for (hole i = f->holes_begin(); i != f->holes_end(); i++)
@@ -152,9 +154,17 @@ closest (const point & _p) const
 	//
 	// select and return the best candidate
 	//
-	typename std::vector<cgal_point>::iterator best = std::min_element(candidates.begin(), candidates.end(), closest_to(p));
+	typename candidate_set::iterator best = std::min_element(candidates.begin(), candidates.end(), closest_to(p));
 
-	return point(best->x(), best->y());
+	return point(best->second.x(), best->second.y());
+}
+
+template<typename GameTraits>
+const typename ObstacleSet<GameTraits>::arrangement &
+ObstacleSet<GameTraits>::
+get_impl() const
+{
+	return _impl;
 }
 
 /*
@@ -271,6 +281,11 @@ struct closest_to_t
 	{
 		return CGAL::compare_distance_to_point (_p, a, b) == CGAL::SMALLER;
 	}
+
+	bool operator() (const std::pair<cgal_point, cgal_point> & a, const std::pair<cgal_point, cgal_point> & b)
+	{
+		return this->operator() (a.first, b.first);
+	}
 };
 
 template<typename cgal_point>
@@ -370,7 +385,7 @@ sum (const tan & moving, const tan & fixed, Out out)
 }
 
 template<typename cgal_point>
-cgal_point
+std::pair<cgal_point, cgal_point>
 closest_point_on_segment (const cgal_point & p, const cgal_point & source, const cgal_point & target)
 {
 	typedef typename CGAL::Kernel_traits<cgal_point>::Kernel::RT number;
@@ -378,13 +393,28 @@ closest_point_on_segment (const cgal_point & p, const cgal_point & source, const
 	number dot = (p - source) * (target - source);
 
 	if (dot < number(0))
-		return source;
+		return std::make_pair(source, source);
 
 	else if (dot > (target - source) * (target - source))
-		return target;
+		return std::make_pair(target, target);
 
 	else
-		return source + dot * (target - source) / ((target - source) * (target - source));
+	{
+		cgal_point closest = source + dot * (target - source) / ((target - source) * (target - source));
+		cgal_point snapped = closest;
+
+		number dsource = CGAL::squared_distance(closest, source);
+		number dtarget = CGAL::squared_distance(closest, target);
+
+		number threshold = number(1)/32;
+
+		if (dsource <= threshold && dsource <= dtarget)
+			snapped = source;
+		else if (dtarget <= threshold)
+			snapped = target;
+
+		return std::make_pair (closest, snapped);
+	}
 }
 
 template<typename InputIterator, typename Arrangement>

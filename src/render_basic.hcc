@@ -17,6 +17,8 @@ init ()
 	glEnable(GL_LINE_SMOOTH);
 	glEnable(GL_BLEND);
 
+	glPointSize(10.0);
+
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
@@ -105,6 +107,18 @@ render ()
 
 		glEnd();
 	}
+
+	/*
+	typedef typename tanset::obstacles::arrangement arrangement;
+	typedef typename arrangement::Vertex_const_iterator iter;
+
+	const arrangement & arr = tans.get_obstacles().get_impl();
+
+	glBegin(GL_POINTS);
+	for (iter i = arr.vertices_begin(); i != arr.vertices_end(); i++)
+		glVertex2f(i->point().x(), i->point().y());
+	glEnd();
+	*/
 }
 
 /*

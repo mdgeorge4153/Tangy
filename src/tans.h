@@ -73,10 +73,7 @@ protected:
 	mutable std::vector<point> _points;
 	mutable bool               _points_valid;
 
-	Tan ();
-	Tan (const point &, const point &, const point &);
-	Tan (const point &, const point &, const point &, const point &);
-
+	template<typename In> Tan (In, In);
 };
 
 /*

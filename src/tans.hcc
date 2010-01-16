@@ -1,6 +1,7 @@
 #include<iterator>
 #include<algorithm>
 #include<functional>
+#include<cstdarg>
 
 /*
 ** Tans ************************************************************************
@@ -123,49 +124,19 @@ contains (const point & p) const
 }
 
 template<typename GT>
+template<typename In>
 Tan<GT>::
-Tan ()
+Tan (In begin, In end)
 	: _pos(0,0),
 	  _rot(1),
 	  _conj(false),
-	  _shape(),
+	  _shape(std::distance(begin, end)),
 	  _points(),
 	  _points_valid(false)
 {
-}
+	std::copy (begin, end, &_shape[0]);
 
-template<typename GT>
-Tan<GT>::
-Tan (const point & p0, const point & p1, const point & p2)
-	: _rot(1),
-	  _conj(false),
-	  _shape(3),
-	  _points(),
-	  _points_valid(false)
-{
-	_shape[0] = p0;
-	_shape[1] = p1;
-	_shape[2] = p2;
-
-	_pos = _shape.sum() / point(3);
-	_shape -= _pos;
-}
-
-template<typename GT>
-Tan<GT>::
-Tan (const point & p0, const point & p1, const point & p2, const point & p3)
-	: _rot(1),
-	  _conj(false),
-	  _shape(4),
-	  _points(),
-	  _points_valid(false)
-{
-	_shape[0] = p0;
-	_shape[1] = p1;
-	_shape[2] = p2;
-	_shape[3] = p3;
-
-	_pos = _shape.sum() / point(4);
+	_pos = _shape.sum() / point(_shape.size());
 	_shape -= _pos;
 }
 
@@ -181,14 +152,26 @@ TanSet ()
 	typedef typename GT::point  point;
 	typedef typename GT::number number;
 
+	point coords[][7] = {
+		{point(0,2), point(0,1), point(0,0), point(1,0), point(2,0), point(1,1)}, // big triangle
+		{point(0,2), point(1,1), point(2,0), point(2,1), point(2,2), point(1,2)}, // big triangle
+		{point(0,2), point(0,1), point(0,0), point(1,1)},                         // medium triangle
+		{point(1,1), point(0,1), point(1,0)},                                     // small triangle
+		{point(0,0), point(1,0), point(2,1), point(1,1)},                         // parallelogram
+		{point(1,1), point(0,0), point(1,0)},                                     // small triangle
+		{point(0,1), point(0,0), point(1,0), point(1,1)}                          // square
+	};
+
+
+
 	// shapes
-	_tans.push_back(tan(point(0,2), point(0,0), point(2,0)));             // big triangle
-	_tans.push_back(tan(point(0,2), point(2,0), point(2,2)));             // big triangle
-	_tans.push_back(tan(point(0,2), point(0,0), point(1,1)));             // medium triangle
-	_tans.push_back(tan(point(1,1), point(0,1), point(1,0)));             // small triangle
-	_tans.push_back(tan(point(0,0), point(1,0), point(2,1), point(1,1))); // parallelogram
-	_tans.push_back(tan(point(1,1), point(0,0), point(1,0)));             // small triangle
-	_tans.push_back(tan(point(0,1), point(0,0), point(1,0), point(1,1))); // square
+	_tans.push_back(tan(coords[0], coords[0] + 6));
+	_tans.push_back(tan(coords[1], coords[1] + 6));
+	_tans.push_back(tan(coords[2], coords[2] + 4));
+	_tans.push_back(tan(coords[3], coords[3] + 3));
+	_tans.push_back(tan(coords[4], coords[4] + 4));
+	_tans.push_back(tan(coords[5], coords[5] + 3));
+	_tans.push_back(tan(coords[6], coords[6] + 4));
 
 	// positions
 	_tans[0]._pos += point(1,1)  / number(2);
