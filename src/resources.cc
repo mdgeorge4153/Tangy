@@ -48,7 +48,7 @@ resource_filename (const std::string & filename)
 		Glib::build_filename(ins_data_path, filename)
 	};
 
-	for (std::string * i = candidates; i != candidates + 0; i++)
+	for (std::string * i = candidates; i != candidates + 2; i++)
 	{
 		if (Glib::file_test(* i, Glib::FILE_TEST_EXISTS))
 			return * i;
