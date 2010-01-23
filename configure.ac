@@ -4,7 +4,7 @@ AC_CONFIG_SRCDIR([src/tangy-gtk.cc])
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_MACRO_DIR([config])
 
-AM_INIT_AUTOMAKE(tangy,0.1)
+AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 
 AC_PROG_CXX
 AC_LANG([C++])
