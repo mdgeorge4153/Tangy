@@ -1,5 +1,5 @@
 
-INCLUDES    = $(gtkmm_CFLAGS) $(gtkglextmm_CFLAGS) $(CGAL_CPPFLAGS)
+AM_CPPFLAGS = $(gtkmm_CFLAGS) $(gtkglextmm_CFLAGS) $(CGAL_CPPFLAGS)
 LIBS        = $(gtkmm_LIBS)   $(gtkglextmm_LIBS) $(CGAL_LIBS)
 AM_LDFLAGS  = $(CGAL_LDFLAGS)
 AM_CXXFLAGS = -Werror -Wall -pedantic $(CGAL_CXXFLAGS) -frounding-math
