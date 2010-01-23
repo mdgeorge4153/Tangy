@@ -1,1 +1,1 @@
-EXTRA_DIST = tangy.xml shader.frag
+dist_pkgdata_DATA = tangy.xml shader.frag

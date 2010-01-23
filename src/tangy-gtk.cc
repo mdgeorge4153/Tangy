@@ -7,6 +7,7 @@
 #include "render_basic.h"
 #include "controller.h"
 #include "traits_nocollide.h"
+#include "resources.h"
 
 class TanView
 	: public Gtk::DrawingArea,
@@ -170,10 +171,10 @@ render()
 int main(int argc, char ** argv)
 {
 	Gtk::Main kit(argc, argv);
-
 	Gtk::GL::init(argc, argv);
+	resources_init(argv[0]);
 
-	Glib::RefPtr<Gtk::Builder> builder = Gtk::Builder::create_from_file("../data/tangy.xml");
+	Glib::RefPtr<Gtk::Builder> builder = Gtk::Builder::create_from_file(resource_filename("tangy.xml"));
 
 	Gtk::Window * window = 0;
 	builder->get_widget("window", window);
