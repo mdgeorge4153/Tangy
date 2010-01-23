@@ -2,7 +2,6 @@
 #define __TANGY_RESOURCES_H__ 1
 
 #include <string>
-#include <exception>
 
 void resources_init (const std::string & argv0);
 
