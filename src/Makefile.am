@@ -16,8 +16,8 @@ AM_LDFLAGS = \
 	$(GLEW_LDFLAGS)
 
 AM_CXXFLAGS = \
-	-Werror -Wall -pedantic
-	$(CGAL_CXXFLAGS)
+	-Werror -Wall -pedantic \
+	$(CGAL_CXXFLAGS)        \
 	-frounding-math
 
 bin_PROGRAMS = tangy-gtk
