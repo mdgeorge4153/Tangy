@@ -1,8 +1,24 @@
 
-AM_CPPFLAGS = $(gtkmm_CFLAGS) $(gtkglextmm_CFLAGS) $(CGAL_CPPFLAGS) -DDATADIR="\"$(pkgdatadir)\""
-LIBS        = $(gtkmm_LIBS)   $(gtkglextmm_LIBS) $(CGAL_LIBS)
-AM_LDFLAGS  = $(CGAL_LDFLAGS)
-AM_CXXFLAGS = -Werror -Wall -pedantic $(CGAL_CXXFLAGS) -frounding-math
+AM_CPPFLAGS = \
+	$(gtkmm_CFLAGS)      \
+	$(gtkglextmm_CFLAGS) \
+	$(CGAL_CPPFLAGS)     \
+	-DDATADIR="\"$(pkgdatadir)\""
+
+LIBS = \
+	$(gtkmm_LIBS)         \
+	$(gtkglextmm_LIBS)    \
+	$(CGAL_LIBS)          \
+	$(GLEW_LIBS)
+
+AM_LDFLAGS = \
+	$(CGAL_LDFLAGS) \
+	$(GLEW_LDFLAGS)
+
+AM_CXXFLAGS = \
+	-Werror -Wall -pedantic
+	$(CGAL_CXXFLAGS)
+	-frounding-math
 
 bin_PROGRAMS = tangy-gtk
 
