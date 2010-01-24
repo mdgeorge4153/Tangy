@@ -1,7 +1,8 @@
-#include <gtkmm.h>
-#include <gtkglmm.h>
+#include <GL/glew.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
+#include <gtkmm.h>
+#include <gtkglmm.h>
 
 #include "tans.h"
 #include "render_basic.h"

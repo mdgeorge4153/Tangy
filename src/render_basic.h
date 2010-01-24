@@ -1,3 +1,4 @@
+#include <GL/glew.h>
 
 template<typename GameTraits>
 class BasicRenderer
@@ -20,6 +21,8 @@ private:
 
 	int _width, _height;
 
+	GLhandleARB _shader;
+	GLint       _handle[5];
 };
 
 #include "render_basic.hcc"

@@ -1,5 +1,28 @@
 #include <GL/gl.h>
 #include <iterator>
+#include <sstream>
+#include <cassert>
+#include <iostream>
+#include "resources.h"
+
+static void printInfoLog(GLhandleARB obj)
+{
+	int infologLength = 0;
+	int charsWritten  = 0;
+	char *infoLog;
+
+	glGetObjectParameterivARB(obj, GL_OBJECT_INFO_LOG_LENGTH_ARB,
+							  &infologLength);
+
+	if (infologLength > 0)
+	{
+		infoLog = new char[infologLength];
+		glGetInfoLogARB(obj, infologLength, &charsWritten, infoLog);
+		std::cout << infoLog << std::endl;
+		delete infoLog;
+	}
+}
+
 
 template<typename GameTraits>
 BasicRenderer<GameTraits>::
@@ -20,6 +43,39 @@ init ()
 	glPointSize(10.0);
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	// shader setup
+
+	glewInit();
+	assert(GLEW_ARB_vertex_shader && GLEW_ARB_fragment_shader);
+
+	GLhandleARB fragShader = glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
+
+	std::string fragShaderSource = resource_read("shader.frag");
+	const GLcharARB * c = fragShaderSource.c_str();
+	glShaderSourceARB(fragShader, 1, &c, NULL);
+	glCompileShaderARB(fragShader);
+	printInfoLog(fragShader);
+
+	_shader = glCreateProgramObjectARB();
+	glAttachObjectARB(_shader, fragShader);
+	glLinkProgramARB(_shader);
+	printInfoLog(_shader);
+	glUseProgramObjectARB(_shader);
+
+	glUniform1iARB(glGetUniformLocationARB(_shader, "nwaves"), 5);
+
+	for (int i = 0; i < 5; i++)
+	{
+		std::ostringstream name;
+		name << "waves[" << i << "]" << std::ends;
+		_handle[i] = glGetUniformLocationARB(_shader, name.str().c_str());
+
+		GLfloat x = (float) rand() / RAND_MAX * 400,
+		        y = (float) rand() / RAND_MAX * 400;
+		std::cout << "setting " << i << " to (" << x << ", " << y << ")" << std::endl;
+		glUniform2fARB(_handle[i], x, y);
+	}
 }
 
 template<typename GameTraits>
@@ -85,7 +141,8 @@ render ()
 		else
 			glColor4f(0.13, 0.0, 0.66, 1.0);
 
-		glPolygonMode(GL_FRONT, GL_FILL);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glUseProgramObjectARB(_shader);
 		glBegin(GL_POLYGON);
 
 		for (typename pointset::reverse_iterator j = points.rbegin(); j != points.rend(); j++)
@@ -98,6 +155,7 @@ render ()
 		glColor4f(0.06, 0.0, 0.32, 1.0);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		glLineWidth(2.0);
+		glUseProgramObjectARB(0);
 		glBegin(GL_POLYGON);
 
 		for (typename pointset::reverse_iterator j = points.rbegin(); j != points.rend(); j++)
