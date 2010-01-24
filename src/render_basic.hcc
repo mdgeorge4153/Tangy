@@ -1,8 +1,10 @@
 #include <GL/gl.h>
+#include <sys/time.h>
 #include <iterator>
 #include <sstream>
 #include <cassert>
 #include <iostream>
+#include <functional>
 #include "resources.h"
 
 static void printInfoLog(GLhandleARB obj)
@@ -23,11 +25,30 @@ static void printInfoLog(GLhandleARB obj)
 	}
 }
 
+template<typename GameTraits>
+struct BasicRenderer<GameTraits>::WaveState
+{
+	float x, y, xv, yv;
+	GLint handle;
+
+	void update(float dt)
+	{
+		x += xv * dt;
+		y += yv * dt;
+
+		if (x < -3 || x > 3)
+			xv = - xv;
+		if (y < -3 || y > 3)
+			yv = -yv;
+
+		glUniform2fARB(handle, x, y);
+	}
+};
 
 template<typename GameTraits>
 BasicRenderer<GameTraits>::
 BasicRenderer (const state & s)
-	: _state (s)
+	: _state (s), _waves()
 {
 }
 
@@ -63,19 +84,22 @@ init ()
 	printInfoLog(_shader);
 	glUseProgramObjectARB(_shader);
 
-	glUniform1iARB(glGetUniformLocationARB(_shader, "nwaves"), 5);
-
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		std::ostringstream name;
 		name << "waves[" << i << "]" << std::ends;
-		_handle[i] = glGetUniformLocationARB(_shader, name.str().c_str());
 
-		GLfloat x = (float) rand() / RAND_MAX * 6 - 3,
-		        y = (float) rand() / RAND_MAX * 6 - 3;
-		std::cout << "setting " << i << " to (" << x << ", " << y << ")" << std::endl;
-		glUniform2fARB(_handle[i], x, y);
+		WaveState wave;
+		wave.handle = glGetUniformLocationARB(_shader, name.str().c_str());
+		wave.x  = (float) rand() / RAND_MAX * 6.0 - 3.0;
+		wave.y  = (float) rand() / RAND_MAX * 6.0 - 3.0;
+		wave.xv = (float) rand() / RAND_MAX * 0.3 - .15;
+		wave.yv = (float) rand() / RAND_MAX * 0.3 - .15;
+
+		_waves.push_back(wave);
 	}
+
+	glUniform1iARB(glGetUniformLocationARB(_shader, "nwaves"), _waves.size());
 }
 
 template<typename GameTraits>
@@ -118,6 +142,23 @@ transform (int x, int y) const
 	return result;
 }
 
+static float get_elapsed()
+{
+	static timeval last;
+	static bool   first = true;
+
+	if (first)
+		gettimeofday(&last, NULL);
+
+	timeval now;
+	gettimeofday(&now, NULL);
+
+	float result = (now.tv_sec - last.tv_sec) * 1e3 + (now.tv_usec - last.tv_usec) * 1e-3;
+
+	last = now;
+	return result;
+}
+
 template<typename GameTraits>
 void
 BasicRenderer<GameTraits>::
@@ -128,6 +169,9 @@ render ()
 	typedef typename GameTraits::tanset tanset;
 
 	const tanset & tans = _state.tans();
+
+	glUseProgramObjectARB(_shader);
+	std::for_each(_waves.begin(), _waves.end(), std::bind2nd(std::mem_fun_ref(&WaveState::update), get_elapsed()));
 
 	for (typename tanset::container::const_iterator i = tans.begin(); i != tans.end(); i++)
 	{
@@ -142,7 +186,9 @@ render ()
 			glColor4f(0.13, 0.0, 0.66, 1.0);
 
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
 		glUseProgramObjectARB(_shader);
+
 		glBegin(GL_POLYGON);
 
 		for (typename pointset::reverse_iterator j = points.rbegin(); j != points.rend(); j++)

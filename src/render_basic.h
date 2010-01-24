@@ -1,4 +1,5 @@
 #include <GL/glew.h>
+#include <vector>
 
 template<typename GameTraits>
 class BasicRenderer
@@ -18,11 +19,13 @@ public:
 private:
 
 	const state & _state;
-
 	int _width, _height;
 
+
 	GLhandleARB _shader;
-	GLint       _handle[5];
+
+	struct WaveState;
+	std::vector<WaveState> _waves;
 };
 
 #include "render_basic.hcc"
