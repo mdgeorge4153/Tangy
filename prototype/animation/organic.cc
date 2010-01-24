@@ -83,9 +83,9 @@ void renderScene(void) {
 		waves[i].x += waves[i].xv;
 		waves[i].y += waves[i].yv;
 
-		if (waves[i].x < 0 || waves[i].x > 400)
+		if (waves[i].x < 0 || waves[i].x > 5)
 			waves[i].xv = - waves[i].xv;
-		if (waves[i].y < 0 || waves[i].y > 400)
+		if (waves[i].y < 0 || waves[i].y > 5)
 			waves[i].yv = -waves[i].yv;
 
 		glUniform2fARB(waves[i].loc, waves[i].x, waves[i].y);
@@ -94,7 +94,7 @@ void renderScene(void) {
 	glutSolidTeapot(1);
 
 	for (int i = 0; i < nwaves; i++)
-		glUniform2fARB(waves[i].loc, 400 - waves[i].y, 400 - waves[i].x);
+		glUniform2fARB(waves[i].loc, 5 - waves[i].y, 5 - waves[i].x);
 
 	glTranslatef(0.5, 0.5, 0.5);
 	glutSolidTeapot(1);
@@ -127,10 +127,10 @@ void setShaders() {
 	glUniform1iARB(glGetUniformLocationARB(p, "nwaves"), nwaves);
 
 	for (int i = 0; i < nwaves; i++) {
-		waves[i].x = (float) rand() / RAND_MAX * 400;
-		waves[i].y = (float) rand() / RAND_MAX * 400;
-		waves[i].xv = (float) rand() / RAND_MAX / 20;
-		waves[i].yv = (float) rand() / RAND_MAX / 20;
+		waves[i].x = (float) rand() / RAND_MAX * 5;
+		waves[i].y = (float) rand() / RAND_MAX * 5;
+		waves[i].xv = (float) rand() / RAND_MAX / 300;
+		waves[i].yv = (float) rand() / RAND_MAX / 300;
 
 		char buf[20];
 		snprintf(buf,20,"waves[%d]", i);
@@ -152,6 +152,18 @@ int main(int argc, char **argv) {
 	glutKeyboardFunc(processNormalKeys);
 
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_TEXTURE_GEN_S);
+	glEnable(GL_TEXTURE_GEN_T);
+
+	GLfloat xplane[] = {1.0, 0.0, 0.0, 0.0};
+	GLfloat yplane[] = {0.0, 1.0, 0.0, 0.0};
+
+	glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
+	glTexGenfv(GL_S, GL_OBJECT_PLANE, xplane);
+
+	glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
+	glTexGenfv(GL_T, GL_OBJECT_PLANE, yplane);
+
 	glClearColor(1.0,1.0,1.0,1.0);
 //	glEnable(GL_CULL_FACE);
 

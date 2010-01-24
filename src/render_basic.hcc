@@ -71,8 +71,8 @@ init ()
 		name << "waves[" << i << "]" << std::ends;
 		_handle[i] = glGetUniformLocationARB(_shader, name.str().c_str());
 
-		GLfloat x = (float) rand() / RAND_MAX * 400,
-		        y = (float) rand() / RAND_MAX * 400;
+		GLfloat x = (float) rand() / RAND_MAX * 6 - 3,
+		        y = (float) rand() / RAND_MAX * 6 - 3;
 		std::cout << "setting " << i << " to (" << x << ", " << y << ")" << std::endl;
 		glUniform2fARB(_handle[i], x, y);
 	}
@@ -147,6 +147,7 @@ render ()
 
 		for (typename pointset::reverse_iterator j = points.rbegin(); j != points.rend(); j++)
 		{
+			glTexCoord2f(j->real(), j->imag());
 			glVertex2f(j->real(), j->imag());
 		}
 
