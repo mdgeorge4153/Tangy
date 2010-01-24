@@ -6,6 +6,7 @@
 #include <iostream>
 #include <functional>
 #include "resources.h"
+#include "animation.h"
 
 static void printInfoLog(GLhandleARB obj)
 {
@@ -28,20 +29,17 @@ static void printInfoLog(GLhandleARB obj)
 template<typename GameTraits>
 struct BasicRenderer<GameTraits>::WaveState
 {
-	float x, y, xv, yv;
 	GLint handle;
+	Oscillate x,y;
 
-	void update(float dt)
+	WaveState(GLint _handle, float width /*units*/, float max_speed /*units per second*/)
+		: handle(_handle), x(width, max_speed), y(width, max_speed)
 	{
-		x += xv * dt;
-		y += yv * dt;
+	}
 
-		if (x < -3 || x > 3)
-			xv = - xv;
-		if (y < -3 || y > 3)
-			yv = -yv;
-
-		glUniform2fARB(handle, x, y);
+	void update(float t /*seconds*/)
+	{
+		glUniform2fARB(handle, x(t), y(t));
 	}
 };
 
@@ -84,19 +82,13 @@ init ()
 	printInfoLog(_shader);
 	glUseProgramObjectARB(_shader);
 
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		std::ostringstream name;
 		name << "waves[" << i << "]" << std::ends;
+		GLint handle = glGetUniformLocationARB(_shader, name.str().c_str());
 
-		WaveState wave;
-		wave.handle = glGetUniformLocationARB(_shader, name.str().c_str());
-		wave.x  = (float) rand() / RAND_MAX * 6.0 - 3.0;
-		wave.y  = (float) rand() / RAND_MAX * 6.0 - 3.0;
-		wave.xv = (float) rand() / RAND_MAX * 0.3 - .15;
-		wave.yv = (float) rand() / RAND_MAX * 0.3 - .15;
-
-		_waves.push_back(wave);
+		_waves.push_back(WaveState(handle, 6.0, 0.3));
 	}
 
 	glUniform1iARB(glGetUniformLocationARB(_shader, "nwaves"), _waves.size());
@@ -142,22 +134,43 @@ transform (int x, int y) const
 	return result;
 }
 
-static float get_elapsed()
+float seconds()
+{
+	static timeval epoch;
+	static bool   first = true;
+
+	if (first)
+	{
+		gettimeofday(&epoch, NULL);
+		first = false;
+	}
+
+	timeval now;
+	gettimeofday(&now, NULL);
+
+	return (now.tv_sec - epoch.tv_sec) + (now.tv_usec - epoch.tv_usec) * 1e-6;
+}
+
+float get_elapsed()
 {
 	static timeval last;
 	static bool   first = true;
 
 	if (first)
+	{
 		gettimeofday(&last, NULL);
+		first = false;
+	}
 
 	timeval now;
 	gettimeofday(&now, NULL);
 
-	float result = (now.tv_sec - last.tv_sec) * 1e3 + (now.tv_usec - last.tv_usec) * 1e-3;
-
+	float result = (now.tv_sec - last.tv_sec) + (now.tv_usec - last.tv_usec) * 1e-6;
 	last = now;
+
 	return result;
 }
+
 
 template<typename GameTraits>
 void
@@ -171,7 +184,7 @@ render ()
 	const tanset & tans = _state.tans();
 
 	glUseProgramObjectARB(_shader);
-	std::for_each(_waves.begin(), _waves.end(), std::bind2nd(std::mem_fun_ref(&WaveState::update), get_elapsed()));
+	std::for_each(_waves.begin(), _waves.end(), std::bind2nd(std::mem_fun_ref(&WaveState::update), seconds()));
 
 	for (typename tanset::container::const_iterator i = tans.begin(); i != tans.end(); i++)
 	{

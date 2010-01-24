@@ -1,38 +1,156 @@
+#include <functional>
 
-template<typename R>
-struct Varying
+/*
+********************************************************************************
+*/
+
+struct PingPong
+	: public std::unary_function<float, float>
 {
-	R eval (float) const = 0;
+	float _width, _speed, _start;
 
-	virtual ~Varying() {}
+	PingPong(float width, float max_speed)
+	{
+		_speed = (float) rand() / RAND_MAX * max_speed;
+		_start = (float) rand() / RAND_MAX * width / _speed * -2;
+		_width = width;
+	}
+
+	float operator() (float t)
+	{
+		float d = fmod(_speed * (t - _start), 2*_width);
+		if (d <= _width)
+			return d - 0.5 * _width;
+		else
+			return 1.5*_width - d;
+	}
 };
 
 /*
 ********************************************************************************
 */
 
-template<typename R>
-class Const
-	: public Varying<R>
+struct Oscillate
+	: public std::unary_function<float, float>
 {
-public:
-	Const (const R & v)
-		: _value(v)
-	{}
+	float _amplitude, _phase, _freq;
 
-	R eval (float) const
+	Oscillate(float width, float max_speed)
+	{
+		_amplitude = width / 2;
+		_phase     = (float) rand() / RAND_MAX * 2 * M_PI;
+		_freq      = (float) rand() / RAND_MAX * max_speed * M_PI / width;
+	}
+
+	float operator() (float t)
+	{
+		return _amplitude * sin(_phase + t*_freq);
+	}
+};
+
+/*
+********************************************************************************
+*/
+
+template<typename P>
+struct Const
+	: public std::unary_function<float, P>
+{
+	P _value;
+
+	Const(P value)
+	{
+		_value = value;
+	}
+
+	P operator() (float t)
 	{
 		return _value;
 	}
-
-private:
-	R _value;
 };
 
 /*
 ********************************************************************************
 */
 
+template<typename XFun, typename YFun>
+struct Point
+	: public std::unary_function<float, std::complex<float> >
+{
+	XFun _x;
+	YFun _y;
+
+	Point (XFun x, YFun y)
+	{
+		_x = x;
+		_y = y;
+	}
+
+	std::complex<float> operator() (float t)
+	{
+		return std::complex<float> (_x(t), _y(t));
+	}
+};
+
+/*
+********************************************************************************
+*/
+
+struct Alpha
+	: public std::unary_function<float, float>
+{
+	float _start, _end;
+
+	Alpha (float start, float end)
+	{
+		_start = start;
+		_end   = end;
+	}
+
+	float operator() (float t)
+	{
+		if (t < _start)
+			return 0;
+		if (t > _end)
+			return 1;
+		return (t - _start) / (_end - _start);
+	}
+};
+
+/*
+********************************************************************************
+*/
+
+template<typename PFun1, typename PFun2, typename Alpha>
+struct Blend
+	: public std::unary_function<float, typename PFun1::result_type>
+{
+	typedef typename PFun1::value_type value_type;
+
+	PFun1 _source;
+	PFun2 _target;
+	Alpha _alpha;
+
+	Blend(PFun1 source, PFun2 target, Alpha alpha)
+	{
+		_source = source;
+		_target = target;
+		_alpha  = alpha;
+	}
+
+	value_type operator() (float t)
+	{
+		float a = _alpha(t);
+
+		return (1 - a)*_source(t) + a * _target(t);
+	}
+};
+
+/*
+********************************************************************************
+*/
+
+/*
 template<typename R>
 class Spline
 	: public Varying<R>
@@ -71,54 +189,7 @@ private:
 
 	R _basis[4];
 };
-
-/*
-********************************************************************************
 */
-
-template<typename R>
-class Shift
-	: public Varying<R>
-{
-public:
-	Shift(std::auto_ptr<Varying<R> > impl, float t0, float alpha)
-		: _impl(impl), _t0(t0), _alpha(alpha)
-	{
-	}
-
-	R eval(float t) const
-	{
-		return _impl.eval(alpha * (t - _t0));
-	}
-
-private:
-	std::auto_ptr<Varying<R> > _impl;
-	float _t0, _alpha;
-};
-
-/*
-********************************************************************************
-*/
-
-template<typename R>
-class Transform
-	: public Varying<R>
-{
-public:
-	Transform(std::auto_ptr<Varying<R> > impl, const R& rot, const R& trans)
-		: _impl(impl), _rot(rot), _trans(trans)
-	{
-	}
-
-	R eval (float) const
-	{
-		return _rot * (_impl.eval(t) + _trans);
-	}
-
-private:
-	std::auto_ptr<Varying<R> > _impl;
-	R _rot, _trans;
-};
 
 /*
 ** vim: ts=4 sw=4 cindent
