@@ -57,6 +57,12 @@ resource_filename (const std::string & filename)
 	throw file_not_found(filename);
 }
 
+std::string
+resource_read (const std::string & filename)
+{
+	return Glib::file_get_contents(resource_filename(filename));
+}
+
 /*
 ** vim: ts=4 sw=4 cindent
 */

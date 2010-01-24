@@ -5,6 +5,7 @@
 
 void resources_init (const std::string & argv0);
 
-std::string resource_filename(const std::string & filename);
+std::string resource_filename (const std::string & filename);
+std::string resource_read     (const std::string & filename);
 
 #endif
