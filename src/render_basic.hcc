@@ -29,17 +29,23 @@ static void printInfoLog(GLhandleARB obj)
 template<typename GameTraits>
 struct BasicRenderer<GameTraits>::WaveState
 {
+	typedef Point<Oscillate, Oscillate> PFun;
+
 	GLint handle;
 	Oscillate x,y;
+	PFun pos;
 
 	WaveState(GLint _handle, float width /*units*/, float max_speed /*units per second*/)
-		: handle(_handle), x(width, max_speed), y(width, max_speed)
+		: handle(_handle),
+		  x(width, max_speed), y(width, max_speed),
+		  pos(x,y)
 	{
 	}
 
 	void update(float t /*seconds*/)
 	{
-		glUniform2fARB(handle, x(t), y(t));
+		std::complex<float> p = pos(t);
+		glUniform2fARB(handle, p.real(), p.imag());
 	}
 };
 

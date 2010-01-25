@@ -81,9 +81,8 @@ struct Point
 	YFun _y;
 
 	Point (XFun x, YFun y)
+		: _x(x), _y(y)
 	{
-		_x = x;
-		_y = y;
 	}
 
 	std::complex<float> operator() (float t)
@@ -125,20 +124,16 @@ template<typename PFun1, typename PFun2, typename Alpha>
 struct Blend
 	: public std::unary_function<float, typename PFun1::result_type>
 {
-	typedef typename PFun1::value_type value_type;
-
 	PFun1 _source;
 	PFun2 _target;
 	Alpha _alpha;
 
 	Blend(PFun1 source, PFun2 target, Alpha alpha)
+		: _source(source), _target(target), _alpha(alpha)
 	{
-		_source = source;
-		_target = target;
-		_alpha  = alpha;
 	}
 
-	value_type operator() (float t)
+	typename PFun1::result_type operator() (float t)
 	{
 		float a = _alpha(t);
 
