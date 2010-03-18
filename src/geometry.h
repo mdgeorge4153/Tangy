@@ -36,6 +36,7 @@ public:
 	ObstacleSet & operator= (const ObstacleSet &);
 
 	point closest (const point &) const;
+	point snap    (const point &, const number &) const;
 
 	const arrangement & get_impl() const;
 

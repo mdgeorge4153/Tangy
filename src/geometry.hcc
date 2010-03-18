@@ -9,6 +9,7 @@
 #include <CGAL/Arr_overlay_2.h>
 #include <CGAL/IO/Arr_iostream.h>
 #include <CGAL/IO/Arr_text_formatter.h>
+#include <CGAL/squared_distance_2.h>
 
 #include <iostream>
 
@@ -21,7 +22,7 @@ template<typename in, typename out> out convert_from_complex    (const in &);
 
 template<typename cgal_point> struct closest_to_t;
 template<typename cgal_point> closest_to_t<cgal_point>         closest_to (const cgal_point &);
-template<typename cgal_point> std::pair<cgal_point,cgal_point>         closest_point_on_segment (const cgal_point &, const cgal_point &, const cgal_point &);
+template<typename cgal_point> cgal_point                       closest_point_on_segment (const cgal_point &, const cgal_point &, const cgal_point &);
 template<typename cgal_point> struct tikz_t;
 template<typename cgal_point> tikz_t<cgal_point>               tikz (const cgal_point &);
 
@@ -124,12 +125,12 @@ closest (const point & _p) const
 	//
 	// iterate over features adjacent to f to find the closest point on each feature
 	//
-	typedef std::vector<std::pair<cgal_point, cgal_point> > candidate_set;
+	typedef std::vector<cgal_point> candidate_set;
 	candidate_set candidates;
 
 	// isolated vertices
 	for (face_vert i = f->isolated_vertices_begin(); i != f->isolated_vertices_end(); i++)
-		candidates.push_back(std::make_pair(i->point(), i->point()));
+		candidates.push_back(i->point());
 
 	// holes
 	for (hole i = f->holes_begin(); i != f->holes_end(); i++)
@@ -156,8 +157,28 @@ closest (const point & _p) const
 	//
 	typename candidate_set::iterator best = std::min_element(candidates.begin(), candidates.end(), closest_to(p));
 
-	return point(best->second.x(), best->second.y());
+	return point(best->x(), best->y());
 }
+
+
+template<typename GameTraits>
+typename ObstacleSet<GameTraits>::point
+ObstacleSet<GameTraits>::
+snap (const point & _p, const number & threshold) const
+{
+	typedef typename arrangement::Vertex_const_iterator vertex;
+
+	cgal_point  p = convert_from_complex<point, cgal_point>(_p);
+
+	vertex     best = std::min_element(_impl.vertices_begin(), _impl.vertices_end(), closest_to(p));
+
+	if (CGAL::squared_distance(p, best->point()) <= threshold)
+		return point(best->point().x(), best->point().y());
+
+	return _p;
+}
+
+
 
 template<typename GameTraits>
 const typename ObstacleSet<GameTraits>::arrangement &
@@ -282,9 +303,10 @@ struct closest_to_t
 		return CGAL::compare_distance_to_point (_p, a, b) == CGAL::SMALLER;
 	}
 
-	bool operator() (const std::pair<cgal_point, cgal_point> & a, const std::pair<cgal_point, cgal_point> & b)
+	template<typename V>
+	bool operator() (const V & a, const V & b)
 	{
-		return this->operator() (a.first, b.first);
+		return this->operator() (a.point(), b.point());
 	}
 };
 
@@ -385,7 +407,7 @@ sum (const tan & moving, const tan & fixed, Out out)
 }
 
 template<typename cgal_point>
-std::pair<cgal_point, cgal_point>
+cgal_point
 closest_point_on_segment (const cgal_point & p, const cgal_point & source, const cgal_point & target)
 {
 	typedef typename CGAL::Kernel_traits<cgal_point>::Kernel::RT number;
@@ -393,28 +415,13 @@ closest_point_on_segment (const cgal_point & p, const cgal_point & source, const
 	number dot = (p - source) * (target - source);
 
 	if (dot < number(0))
-		return std::make_pair(source, source);
+		return source;
 
 	else if (dot > (target - source) * (target - source))
-		return std::make_pair(target, target);
+		return target;
 
 	else
-	{
-		cgal_point closest = source + dot * (target - source) / ((target - source) * (target - source));
-		cgal_point snapped = closest;
-
-		number dsource = CGAL::squared_distance(closest, source);
-		number dtarget = CGAL::squared_distance(closest, target);
-
-		number threshold = number(1)/32;
-
-		if (dsource <= threshold && dsource <= dtarget)
-			snapped = source;
-		else if (dtarget <= threshold)
-			snapped = target;
-
-		return std::make_pair (closest, snapped);
-	}
+		return source + dot * (target - source) / ((target - source) * (target - source));
 }
 
 template<typename InputIterator, typename Arrangement>

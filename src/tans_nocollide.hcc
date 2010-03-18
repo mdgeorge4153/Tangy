@@ -23,7 +23,8 @@ set_pos (const point & pos)
 
 	this->_desired = pos;
 
-	Tan<GameTraits>::set_pos (_container->_obstruction.closest(pos));
+	typedef typename GameTraits::number number;
+	Tan<GameTraits>::set_pos (_container->_obstruction.snap(_container->_obstruction.closest(pos), 1/number(32)));
 }
 
 template<typename GameTraits>
