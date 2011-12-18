@@ -451,7 +451,7 @@ make_poly (InputIterator begin, InputIterator end, Arrangement & result)
 		point  next_point = *begin++;
 		vertex next_vert  = result.insert_in_face_interior (next_point, result.unbounded_face());
 
-		edge e = result.insert_at_vertices (segment(prev_point, next_point), prev_vert, next_vert);
+		result.insert_at_vertices (segment(prev_point, next_point), prev_vert, next_vert);
 
 		prev_point = next_point;
 		prev_vert  = next_vert;

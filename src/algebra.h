@@ -134,7 +134,7 @@ static const ExtendedRational SQRT6 (0,0,0,1,1);
 static const ExtendedRational COS45 = SQRT2/2;
 static const ExtendedRational SIN45 = SQRT2/2;
 static const ExtendedRational COS30 = SQRT3/2;
-static const ExtendedRational SIN30 = ExtendedRational(1)/2;
+static const ExtendedRational SIN30 = SQRT1/2;
 
 
 static const Vector ROT45 (COS45, SIN45);
