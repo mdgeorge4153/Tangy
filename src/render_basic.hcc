@@ -98,6 +98,10 @@ init ()
 	}
 
 	glUniform1iARB(glGetUniformLocationARB(_shader, "nwaves"), _waves.size());
+	glUniform1fARB(glGetUniformLocationARB(_shader, "radius"), 15.0);
+	glUniform1fARB(glGetUniformLocationARB(_shader, "frequency"), 1.0);
+	glUniform4fARB(glGetUniformLocationARB(_shader, "color1"), 0.0, 0.0, 1.0, 1.0);
+	glUniform4fARB(glGetUniformLocationARB(_shader, "color2"), 0.2, 0.0, 0.5, 1.0);
 }
 
 template<typename GameTraits>

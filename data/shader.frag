@@ -1,10 +1,10 @@
 
 uniform vec2  waves[32];
-uniform int   nwaves    =     0;
-uniform float radius    =  15.0;
-uniform float frequency =   1.0;
-uniform vec4  color1    = vec4(0.0, 0.0, 1.0, 1.0);
-uniform vec4  color2    = vec4(0.2, 0.0, 0.5, 1.0);
+uniform int   nwaves;
+uniform float radius;
+uniform float frequency;
+uniform vec4  color1;
+uniform vec4  color2;
 
 float wave_height(vec2 wave_pos) {
 	float d      = length(gl_TexCoord[0].st - wave_pos);
