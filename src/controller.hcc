@@ -131,11 +131,11 @@ left_down ()
 
 	if (this->_context._selection != this->_context._tans.end())
 	{
-		transition (new Dragging (this->_context));
+		this->transition (new Dragging (this->_context));
 	}
 	else
 	{
-		transition (new Panning (this->_context));
+		this->transition (new Panning (this->_context));
 	}
 }
 
@@ -152,11 +152,11 @@ right_down ()
 	if (this->_context._selection == inside)
 	{
 		this->_context._selection->flip();
-		transition (new Flipping (this->_context));
+		this->transition (new Flipping (this->_context));
 	}
 	else
 	{
-		transition (new Rotating (this->_context));
+		this->transition (new Rotating (this->_context));
 	}
 }
 
@@ -188,7 +188,7 @@ void
 SimpleMouseController<GameTraits>::Panning::
 left_up ()
 {
-	transition (new Inactive(this->_context));
+	this->transition (new Inactive(this->_context));
 }
 
 /*
@@ -217,7 +217,7 @@ SimpleMouseController<GameTraits>::Dragging::
 left_up ()
 {
 	this->_context.pacify();
-	transition (new Inactive(this->_context));
+	this->transition (new Inactive(this->_context));
 }
 
 /*
@@ -244,7 +244,7 @@ SimpleMouseController<GameTraits>::Flipping::
 right_up ()
 {
 	this->_context.pacify();
-	transition (new Inactive(this->_context));
+	this->transition (new Inactive(this->_context));
 }
 
 /*
@@ -273,7 +273,7 @@ SimpleMouseController<GameTraits>::Rotating::
 right_up ()
 {
 	this->_context.pacify();
-	transition (new Inactive (this->_context));
+	this->transition (new Inactive (this->_context));
 }
 
 template<typename GameTraits>
