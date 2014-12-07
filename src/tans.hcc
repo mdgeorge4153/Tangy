@@ -99,8 +99,6 @@ bool
 Tan<GT>::
 contains (const point & p) const
 {
-	typedef typename std::vector<vector> pointset;
-
 	vector offset = p - this->_pos;
 	if (this->_conj)
 		offset = std::conj(offset);

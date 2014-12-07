@@ -37,8 +37,6 @@ template<typename In, typename Out, typename T, typename  BinOp>
 Out
 circular_sum (In in, In end, Out out, T first, BinOp op)
 {
-	typedef typename std::iterator_traits<In> ::value_type diff;
-
 	if (in == end)
 		return out;
 

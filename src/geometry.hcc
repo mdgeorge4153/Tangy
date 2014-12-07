@@ -433,7 +433,6 @@ make_poly (InputIterator begin, InputIterator end, Arrangement & result)
 
 	typedef typename Arrangement::Halfedge_handle       edge;
 	typedef typename Arrangement::Vertex_handle         vertex;
-	typedef typename Arrangement::Face_handle           face;
 
 	if (begin == end)
 		return;
@@ -500,7 +499,6 @@ print_tikz (const arrangement & arr, std::string tag)
 {
 	typedef typename arrangement::Vertex_const_iterator vertex;
 	typedef typename arrangement::Edge_const_iterator   edge;
-	typedef typename arrangement::Face_const_iterator   face;
 
 	for (vertex v = arr.vertices_begin(); v != arr.vertices_end(); v++)
 		std::cout << "\\draw[" << tag << "] " << tikz(v->point()) << " circle (2pt);" << std::endl;
