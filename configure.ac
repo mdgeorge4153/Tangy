@@ -56,11 +56,6 @@ ACX_CGAL([
 	AC_MSG_ERROR("CGAL is required")
 ])
 
-# boost
-
-AX_BOOST_BASE([1.33.1])
-AX_BOOST_SYSTEM
-
 # checks for header files
 # checks for functions
 # checks for types and structures
