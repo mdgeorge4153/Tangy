@@ -11,7 +11,8 @@ LIBS = \
 	$(gtkglextmm_LIBS)    \
 	$(CGAL_LIBS)          \
 	$(GLEW_LIBS)          \
-	$(BOOST_SYSTEM_LIB)
+	$(BOOST_SYSTEM_LIB)   \
+	-lboost_system
 
 AM_LDFLAGS = \
 	$(CGAL_LDFLAGS)     \
